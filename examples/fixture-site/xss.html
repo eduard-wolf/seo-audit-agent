@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <!-- DEFECT: Title, Meta und H1 enthalten XSS-Payloads (HTML-entity-kodiert,
+       damit das Dokument valides HTML bleibt; der Parser liefert die Rohstrings
+       an den Crawler – Unit G muss diese beim Rendern im Report escapen) -->
+  <title>&lt;script&gt;alert(1)&lt;/script&gt;</title>
+  <meta name="description" content="&quot;&gt;&lt;img src=x onerror=alert(1)&gt;">
+  <link rel="canonical" href="http://demo.example/xss.html">
+</head>
+<body>
+  <nav><a href="/">← Startseite</a></nav>
+  <h1>&lt;script&gt;alert(1)&lt;/script&gt;</h1>
+  <p>
+    Diese Testseite der Demo Kaffeerösterei enthält in Titel, Meta-Description und H1
+    absichtlich XSS-Payloads (HTML-entity-kodiert). Der Crawler extrahiert die
+    Rohstrings <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> und
+    <code>"&gt;&lt;img src=x onerror=alert(1)&gt;</code>.
+    Unit G (Report-Renderer) muss diese korrekt escapen.
+  </p>
+</body>
+</html>

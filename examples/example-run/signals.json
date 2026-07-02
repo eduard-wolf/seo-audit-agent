@@ -1,0 +1,247 @@
+{
+  "robots": {
+    "exists": true,
+    "raw": "User-agent: *\nDisallow: /private/\n\n# DEFECT: falsche AI-Bot-Direktive — würde ChatGPT-Search-Citations blockieren.\n# OAI-SearchBot ist der offizielle Bot für ChatGPT Search (Quellenangaben).\n# \"Disallow: /\" hier killt die GEO-Sichtbarkeit vollständig.\n# Korrekt wäre: Disallow: (leer) oder gezielte Pfade.\nUser-agent: OAI-SearchBot\nDisallow: /\n\nSitemap: http://demo.example/sitemap.xml\n",
+    "disallow": [
+      "/private/"
+    ],
+    "allow": [],
+    "aiBots": [
+      {
+        "agent": "OAI-SearchBot",
+        "disallowAll": true,
+        "disallowPaths": [
+          "/"
+        ],
+        "kategorie": "ai-search",
+        "operator": "OpenAI"
+      }
+    ],
+    "sitemapRefs": [
+      "http://demo.example/sitemap.xml"
+    ]
+  },
+  "llms": {
+    "exists": true,
+    "valid": false,
+    "problems": [
+      "missing-h1: first non-empty line must start with \"# \" (H1 heading)",
+      "missing-blockquote: no \"> \" summary line found"
+    ],
+    "raw": "Demo Kaffeerösterei\n\nDEFECT: Diese llms.txt ist strukturell fehlerhaft.\nEs fehlt der obligatorische H1-Titel (Zeile mit \"# Titel\") sowie die Pflicht-Summary\nals Blockquote (Zeile mit \"> Zusammenfassung\"). Beides wird von der llms.txt-Spezifikation\nunter https://llmstxt.org verlangt.\n\nAbschnitte:\n- Über uns: http://demo.example/perfect.html\n- Produkte: http://demo.example/no-alt.html\n- Kontakt: http://demo.example/no-citations.html\n"
+  },
+  "sitemapUrls": [
+    "http://demo.example/index.html",
+    "http://demo.example/perfect.html",
+    "http://demo.example/missing-title.html",
+    "http://demo.example/long-title.html",
+    "http://demo.example/dup-title-a.html",
+    "http://demo.example/dup-title-b.html",
+    "http://demo.example/missing-meta.html",
+    "http://demo.example/dup-meta-a.html",
+    "http://demo.example/dup-meta-b.html",
+    "http://demo.example/multi-h1.html",
+    "http://demo.example/noindex.html",
+    "http://demo.example/thin.html",
+    "http://demo.example/no-alt.html",
+    "http://demo.example/invalid-schema.html",
+    "http://demo.example/no-citations.html",
+    "http://demo.example/orphan.html",
+    "http://demo.example/xss.html",
+    "http://demo.example/client-rendered.html",
+    "http://demo.example/redirect-final.html",
+    "http://demo.example/redirect-1",
+    "http://demo.example/gone-page.html",
+    "http://demo.example/private/secret.html"
+  ],
+  "sitemapFiles": [
+    {
+      "url": "http://127.0.0.1:59896/sitemap.xml",
+      "locCount": 22
+    }
+  ],
+  "httpProbe": {
+    "reachable": true,
+    "redirectsToHttps": false,
+    "status": 200
+  },
+  "crawlMeta": {
+    "crawledAt": "2026-06-29T00:00:00.000Z",
+    "discovered": 22,
+    "fetched": 21,
+    "capped": false
+  },
+  "linkGraph": {
+    "orphanCount": 3,
+    "orphans": [
+      "http://127.0.0.1:59896/orphan.html",
+      "http://127.0.0.1:59896/redirect-1",
+      "http://127.0.0.1:59896/gone-page.html"
+    ],
+    "totalPages": 21,
+    "depthByUrl": {
+      "http://127.0.0.1:59896/": 0,
+      "http://127.0.0.1:59896/perfect.html": 1,
+      "http://127.0.0.1:59896/missing-title.html": 1,
+      "http://127.0.0.1:59896/long-title.html": 1,
+      "http://127.0.0.1:59896/dup-title-a.html": 1,
+      "http://127.0.0.1:59896/dup-title-b.html": 1,
+      "http://127.0.0.1:59896/missing-meta.html": 1,
+      "http://127.0.0.1:59896/dup-meta-a.html": 1,
+      "http://127.0.0.1:59896/dup-meta-b.html": 1,
+      "http://127.0.0.1:59896/multi-h1.html": 1,
+      "http://127.0.0.1:59896/noindex.html": 1,
+      "http://127.0.0.1:59896/thin.html": 1,
+      "http://127.0.0.1:59896/no-alt.html": 1,
+      "http://127.0.0.1:59896/invalid-schema.html": 1,
+      "http://127.0.0.1:59896/no-citations.html": 1,
+      "http://127.0.0.1:59896/xss.html": 1,
+      "http://127.0.0.1:59896/client-rendered.html": 1,
+      "http://127.0.0.1:59896/redirect-final.html": 1
+    },
+    "edges": [
+      {
+        "url": "http://127.0.0.1:59896/index.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/perfect.html",
+          "http://127.0.0.1:59896/missing-title.html",
+          "http://127.0.0.1:59896/long-title.html",
+          "http://127.0.0.1:59896/dup-title-a.html",
+          "http://127.0.0.1:59896/dup-title-b.html",
+          "http://127.0.0.1:59896/missing-meta.html",
+          "http://127.0.0.1:59896/dup-meta-a.html",
+          "http://127.0.0.1:59896/dup-meta-b.html",
+          "http://127.0.0.1:59896/multi-h1.html",
+          "http://127.0.0.1:59896/noindex.html",
+          "http://127.0.0.1:59896/thin.html",
+          "http://127.0.0.1:59896/no-alt.html",
+          "http://127.0.0.1:59896/invalid-schema.html",
+          "http://127.0.0.1:59896/no-citations.html",
+          "http://127.0.0.1:59896/xss.html",
+          "http://127.0.0.1:59896/client-rendered.html",
+          "http://127.0.0.1:59896/redirect-final.html"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/perfect.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/missing-title.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/long-title.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/dup-title-a.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/",
+          "http://127.0.0.1:59896/dup-title-b.html"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/dup-title-b.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/",
+          "http://127.0.0.1:59896/dup-title-a.html"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/missing-meta.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/dup-meta-a.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/",
+          "http://127.0.0.1:59896/dup-meta-b.html"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/dup-meta-b.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/",
+          "http://127.0.0.1:59896/dup-meta-a.html"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/multi-h1.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/noindex.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/thin.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/no-alt.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/invalid-schema.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/no-citations.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/orphan.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/xss.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/client-rendered.html",
+        "internalLinks": []
+      },
+      {
+        "url": "http://127.0.0.1:59896/redirect-final.html",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/redirect-1",
+        "internalLinks": [
+          "http://127.0.0.1:59896/"
+        ]
+      },
+      {
+        "url": "http://127.0.0.1:59896/gone-page.html",
+        "internalLinks": []
+      }
+    ]
+  }
+}

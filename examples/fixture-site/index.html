@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Demo Kaffeerösterei – Startseite</title>
+  <meta name="description" content="Willkommen bei der Demo Kaffeerösterei – Ihrer fiktiven Referenz-Rösterei für SEO-Tests.">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="canonical" href="http://demo.example/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Demo Kaffeerösterei",
+    "url": "http://demo.example"
+  }
+  </script>
+  <!-- DEFECT: Organization JSON-LD fehlt sameAs-Eigenschaft -->
+</head>
+<body>
+  <h1>Demo Kaffeerösterei</h1>
+  <p>
+    Dies ist die synthetische Fixture-Site der Demo Kaffeerösterei – ausschließlich für
+    automatisierte SEO-Audit-Tests. Alle Inhalte, Namen und Daten sind fiktiv.
+  </p>
+  <nav>
+    <h2>Alle Testseiten</h2>
+    <ul>
+      <li><a href="/perfect.html">Musterseite (keine Findings erwartet)</a></li>
+      <li><a href="/missing-title.html">Fehlender Titel</a></li>
+      <li><a href="/long-title.html">Zu langer Titel</a></li>
+      <li><a href="/dup-title-a.html">Doppelter Titel A</a></li>
+      <li><a href="/dup-title-b.html">Doppelter Titel B</a></li>
+      <li><a href="/missing-meta.html">Fehlende Meta-Beschreibung</a></li>
+      <li><a href="/dup-meta-a.html">Doppelte Meta-Beschreibung A</a></li>
+      <li><a href="/dup-meta-b.html">Doppelte Meta-Beschreibung B</a></li>
+      <li><a href="/multi-h1.html">Mehrere H1-Überschriften</a></li>
+      <li><a href="/noindex.html">Noindex-Seite (Sitemap-Konflikt)</a></li>
+      <li><a href="/thin.html">Dünner Content</a></li>
+      <li><a href="/no-alt.html">Bilder ohne Alt-Text</a></li>
+      <li><a href="/invalid-schema.html">Ungültiges JSON-LD Schema</a></li>
+      <li><a href="/no-citations.html">Keine Quellenangaben (GEO)</a></li>
+      <li><a href="/xss.html">XSS-Payload-Test</a></li>
+      <li><a href="/client-rendered.html">Client-seitig gerendert</a></li>
+      <li><a href="/redirect-final.html">Redirect-Ziel</a></li>
+    </ul>
+    <!-- orphan.html ist absichtlich NICHT verlinkt -->
+  </nav>
+</body>
+</html>

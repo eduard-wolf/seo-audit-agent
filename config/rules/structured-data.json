@@ -1,0 +1,167 @@
+[
+  {
+    "id": "schema:invalid",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "hoch",
+    "title": "Ungültiges JSON-LD (Parse-Fehler)",
+    "quelle": "Google Rich Results – Structured Data",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "schema:context-invalid",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "JSON-LD ohne schema.org-@context (nicht rich-result-fähig)",
+    "quelle": "Google Search Central – Introduction to structured data (JSON-LD @context muss schema.org referenzieren)",
+    "datum": "2026-01",
+    "lastReviewed": "2026-07",
+    "params": {}
+  },
+  {
+    "id": "schema:product-no-aggregate",
+    "kategorie": "structured-data",
+    "scope": "ecommerce",
+    "severity": "mittel",
+    "title": "Produkt ohne AggregateRating (nur mit echten Bewertungen ergänzen)",
+    "quelle": "Google Rich Results – Product / Review-Snippet-Policy (keine fabrizierten Ratings)",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:no-organization",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Kein Organization-Schema auf der gesamten Site",
+    "quelle": "Google Rich Results – Organization",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "schema:missing-dates",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Article-/News-/Blog-Schema ohne datePublished",
+    "quelle": "Google Search Central – Article (structured data): Article/NewsArticle/BlogPosting",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:org-missing-same-as",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Organization-Schema ohne sameAs (Entity-Erkennung für KI-Suche eingeschränkt)",
+    "quelle": "Schema.org – Organization / Google Knowledge Graph",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:breadcrumb-missing",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Tiefe Seite ohne BreadcrumbList-Schema (Breadcrumb-Rich-Result)",
+    "quelle": "Google Search Central – Breadcrumb (structured data)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": { "minDepth": 2 }
+  },
+  {
+    "id": "schema:article-no-author",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Artikel-Schema ohne author (E-E-A-T-Signal — empfohlen)",
+    "quelle": "Google Search Central – Article (structured data): author = empfohlen (E-E-A-T)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:offer-no-price",
+    "kategorie": "structured-data",
+    "scope": "ecommerce",
+    "severity": "mittel",
+    "title": "Produkt ohne Preis im Offer (price ist für Rich-Results erforderlich)",
+    "quelle": "Google Search Central – Product snippet / Merchant listing (structured data): price erforderlich",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:date-inconsistent",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Widersprüchliche Datumsangaben (dateModified vor datePublished)",
+    "quelle": "Schema.org – CreativeWork datePublished/dateModified (logische Konsistenzprüfung)",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:aggregaterating-incomplete",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "AggregateRating unvollständig (ratingValue/-Count fehlt)",
+    "quelle": "Google Search Central – Review-Snippet Structured Data (ratingValue + ratingCount|reviewCount required für Sterne; Rich-Result-Eligibility, kein Ranking)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:merchant-shipping-returns",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Product/Offer ohne shippingDetails/Rückgabepolicy (empfohlen)",
+    "quelle": "Google Search Central – Merchant Listing / Shipping- & Return-Policy Structured Data (shippingDetails + hasMerchantReturnPolicy empfohlen; alternativ via Merchant Center; kein Ranking)",
+    "datum": "2026-05",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:organization-logo",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Organization ohne logo",
+    "quelle": "Google Search Central – Organization Structured Data (logo empfohlen für Logo in Suche/Knowledge Panel; kein Ranking)",
+    "datum": "2026-04",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:organization-contact",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Organization ohne contactPoint",
+    "quelle": "Google Search Central – Organization Structured Data (contactPoint empfohlen; Entity-/Knowledge-Panel-Anreicherung; kein Ranking)",
+    "datum": "2026-04",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "schema:microdata-only",
+    "kategorie": "structured-data",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Strukturierte Daten nur als Microdata/RDFa (JSON-LD empfohlen, kein Defekt)",
+    "quelle": "Google Search Central – Structured data intro (JSON-LD, Microdata und RDFa werden unterstützt; JSON-LD ist das von Google empfohlene Format)",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  }
+]

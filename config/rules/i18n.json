@@ -1,0 +1,79 @@
+[
+  {
+    "id": "i18n:html-lang-hreflang-mismatch",
+    "kategorie": "i18n",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "html lang widerspricht dem self-referenziellen hreflang",
+    "quelle": "Google Search Central – Lokalisierte Versionen (hreflang): der self-referenzielle hreflang muss zur Seitensprache passen",
+    "datum": "2026-01",
+    "lastReviewed": "2026-07",
+    "params": {}
+  },
+  {
+    "id": "i18n:hreflang-invalid-code",
+    "kategorie": "i18n",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Ungültige hreflang-Codes",
+    "quelle": "Google Search Central – Lokalisierte Versionen (hreflang): ISO 639-1 + optional ISO 3166-1 Alpha-2 oder x-default",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "i18n:hreflang-no-x-default",
+    "kategorie": "i18n",
+    "scope": "agnostic",
+    "severity": "info",
+    "title": "hreflang-Cluster ohne x-default (empfohlen)",
+    "quelle": "Google Search Central – Lokalisierte Versionen (hreflang): x-default empfohlen",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "i18n:hreflang-on-noindex",
+    "kategorie": "i18n",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "hreflang auf noindex-Seite",
+    "quelle": "Google Search Central – hreflang + Indexierung (Schlussfolgerung: eine noindex-Seite ist kein indexierbares Cluster-Mitglied)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "i18n:hreflang-canonical-conflict",
+    "kategorie": "i18n",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "hreflang mit fremdem Canonical (Konflikt)",
+    "quelle": "Google Search Central – Canonical festlegen + hreflang (gleiche-Sprache-Self-Canonical empfohlen)",
+    "datum": "2026-03",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "i18n:hreflang-not-reciprocal",
+    "kategorie": "i18n",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "hreflang nicht reziprok / ohne Self-Referenz / relativ (Targeting-Defekt)",
+    "quelle": "Google Search Central – Lokalisierte Versionen (hreflang): voll-qualifizierte absolute URLs, Self-Referenz Pflicht (\"must list itself\"), beidseitige Reziprozität (\"if two pages don't both point to each other, the tags will be ignored\") — Targeting, kein Ranking",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "i18n:hreflang-target-broken",
+    "kategorie": "i18n",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "hreflang-Ziel ist fehlerhaft (4xx/Redirect)",
+    "quelle": "Google Search Central – Lokalisierte Versionen (hreflang): Ziele müssen funktionierende, indexierbare URLs sein; hreflang auf Fehler/Redirect wird ignoriert — Targeting-Eignung, kein Ranking-Faktor",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  }
+]

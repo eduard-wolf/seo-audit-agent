@@ -1,0 +1,222 @@
+[
+  {
+    "id": "onpage:title-missing",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "hoch",
+    "title": "Fehlender Seitentitel",
+    "quelle": "Google Search Central – Title Tags",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:title-long",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Seitentitel zu lang (wird in SERPs gekürzt)",
+    "quelle": "Google Search Central – Title Tags (Heuristik: Google kürzt pixelbasiert bei ~600px, nennt KEINE feste Zeichenzahl — 60 ist ein Praktiker-Richtwert)",
+    "datum": "2024-01",
+    "lastReviewed": "2026-07",
+    "params": { "maxTitle": 60 }
+  },
+  {
+    "id": "onpage:title-dup",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Doppelter Seitentitel",
+    "quelle": "Google Search Central – Title Tags",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:meta-missing",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Fehlende Meta-Beschreibung",
+    "quelle": "Google Search Central – Meta Descriptions",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:meta-dup",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Doppelte Meta-Beschreibung",
+    "quelle": "Google Search Central – Meta Descriptions",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:h1-missing",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "hoch",
+    "title": "Fehlende oder leere H1-Überschrift",
+    "quelle": "Google Search Central – Headings",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:h1-multi",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Mehrere H1-Überschriften (Dokumentstruktur/Barrierefreiheit — kein Ranking-Defekt)",
+    "quelle": "WCAG 2.1 – Headings / MDN HTML Document Structure",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:heading-skip",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Überschriften-Hierarchie übersprungen",
+    "quelle": "WCAG 2.1 – Headings / Google Accessibility",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:alt-missing",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Bilder ohne Alt-Text",
+    "quelle": "WCAG 2.1 – Non-text Content / Google Image SEO",
+    "datum": "2024-01",
+    "lastReviewed": "2025-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:thin",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Wenig Textinhalt (manueller Review-Hinweis — keine Google-Wortzahl-Schwelle)",
+    "quelle": "Heuristik — Google: Wortzahl ist KEIN Qualitätssignal (Mueller/Sullivan 2025); manuell prüfen",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": { "minWords": 100 }
+  },
+  {
+    "id": "onpage:html-lang-missing",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Fehlendes lang-Attribut am <html>-Element (Barrierefreiheit & Sprach-Erkennung)",
+    "quelle": "W3C – WCAG 2.2 SC 3.1.1 „Language of Page“ (Level A) / Technik H57",
+    "datum": "2024-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:meta-desc-length",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Meta-Beschreibung zu kurz oder zu lang (Snippet-Heuristik)",
+    "quelle": "Google Search Central – Snippets steuern (Google nennt KEINE feste Länge — Heuristik zur SERP-Kürzung)",
+    "datum": "2026-04",
+    "lastReviewed": "2026-06",
+    "params": { "min": 70, "max": 160 }
+  },
+  {
+    "id": "onpage:title-short",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Seitentitel sehr kurz (Heuristik — kein Google-Mindestwert)",
+    "quelle": "Google Search Central – Title-Links beeinflussen (keine Mindestlänge — Heuristik)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": { "minTitle": 30 }
+  },
+  {
+    "id": "onpage:viewport-zoom-disabled",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Zoom/Skalierung im Viewport unterdrückt (Barrierefreiheit WCAG 2.2 SC 1.4.4)",
+    "quelle": "W3C WAI – WCAG 2.2 Success Criterion 1.4.4 Resize Text (Level AA): Text muss auf 200 % vergrößerbar sein (= maximum-scale ≥ 2); user-scalable=no oder maximum-scale < 2 verstoßen dagegen. Kein Google-Ranking-Signal — reine Barrierefreiheitspflicht.",
+    "datum": "2023-10",
+    "lastReviewed": "2026-06",
+    "params": { "minScale": 2 }
+  },
+  {
+    "id": "onpage:og-missing",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Unvollständiges Open-Graph-Markup (Social-/Link-Preview)",
+    "quelle": "Open Graph Protocol (ogp.me) + Google Search Central – Title-Links beeinflussen (og:title als mögliche Title-Quelle; KEIN Ranking-Signal)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:favicon-missing",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Startseite ohne deklariertes Favicon (SERP-Darstellung)",
+    "quelle": "Google Search Central – Favicon für die Suche definieren (Favicon wird der Homepage zugeordnet; SERP-Darstellung, KEIN Ranking-Signal)",
+    "datum": "2026-02",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:img-missing-dimensions",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Bilder ohne width/height (Layout-Shift / CLS)",
+    "quelle": "web.dev – Optimize Cumulative Layout Shift (width+height bzw. CSS aspect-ratio setzen; CLS ist Core Web Vital, kein primärer Ranking-Faktor)",
+    "datum": "2025-02",
+    "lastReviewed": "2026-06",
+    "params": { "minCount": 1 }
+  },
+  {
+    "id": "onpage:lcp-image-lazy",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Erstes Content-Bild lazy-geladen (LCP-Risiko)",
+    "quelle": "web.dev – Optimize Largest Contentful Paint (LCP-Bild nicht lazy laden; LCP ist Core Web Vital)",
+    "datum": "2025-03",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "onpage:excessive-dom",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Übermäßige DOM-Größe (Performance-Heuristik)",
+    "quelle": "Lighthouse / Chrome – Avoid an excessive DOM size (~800 Warnung / ~1.400 kritisch; Performance-Heuristik, kein Ranking-Signal)",
+    "datum": "2024-06",
+    "lastReviewed": "2026-06",
+    "params": { "maxNodes": 1400 }
+  },
+  {
+    "id": "onpage:render-blocking-head",
+    "kategorie": "on-page",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Render-blockierende Ressourcen im <head>",
+    "quelle": "MDN – <script> (async/defer, module deferred by default) + web.dev – Critical Rendering Path / Render-blocking resources",
+    "datum": "2026-05",
+    "lastReviewed": "2026-06",
+    "params": { "maxStyles": 4 }
+  }
+]

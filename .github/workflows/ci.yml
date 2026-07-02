@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-scan:
+    name: Test & Leak Scan
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22, 24]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run leak scan
+        if: always()
+        run: npm run leak-scan
+
+  python-checks:
+    name: Python Lint, Type & Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Only the dev tools — the skip-path + mocked tests need none of the heavy
+      # runtime deps (google-api-python-client, psycopg, pgvector).
+      - name: Install dev tools
+        run: pip install -r requirements-dev.txt
+
+      - name: Ruff (lint)
+        run: ruff check crawl/gsc.py kb/pgvector_store.py tests/python/
+
+      - name: Mypy (type check)
+        run: mypy crawl/gsc.py kb/pgvector_store.py
+
+      - name: Pytest
+        run: python -m pytest tests/python -q

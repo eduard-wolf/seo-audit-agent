@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /private/
+
+# DEFECT: falsche AI-Bot-Direktive — würde ChatGPT-Search-Citations blockieren.
+# OAI-SearchBot ist der offizielle Bot für ChatGPT Search (Quellenangaben).
+# "Disallow: /" hier killt die GEO-Sichtbarkeit vollständig.
+# Korrekt wäre: Disallow: (leer) oder gezielte Pfade.
+User-agent: OAI-SearchBot
+Disallow: /
+
+Sitemap: http://demo.example/sitemap.xml

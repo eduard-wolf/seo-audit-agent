@@ -1,0 +1,19 @@
+[
+  { "agent": "GPTBot",               "operator": "OpenAI",       "kategorie": "training"          },
+  { "agent": "ClaudeBot",            "operator": "Anthropic",    "kategorie": "training"          },
+  { "agent": "Google-Extended",      "operator": "Google",       "kategorie": "training"          },
+  { "agent": "CCBot",                "operator": "Common Crawl", "kategorie": "training"          },
+  { "agent": "Applebot-Extended",    "operator": "Apple",        "kategorie": "training"          },
+  { "agent": "Meta-ExternalAgent",   "operator": "Meta",         "kategorie": "training"          },
+  { "agent": "Amazonbot",            "operator": "Amazon",       "kategorie": "training"          },
+  { "agent": "Bytespider",           "operator": "ByteDance",    "kategorie": "training"          },
+  { "agent": "OAI-SearchBot",        "operator": "OpenAI",       "kategorie": "ai-search"         },
+  { "agent": "Claude-SearchBot",     "operator": "Anthropic",    "kategorie": "ai-search"         },
+  { "agent": "PerplexityBot",        "operator": "Perplexity",   "kategorie": "ai-search"         },
+  { "agent": "Claude-User",          "operator": "Anthropic",    "kategorie": "on-demand-fetcher" },
+  { "agent": "ChatGPT-User",         "operator": "OpenAI",       "kategorie": "on-demand-fetcher" },
+  { "agent": "Perplexity-User",      "operator": "Perplexity",   "kategorie": "on-demand-fetcher" },
+  { "agent": "meta-externalfetcher", "operator": "Meta",         "kategorie": "on-demand-fetcher" },
+  { "agent": "Googlebot",            "operator": "Google",       "kategorie": "indexing"          },
+  { "agent": "Bingbot",              "operator": "Microsoft",    "kategorie": "indexing"          }
+]

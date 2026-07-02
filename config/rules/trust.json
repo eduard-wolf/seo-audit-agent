@@ -1,0 +1,13 @@
+[
+  {
+    "id": "trust:contact-pages-missing",
+    "kategorie": "trust",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Keine erkennbare Kontakt-/Über-uns-/Impressums-/Datenschutz-Seite (Trust)",
+    "quelle": "Google Search Quality Rater Guidelines (2025-09, „Trust is the most important member of the E-E-A-T family“; transaktionale Seiten: „satisfying customer service information“) + DE-Rechtspflicht: Impressum DDG §5 (2024-05) / Datenschutzerklärung DSGVO Art. 13 — Vertrauens-/Rechtssignal, KEIN Ranking-Faktor",
+    "datum": "2025-09",
+    "lastReviewed": "2026-06",
+    "params": {}
+  }
+]

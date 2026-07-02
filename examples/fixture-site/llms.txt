@@ -1,0 +1,11 @@
+Demo Kaffeerösterei
+
+DEFECT: Diese llms.txt ist strukturell fehlerhaft.
+Es fehlt der obligatorische H1-Titel (Zeile mit "# Titel") sowie die Pflicht-Summary
+als Blockquote (Zeile mit "> Zusammenfassung"). Beides wird von der llms.txt-Spezifikation
+unter https://llmstxt.org verlangt.
+
+Abschnitte:
+- Über uns: http://demo.example/perfect.html
+- Produkte: http://demo.example/no-alt.html
+- Kontakt: http://demo.example/no-citations.html

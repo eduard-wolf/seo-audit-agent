@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Demo Kaffeerösterei – Mehrere Überschriften</title>
+  <meta name="description" content="Testseite mit mehreren H1-Tags und Heading-Sprung.">
+  <link rel="canonical" href="http://demo.example/multi-h1.html">
+</head>
+<body>
+  <nav><a href="/">← Startseite</a></nav>
+  <!-- DEFECT: zwei H1-Tags + Heading-Sprung H1→H3 (kein H2) -->
+  <h1>Demo Kaffeerösterei – Hauptüberschrift</h1>
+  <h1>Zweite Hauptüberschrift (Fehler!)</h1>
+  <h3>Direkt zu H3 gesprungen – H2 fehlt</h3>
+  <p>
+    Diese Testseite der Demo Kaffeerösterei enthält absichtlich zwei
+    <code>&lt;h1&gt;</code>-Elemente sowie einen Heading-Sprung von H1 direkt zu H3
+    ohne zwischenliegendes H2. Sie dient zum Test der Regeln
+    „mehrere H1" und „Heading-Hierarchie verletzt".
+  </p>
+</body>
+</html>

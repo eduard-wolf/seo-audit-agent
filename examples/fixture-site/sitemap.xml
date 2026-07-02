@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Alle Fixture-Seiten der Demo Kaffeerösterei -->
+  <url><loc>http://demo.example/index.html</loc></url>
+  <url><loc>http://demo.example/perfect.html</loc></url>
+  <url><loc>http://demo.example/missing-title.html</loc></url>
+  <url><loc>http://demo.example/long-title.html</loc></url>
+  <url><loc>http://demo.example/dup-title-a.html</loc></url>
+  <url><loc>http://demo.example/dup-title-b.html</loc></url>
+  <url><loc>http://demo.example/missing-meta.html</loc></url>
+  <url><loc>http://demo.example/dup-meta-a.html</loc></url>
+  <url><loc>http://demo.example/dup-meta-b.html</loc></url>
+  <url><loc>http://demo.example/multi-h1.html</loc></url>
+  <!-- noindex.html: steht absichtlich in Sitemap, hat aber noindex-Meta → Konflikt -->
+  <url><loc>http://demo.example/noindex.html</loc></url>
+  <url><loc>http://demo.example/thin.html</loc></url>
+  <url><loc>http://demo.example/no-alt.html</loc></url>
+  <url><loc>http://demo.example/invalid-schema.html</loc></url>
+  <url><loc>http://demo.example/no-citations.html</loc></url>
+  <!-- orphan.html: in Sitemap, aber von keiner Seite intern verlinkt -->
+  <url><loc>http://demo.example/orphan.html</loc></url>
+  <url><loc>http://demo.example/xss.html</loc></url>
+  <url><loc>http://demo.example/client-rendered.html</loc></url>
+  <url><loc>http://demo.example/redirect-final.html</loc></url>
+  <!-- redirect-1 → redirect-2 → redirect-final.html: Redirect-Ketten-Test (≥2 Hops) -->
+  <url><loc>http://demo.example/redirect-1</loc></url>
+  <!-- Absichtlich defekter Eintrag: Seite wurde entfernt → Server liefert 410 -->
+  <url><loc>http://demo.example/gone-page.html</loc></url>
+  <!-- robots.txt disallows /private/ — crawler must NOT fetch this even though it is in sitemap -->
+  <url><loc>http://demo.example/private/secret.html</loc></url>
+</urlset>

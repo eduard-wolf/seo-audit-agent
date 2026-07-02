@@ -1,0 +1,13 @@
+[
+  {
+    "id": "a11y:control-no-name",
+    "kategorie": "a11y",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Interaktives Element ohne zugänglichen Namen (WCAG 4.1.2)",
+    "quelle": "W3C – WCAG 2.2 SC 4.1.2 Name, Role, Value (Level A) / Technik H64 (iframe title) / F68",
+    "datum": "2026-03",
+    "lastReviewed": "2026-06",
+    "params": { "minCount": 1 }
+  }
+]

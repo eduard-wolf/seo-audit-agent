@@ -1,0 +1,11 @@
+data/
+node_modules/
+*.log
+.DS_Store
+.superpowers/
+report/*/
+!report/templates/
+
+# Python bytecode (optional GSC / pgvector tooling)
+__pycache__/
+*.pyc
