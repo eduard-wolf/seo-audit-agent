@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Demo Kaffeerösterei – Interne Testseite</title>
+  <meta name="description" content="Interne Testseite – nicht für Suchmaschinen bestimmt.">
+  <!-- DEFECT: noindex-Direktive, obwohl Seite in sitemap.xml gelistet ist (Konflikt) -->
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="http://demo.example/noindex.html">
+</head>
+<body>
+  <nav><a href="/">← Startseite</a></nav>
+  <h1>Interne Testseite (noindex)</h1>
+  <p>
+    Diese Seite der Demo Kaffeerösterei trägt <code>noindex</code>, ist aber trotzdem
+    in der <code>sitemap.xml</code> gelistet. Dieser Widerspruch dient zum Test der
+    Regel „noindex-Seite in Sitemap".
+  </p>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Demo Kaffeerösterei – Bildergalerie</title>
+  <meta name="description" content="Bildergalerie der Demo Kaffeerösterei ohne Alt-Texte.">
+  <link rel="canonical" href="http://demo.example/no-alt.html">
+</head>
+<body>
+  <nav><a href="/">← Startseite</a></nav>
+  <h1>Bildergalerie</h1>
+  <p>
+    Diese Testseite der Demo Kaffeerösterei enthält absichtlich mehrere
+    Bilder im JPG-Format ohne <code>alt</code>-Attribut. Test der Regeln
+    „fehlendes alt-Attribut" und „kein modernes Bildformat (webp/avif)".
+  </p>
+  <!-- DEFECT: Bilder ohne alt, JPG-Format (nicht webp/avif) -->
+  <img src="roesterei-eingang.jpg" width="800" height="600">
+  <img src="bohnen-nahaufnahme.jpg" width="800" height="600">
+  <img src="kaffeemaschine.jpg" width="800" height="600">
+  <img src="barista-arbeit.jpg" width="800" height="600">
+</body>
+</html>

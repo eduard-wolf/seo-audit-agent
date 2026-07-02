@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "url": "https://example.com",
+    "crawledAt": "2026-06-27T10:00:00Z",
+    "modelId": "claude-opus-4",
+    "rulesetVersion": "1.0.0",
+    "sampleSize": 50,
+    "coveragePct": 80,
+    "siteType": "ecommerce"
+  },
+  "execSummary": {
+    "metrics": ["50 pages crawled", "12 pages missing meta descriptions"],
+    "patterns": ["Thin content on category pages", "Missing structured data on product pages"],
+    "quickWins": ["Add meta descriptions to 12 pages", "Add Product schema to top-10 product pages"]
+  },
+  "sections": [
+    {
+      "id": "sec-1",
+      "num": 1,
+      "title": "Technical SEO",
+      "findings": [
+        {
+          "id": "f-1-1",
+          "title": "Missing meta descriptions on 12 pages",
+          "category": "on-page",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "12 of 50 crawled pages have no meta description tag.",
+          "beleg": "crawl output: metaMissing=true on rows 3, 7, 12-14, 22-28",
+          "evidence": "See crawl/output.csv, filter metaMissing=true",
+          "auswirkung": "Search engines generate auto-snippets, reducing CTR predictability.",
+          "empfehlung": "Author unique meta descriptions (120-155 chars) for all 12 pages, prioritising those with highest organic traffic.",
+          "ice": { "i": 2, "c": 3, "e": 2, "score": 12 },
+          "kbSources": [{ "source": "05-meta-tags.md", "heading": "Meta Description", "date": "2024-09" }]
+        },
+        {
+          "id": "f-1-2",
+          "title": "No HTTPS on 3 internal resources (mixed content)",
+          "category": "technical",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "3 pages load HTTP images, triggering browser mixed-content warnings.",
+          "beleg": "crawl field mixedContent=true on rows 8, 19, 31",
+          "evidence": "Chrome DevTools: mixed content reported on /category/shoes, /category/bags, /product/belt-01",
+          "auswirkung": "Browser warning may block resources; negative trust signal for users and crawlers.",
+          "empfehlung": "Update all asset URLs to HTTPS; enforce HSTS.",
+          "ice": { "i": 3, "c": 3, "e": 3, "score": 27 },
+          "kbSources": [{ "source": "06-crawlability.md", "heading": "Common mistakes", "date": "2024-09" }]
+        }
+      ]
+    },
+    {
+      "id": "sec-2",
+      "num": 2,
+      "title": "Structured Data",
+      "findings": [
+        {
+          "id": "f-2-1",
+          "title": "Product schema missing on top product pages",
+          "category": "structured-data",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Top-10 product pages lack Product/Offer schema; rich results not eligible.",
+          "beleg": "ldTypes empty string on rows 40-49",
+          "evidence": "Google Rich Results Test: no eligible rich result type detected",
+          "auswirkung": "Missed rich result eligibility (price, availability, ratings in SERP).",
+          "empfehlung": "Implement JSON-LD Product schema with Offer (price, availability, currency) on all product pages.",
+          "ice": { "i": 3, "c": 3, "e": 2, "score": 18 },
+          "kbSources": [{ "source": "01-aggregate-rating.md", "heading": "Required Properties", "date": "2024-09" }]
+        }
+      ]
+    }
+  ],
+  "positives": [
+    "All pages return HTTPS (except 3 mixed-content resources)",
+    "Canonical tags correctly self-referential on 47/50 pages",
+    "htmlLang set correctly on all pages"
+  ],
+  "strategy": {
+    "levers": ["technical", "on-page", "structured-data"],
+    "todos": [
+      "Fix mixed content on 3 pages (hoch, quick)",
+      "Add meta descriptions to 12 pages",
+      "Implement Product schema on top-10 product pages"
+    ]
+  },
+  "confidence": {
+    "sampleSize": 50,
+    "minNMet": true,
+    "caveats": [
+      "Sample covers landing pages only; blog posts not crawled.",
+      "JavaScript-rendered content not evaluated in this run."
+    ]
+  }
+}

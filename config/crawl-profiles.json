@@ -1,0 +1,14 @@
+{
+  "quick-scan": {
+    "maxUrls": 50, "maxDepth": 2, "rps": 2, "concurrency": 1, "wallClockMs": 300000,
+    "description": "Schnell-Triage / sehr kleine Site: Homepage + Haupt-Templates, klärt minNMet (≥5). ~25 s."
+  },
+  "standard": {
+    "maxUrls": 300, "maxDepth": 4, "rps": 2, "concurrency": 2, "wallClockMs": 600000,
+    "description": "Default. Die meisten Marketing-/KMU-Sites (≤ wenige hundert Seiten). ~2,5 min. rps=Politeness, concurrency=Latenz-Versteck (erst ab Concurrency-Unit aktiv)."
+  },
+  "full-audit": {
+    "maxUrls": 25000, "maxDepth": 8, "rps": 3, "concurrency": 4, "wallClockMs": 3600000,
+    "description": "Große Sites, Near-Complete-Coverage; Off-Peak. Braucht Streaming+Resume (Folge-Units). rps ≤ Norm 5."
+  }
+}

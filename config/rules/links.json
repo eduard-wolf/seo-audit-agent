@@ -1,0 +1,68 @@
+[
+  {
+    "id": "crawl:orphan-page",
+    "kategorie": "crawl",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Verwaiste Seiten (keine internen Eingangslinks)",
+    "quelle": "Google Search Central – Internal Linking",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "links:deep",
+    "kategorie": "links",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Seiten zu tief im Klick-Pfad (>maxDepth Klicks von der Startseite)",
+    "quelle": "Google Search Central – Site Structure & Internal Linking",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": { "maxDepth": 4 }
+  },
+  {
+    "id": "links:dead-end",
+    "kategorie": "links",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Sackgassen-Seite (keine ausgehenden internen Links — Link-Equity-Heuristik)",
+    "quelle": "Google Search Central – Links crawlbar machen (Erreichbarkeit) + PageRank-/Link-Equity-Prinzip (Heuristik)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "links:generic-anchor",
+    "kategorie": "links",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Generischer oder leerer Linktext (Barrierefreiheit/Usability)",
+    "quelle": "W3C – WCAG 2.2 SC 2.4.4 Link Purpose (Level A) + F89 (leere Links) / F84 (generischer Text) + Google Search Central – beschreibender Linktext (Usability/Crawlability, kein Ranking-Faktor)",
+    "datum": "2026-05",
+    "lastReviewed": "2026-06",
+    "params": { "minCount": 1 }
+  },
+  {
+    "id": "links:internal-broken",
+    "kategorie": "links",
+    "scope": "agnostic",
+    "severity": "hoch",
+    "title": "Interner Link auf tote URL (4xx/5xx)",
+    "quelle": "Google Search Central – Links best practices (auf funktionierende, crawlbare URLs verlinken) — Crawl-Qualität/Erreichbarkeit, kein direkter Ranking-Faktor",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "links:internal-redirect",
+    "kategorie": "links",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Interner Link auf eine Weiterleitung (Link-Equity-Verlust)",
+    "quelle": "Google Search Central – Links best practices / Redirects (direkt auf die finale URL verlinken statt auf eine Redirect-Quelle) — Crawl-Qualität/Link-Equity, kein direkter Ranking-Faktor",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  }
+]

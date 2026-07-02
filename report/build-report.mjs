@@ -1,0 +1,481 @@
+#!/usr/bin/env node
+/**
+ * report/build-report.mjs — Unit G: deterministic HTML report renderer (Layer 5).
+ *
+ * Turns a schema-valid findings.json (LLM output, Layer 3) into the delivered,
+ * self-contained HTML report — the visible artifact. Two non-negotiables:
+ *
+ *   1. SECURITY. The report embeds crawled, UNTRUSTED strings (foreign titles,
+ *      meta descriptions, …). Every string that originates from findings/crawl
+ *      is HTML-escaped before it touches the document. No exceptions.
+ *   2. Self-contained, no script/external resources; ships a strict CSP
+ *      (style-src 'unsafe-inline' for the single inline <style>). Inline CSS
+ *      only, no <script> with logic, no inline event handlers,
+ *      <meta robots=noindex>. The report is a static document that can be
+ *      hosted behind a gate.
+ *
+ * API:
+ *   render(findings) → htmlString     // validates first; throws on invalid input
+ *
+ * CLI:
+ *   node report/build-report.mjs <path/to/findings.json>
+ *     → writes report/<host>/index.html and prints its absolute path
+ *
+ * Determinism: render() derives the whole document from `findings` alone — no
+ * clock, no randomness — so the same findings.json always yields byte-identical
+ * HTML. (The underlying LLM synthesis is non-deterministic; the report is the
+ * frozen, representative snapshot of one run, as stamped in the footer.)
+ *
+ * Roadmap (NOT in MVP): PDF export. HTML→PDF would be a separate runtime step
+ * (e.g. headless Chrome `page.pdf()` over this self-contained HTML); it adds a
+ * heavy binary dependency and is intentionally out of scope here.
+ *
+ * No npm dependencies — pure Node.js.
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { validateFindings } from '../lib/findings-schema.mjs';
+
+// ── escaping ──────────────────────────────────────────────────────────────────
+
+/**
+ * HTML-escape an arbitrary value. The single security primitive of this module:
+ * every untrusted string passes through here before entering the document.
+ * Order matters — `&` must be replaced first.
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+export function esc(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ── small render helpers ───────────────────────────────────────────────────────
+
+/** Escaped <ul> from a list of strings. Returns '' for an empty list. */
+function ul(items, cls = '') {
+  if (!Array.isArray(items) || items.length === 0) return '';
+  const classAttr = cls ? ` class="${cls}"` : '';
+  return `<ul${classAttr}>${items.map((it) => `<li>${esc(it)}</li>`).join('')}</ul>`;
+}
+
+/** Fixed-vocabulary class suffix lookups — never interpolate free text into a class. */
+const SEV_CLASS = { hoch: 'hoch', mittel: 'mittel', niedrig: 'niedrig' };
+const PROV_CLASS = { gemessen: 'gemessen', beobachtet: 'beobachtet', 'geschätzt': 'geschaetzt' };
+
+/** Severity → German short rationale shown next to the label (text, not colour-only). */
+const SEV_HINT = { hoch: 'kritisch', mittel: 'relevant', niedrig: 'gering' };
+
+// ── section renderers ──────────────────────────────────────────────────────────
+
+function renderBadges(f) {
+  const sev = SEV_CLASS[f.severity] || 'mittel';
+  const prov = PROV_CLASS[f.prov] || 'geschaetzt';
+  const { i, c, e, score } = f.ice;
+  return `<p class="badges">
+        <span class="badge badge--sev-${sev}">Schweregrad: ${esc(f.severity)} (${esc(SEV_HINT[f.severity] || '')})</span>
+        <span class="badge badge--prov-${prov}">Provenienz: ${esc(f.prov)}</span>
+        <span class="badge badge--ice"><abbr title="Impact × Confidence × Ease">ICE</abbr> ${esc(i)} × ${esc(c)} × ${esc(e)} = ${esc(score)}</span>
+        <span class="badge badge--cat">Kategorie: ${esc(f.category)}</span>
+      </p>`;
+}
+
+function renderKbSources(kbSources) {
+  if (!Array.isArray(kbSources) || kbSources.length === 0) return '';
+  const items = kbSources.map((src) => {
+    const parts = [src.source, src.heading, src.date]
+      .filter((p) => p !== undefined && p !== null && p !== '')
+      .map((p) => esc(p));
+    return `<li>${parts.join(' · ')}</li>`;
+  });
+  return `<div class="kb">
+          <p class="kb-label">Wissensbasis-Beleg</p>
+          <ul class="kb-list">${items.join('')}</ul>
+        </div>`;
+}
+
+function renderFinding(f) {
+  return `<article class="finding finding--sev-${SEV_CLASS[f.severity] || 'mittel'}" id="${esc(f.id)}" aria-labelledby="h-${esc(f.id)}">
+      <h3 id="h-${esc(f.id)}" class="finding-title">${esc(f.title)}</h3>
+      ${renderBadges(f)}
+      <dl class="finding-body">
+        <dt>Befund</dt><dd>${esc(f.befund)}</dd>
+        <dt>Beleg</dt><dd>${esc(f.beleg)}</dd>
+        <dt>Evidenz</dt><dd>${esc(f.evidence)}</dd>
+        <dt>Auswirkung</dt><dd>${esc(f.auswirkung)}</dd>
+        <dt>Empfehlung</dt><dd>${esc(f.empfehlung)}</dd>
+      </dl>
+      ${renderKbSources(f.kbSources)}
+    </article>`;
+}
+
+function renderSection(section) {
+  const findings = Array.isArray(section.findings) ? section.findings : [];
+  return `<section class="section" id="${esc(section.id)}" aria-labelledby="h-${esc(section.id)}">
+      <h2 id="h-${esc(section.id)}" class="section-title">${esc(section.num)}. ${esc(section.title)}</h2>
+      ${findings.map(renderFinding).join('\n      ')}
+    </section>`;
+}
+
+function renderToc(sections, { hasStrategy } = {}) {
+  // Exec/Konfidenz/Positives always render (their renderers always emit a
+  // section); Strategie only when it has content. Link only what is rendered.
+  const items = [
+    `<li><a href="#h-exec">Zusammenfassung</a></li>`,
+    ...sections.map((s) => `<li><a href="#${esc(s.id)}">${esc(s.num)}. ${esc(s.title)}</a></li>`),
+    `<li><a href="#h-conf">Konfidenz</a></li>`,
+    `<li><a href="#h-pos">Positives</a></li>`,
+    ...(hasStrategy ? [`<li><a href="#h-strat">Strategie</a></li>`] : []),
+  ].join('');
+  return `<nav class="toc" aria-label="Inhaltsverzeichnis">
+      <h2 class="section-title">Inhaltsverzeichnis</h2>
+      <ol class="toc-list">${items}</ol>
+    </nav>`;
+}
+
+/** Count findings by severity across all sections — input to the SVG distribution chart. */
+function countSeverities(sections) {
+  const counts = { hoch: 0, mittel: 0, niedrig: 0 };
+  for (const section of Array.isArray(sections) ? sections : []) {
+    for (const f of Array.isArray(section.findings) ? section.findings : []) {
+      if (counts[f.severity] !== undefined) counts[f.severity] += 1;
+    }
+  }
+  return counts;
+}
+
+/**
+ * Deterministic inline SVG stacked-bar of the severity distribution.
+ * Segment widths are derived purely from the integer counts (Math.round over a
+ * fixed viewBox width — no clock, no randomness), so the same findings.json
+ * yields byte-identical SVG. CSP-compatible: inline shapes only, no script.
+ * Colour is one channel; the figcaption carries the same counts as text.
+ */
+function renderSeverityChart(counts) {
+  const total = counts.hoch + counts.mittel + counts.niedrig;
+  if (total === 0) return '';
+  const W = 600;
+  const H = 28;
+  const segs = [
+    { key: 'hoch', fill: 'var(--sev-hoch-bd)' },
+    { key: 'mittel', fill: 'var(--sev-mittel-bd)' },
+    { key: 'niedrig', fill: 'var(--sev-niedrig-bd)' },
+  ];
+  let x = 0;
+  let acc = 0;
+  const rects = [];
+  for (const seg of segs) {
+    const n = counts[seg.key];
+    acc += n;
+    const xEnd = Math.round((W * acc) / total);
+    const w = xEnd - x;
+    if (w > 0) {
+      // fill is a fixed-vocabulary CSS var; n/x/w/H are escaped per discipline.
+      rects.push(`<rect x="${esc(x)}" y="0" width="${esc(w)}" height="${esc(H)}" fill="${seg.fill}"><title>${esc(seg.key)}: ${esc(n)}</title></rect>`);
+    }
+    x = xEnd;
+  }
+  const desc = `Schweregrad-Verteilung: ${esc(counts.hoch)} hoch, ${esc(counts.mittel)} mittel, ${esc(counts.niedrig)} niedrig (${esc(total)} Befunde gesamt).`;
+  return `<figure class="sev-dist">
+        <svg class="sev-chart" role="img" viewBox="0 0 ${esc(W)} ${esc(H)}" preserveAspectRatio="none" aria-label="${desc}"><title>${desc}</title>${rects.join('')}</svg>
+        <figcaption class="sev-dist-legend">Schweregrade — hoch: ${esc(counts.hoch)} · mittel: ${esc(counts.mittel)} · niedrig: ${esc(counts.niedrig)}</figcaption>
+      </figure>`;
+}
+
+function renderExecSummary(es, sevCounts) {
+  const tiles = (es.metrics || [])
+    .map((m) => `<div class="tile">${esc(m)}</div>`)
+    .join('');
+  return `<section class="exec" aria-labelledby="h-exec">
+      <h2 id="h-exec" class="section-title">Executive Summary</h2>
+      <div class="tiles">${tiles}</div>
+      ${renderSeverityChart(sevCounts)}
+      <div class="cols">
+        <div class="col">
+          <h3>Muster</h3>
+          ${ul(es.patterns)}
+        </div>
+        <div class="col">
+          <h3>Quick Wins</h3>
+          ${ul(es.quickWins, 'wins')}
+        </div>
+      </div>
+    </section>`;
+}
+
+function renderPositives(positives) {
+  return `<section class="positives" aria-labelledby="h-pos">
+      <h2 id="h-pos" class="section-title">Was bereits gut ist</h2>
+      ${ul(positives, 'positives-list') || '<p>Keine positiven Befunde erfasst.</p>'}
+    </section>`;
+}
+
+/** Whether the strategy section renders — single source of truth for renderer + TOC. */
+function strategyHasContent(strategy) {
+  return !!(strategy && ((strategy.levers && strategy.levers.length) || (strategy.todos && strategy.todos.length)));
+}
+
+function renderStrategy(strategy) {
+  if (!strategyHasContent(strategy)) return '';
+  return `<section class="strategy" aria-labelledby="h-strat">
+      <h2 id="h-strat" class="section-title">Strategie</h2>
+      <div class="cols">
+        <div class="col"><h3>Hebel</h3>${ul(strategy.levers)}</div>
+        <div class="col"><h3>To-dos</h3>${ul(strategy.todos)}</div>
+      </div>
+    </section>`;
+}
+
+function renderConfidence(conf) {
+  const warn = conf.minNMet === false;
+  const banner = warn
+    ? `<p class="warn"><strong>Achtung:</strong> Mindest-Stichprobe nicht erreicht — die Befunde sind indikativ, nicht repräsentativ.</p>`
+    : '';
+  return `<section class="confidence${warn ? ' confidence--warn' : ''}" aria-labelledby="h-conf">
+      <h2 id="h-conf" class="section-title">Konfidenz &amp; Einschränkungen</h2>
+      ${banner}
+      <p class="conf-meta">Stichprobe: ${esc(conf.sampleSize)} Seiten · Mindest-N erfüllt: ${warn ? 'nein' : 'ja'}</p>
+      ${ul(conf.caveats) || '<p>Keine zusätzlichen Einschränkungen.</p>'}
+    </section>`;
+}
+
+function renderHero(meta, host) {
+  const coverageStr = (meta.coveragePct == null) ? 'n. v.' : `${esc(meta.coveragePct)} %`;
+  const crawledAtStr = (meta.crawledAt == null || meta.crawledAt === '') ? 'unbekannt' : esc(meta.crawledAt);
+  return `<header class="hero">
+      <p class="eyebrow">SEO-Audit-Report</p>
+      <h1>SEO-Audit: ${esc(host)}</h1>
+      <dl class="hero-meta">
+        <div><dt>Adresse</dt><dd>${esc(meta.url)}</dd></div>
+        <div><dt>Site-Typ</dt><dd>${esc(meta.siteType)}</dd></div>
+        <div><dt>Stichprobe</dt><dd>${esc(meta.sampleSize)} Seiten</dd></div>
+        <div><dt>Abdeckung</dt><dd>${coverageStr}</dd></div>
+        <div><dt>Crawl-Zeitpunkt</dt><dd>${crawledAtStr}</dd></div>
+      </dl>
+    </header>`;
+}
+
+function renderFooter(meta) {
+  const crawledAtFooter = (meta.crawledAt == null || meta.crawledAt === '') ? 'unbekannt' : esc(meta.crawledAt);
+  return `<footer class="stamp">
+      <p class="stamp-line">Erzeugt aus <code>findings.json</code> · Modell <strong>${esc(meta.modelId)}</strong> · Regelwerk <strong>${esc(meta.rulesetVersion)}</strong> · Crawl <strong>${crawledAtFooter}</strong></p>
+      <p class="note">Eingefrorener, repräsentativer Lauf — die LLM-Synthese ist <strong>nicht-deterministisch</strong>. Dieser Report ist eine eingefrorene Momentaufnahme genau dieses Laufs.</p>
+      <p class="note">Bewusst <code>noindex</code>: der Report kann gegatet gehostet werden und soll nicht in Suchmaschinen erscheinen.</p>
+      <p class="note legend-ice"><abbr title="Impact × Confidence × Ease">ICE</abbr> = Impact × Confidence × Ease — Bewertung je Befund (Wirkung × Konfidenz × Aufwand).</p>
+    </footer>`;
+}
+
+// ── stylesheet (inline, CSP-pure) ──────────────────────────────────────────────
+
+const STYLES = `
+  :root {
+    --bg: #f6f7f9; --surface: #ffffff; --ink: #1a2230; --muted: #5a6573;
+    --line: #e3e7ec; --accent: #1f3a8a; --accent-soft: #eef2ff;
+    --sev-hoch-bg: #fef3f2; --sev-hoch-bd: #f0998c; --sev-hoch-fg: #97180c;
+    --sev-mittel-bg: #fffaeb; --sev-mittel-bd: #f3c34a; --sev-mittel-fg: #93500b;
+    --sev-niedrig-bg: #eff8ff; --sev-niedrig-bd: #7cc0f5; --sev-niedrig-fg: #0e4b9b;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px 64px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover, a:focus { text-decoration: underline; }
+  code { background: #eef1f4; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  h1, h2, h3 { line-height: 1.25; color: var(--ink); }
+  h2.section-title { font-size: 1.4rem; margin: 0 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 0 0 8px; }
+
+  .hero { background: var(--ink); color: #fff; border-radius: var(--radius); padding: 32px; margin: 28px 0; }
+  .hero h1 { color: #fff; margin: 4px 0 18px; font-size: 1.9rem; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: .72rem; color: #aeb9cc; margin: 0; }
+  .hero-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 0; }
+  .hero-meta div { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 10px 12px; }
+  .hero-meta dt { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #aeb9cc; margin: 0 0 3px; }
+  .hero-meta dd { margin: 0; font-weight: 600; word-break: break-word; }
+
+  section, .toc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; margin: 18px 0; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .tile { background: var(--accent-soft); border: 1px solid #d3ddf7; border-radius: 8px; padding: 14px 16px; font-weight: 600; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .col h3 { color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; }
+  ul, ol { margin: 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  ul.wins li { list-style: none; position: relative; padding-left: 22px; }
+  ul.wins li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+  .toc-list { columns: 2; column-gap: 28px; }
+  @media (max-width: 640px) { .cols, .toc-list { grid-template-columns: 1fr; columns: 1; } }
+
+  .finding { border: 1px solid var(--line); border-left: 5px solid var(--line); border-radius: 8px; padding: 18px 20px; margin: 16px 0; background: #fff; }
+  .finding--sev-hoch { border-left-color: var(--sev-hoch-bd); }
+  .finding--sev-mittel { border-left-color: var(--sev-mittel-bd); }
+  .finding--sev-niedrig { border-left-color: var(--sev-niedrig-bd); }
+  .finding-title { word-break: break-word; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .badge { display: inline-block; font-size: .76rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: #f1f3f6; color: var(--ink); }
+  .badge--sev-hoch { background: var(--sev-hoch-bg); border-color: var(--sev-hoch-bd); color: var(--sev-hoch-fg); }
+  .badge--sev-mittel { background: var(--sev-mittel-bg); border-color: var(--sev-mittel-bd); color: var(--sev-mittel-fg); }
+  .badge--sev-niedrig { background: var(--sev-niedrig-bg); border-color: var(--sev-niedrig-bd); color: var(--sev-niedrig-fg); }
+  .badge--prov-gemessen { background: #ecfdf3; border-color: #6cd699; color: #066034; }
+  .badge--prov-beobachtet { background: #eef4ff; border-color: #9bb8f0; color: #1d3c87; }
+  .badge--prov-geschaetzt { background: #f8f6ef; border-color: #d8cba2; color: #6b5a1e; border-style: dashed; }
+  .badge--ice { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .badge--cat { background: #f1f3f6; border-color: var(--line); color: var(--muted); }
+
+  .finding-body { display: grid; grid-template-columns: 130px 1fr; gap: 4px 16px; margin: 0; }
+  .finding-body dt { font-weight: 700; color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
+  .finding-body dd { margin: 0; }
+  @media (max-width: 560px) { .finding-body { grid-template-columns: 1fr; } .finding-body dt { margin-top: 8px; } }
+
+  .kb { margin-top: 14px; padding: 10px 14px; background: #f7f8fa; border: 1px dashed var(--line); border-radius: 8px; }
+  .kb-label { margin: 0 0 4px; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+  .kb-list { font-size: .9rem; color: var(--muted); }
+
+  .positives { border-left: 5px solid #6cd699; }
+  ul.positives-list li::marker { color: #15a05a; }
+
+  .confidence--warn { border-left: 5px solid var(--sev-hoch-bd); }
+  .warn { background: var(--sev-hoch-bg); border: 1px solid var(--sev-hoch-bd); color: var(--sev-hoch-fg); padding: 10px 14px; border-radius: 8px; }
+  .conf-meta { color: var(--muted); }
+
+  .stamp { margin-top: 28px; padding: 20px 24px; border-top: 2px solid var(--line); color: var(--muted); font-size: .86rem; }
+  .stamp-line { margin: 0 0 8px; }
+  .note { margin: 4px 0; }
+  .legend-ice abbr { text-decoration: none; font-weight: 700; color: var(--ink); }
+
+  .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; background: var(--accent); color: #fff; padding: 10px 16px; border-radius: 0 0 8px 0; font-weight: 700; }
+  .skip-link:focus { left: 0; }
+
+  .sev-dist { margin: 0 0 20px; }
+  .sev-chart { display: block; width: 100%; height: 28px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+  .sev-dist-legend { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
+
+  @media print {
+    body { background: #fff; }
+    .skip-link { display: none; }
+    .hero { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .hero h1 { color: var(--ink); }
+    .eyebrow, .hero-meta dt { color: var(--muted); }
+    .hero-meta div { background: transparent; border-color: var(--line); }
+    .cols, .toc-list { grid-template-columns: 1fr; columns: 1; }
+    .finding, .tile { break-inside: avoid; }
+  }
+`;
+
+// ── main render ────────────────────────────────────────────────────────────────
+
+/**
+ * Render a findings object to a self-contained HTML document.
+ *
+ * @param {object} findings — must satisfy lib/findings-schema.mjs#validateFindings
+ * @returns {string} HTML
+ * @throws {Error} if `findings` is schema-invalid (all errors reported)
+ */
+export function render(findings) {
+  const { valid, errors } = validateFindings(findings);
+  if (!valid) {
+    throw new Error(`Invalid findings.json — cannot render report:\n  - ${errors.join('\n  - ')}`);
+  }
+
+  const { meta, execSummary, sections, positives, strategy, confidence } = findings;
+  const host = hostOf(meta.url);
+  const sevCounts = countSeverities(sections);
+  const hasStrategy = strategyHasContent(strategy);
+
+  // <header> is a sibling BEFORE <main> and <footer> a sibling AFTER it, so they
+  // map to the banner/contentinfo landmarks (a <header>/<footer> nested in <main>
+  // would degrade to role=generic). The .wrap centering/padding moves to the
+  // surrounding div, keeping the rendered layout identical.
+  const mainContent = `${renderExecSummary(execSummary, sevCounts)}
+      ${renderToc(sections, { hasStrategy })}
+      ${renderConfidence(confidence)}
+      ${sections.map(renderSection).join('\n      ')}
+      ${renderPositives(positives)}
+      ${renderStrategy(strategy)}`;
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">
+  <title>SEO-Audit-Report — ${esc(host)}</title>
+  <style>${STYLES}</style>
+</head>
+<body>
+  <a class="skip-link" href="#h-exec">Zum Inhalt springen</a>
+  <div class="wrap">
+    ${renderHero(meta, host)}
+    <main>
+      ${mainContent}
+    </main>
+    ${renderFooter(meta)}
+  </div>
+</body>
+</html>
+`;
+}
+
+/**
+ * Extract a filesystem-safe host label from the audited URL.
+ * Falls back to a slugified URL when it is not parseable.
+ *
+ * @param {string} url
+ * @returns {string}
+ */
+export function hostOf(url) {
+  try {
+    return new URL(url).hostname || 'report';
+  } catch {
+    return String(url).replace(/[^a-z0-9.-]+/gi, '-').replace(/^-+|-+$/g, '') || 'report';
+  }
+}
+
+// ── CLI entry point ─────────────────────────────────────────────────────────────
+// Only runs when invoked directly, not on import.
+if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+  const inPath = process.argv[2];
+  if (!inPath) {
+    console.error('Usage: node report/build-report.mjs <path/to/findings.json>');
+    process.exit(1);
+  }
+
+  let findings;
+  try {
+    findings = JSON.parse(fs.readFileSync(inPath, 'utf8'));
+  } catch (err) {
+    console.error(`Cannot read/parse ${inPath}: ${err?.message || err}`);
+    process.exit(1);
+  }
+
+  let html;
+  try {
+    html = render(findings);
+  } catch (err) {
+    console.error(err?.message || String(err));
+    process.exit(1);
+  }
+
+  const host = hostOf(findings.meta?.url);
+  const outDir = path.resolve(path.dirname(new URL(import.meta.url).pathname), host);
+  const outFile = path.join(outDir, 'index.html');
+  fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(outFile, html, 'utf8');
+
+  console.error(`report written: host=${host} bytes=${Buffer.byteLength(html, 'utf8')}`);
+  console.log(outFile); // stdout = the one machine-readable line: the written path
+}

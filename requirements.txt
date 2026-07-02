@@ -1,0 +1,17 @@
+# Runtime-only requirements — the Node.js KB core runs without any of these.
+# Install only what you need for the features you use:
+#
+#   pip install -r requirements.txt
+#
+# ── GSC enrichment (crawl/gsc.py) ────────────────────────────────────────────
+google-api-python-client>=2.120.0
+google-auth>=2.28.0
+
+# ── pgvector production store (kb/pgvector_store.py) ─────────────────────────
+# Choose psycopg3 (preferred) or psycopg2 — both are guarded with try/except.
+# Embeddings are bound as pgvector text literals via a %s::vector cast, so the
+# pgvector Python adapter is NOT required (psycopg alone is sufficient).
+psycopg[binary]>=3.1.0
+
+# Alternative (older stack):
+# psycopg2-binary>=2.9.0

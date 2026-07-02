@@ -1,0 +1,1394 @@
+{
+  "meta": {
+    "origin": "http://127.0.0.1:59896",
+    "host": "127.0.0.1",
+    "crawledAt": "2026-06-29T00:00:00.000Z",
+    "pageCount": 21,
+    "sampleSize": 21,
+    "siteType": "server-rendered",
+    "coveragePct": 95,
+    "capped": false,
+    "fetched": 21,
+    "discovered": 22,
+    "sitemapTotal": 22,
+    "minNMet": true
+  },
+  "rulesetVersion": "1.7.0",
+  "findings": [
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "KI-Suchbot blockiert (GEO-Sichtbarkeit gefährdet)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "OAI-SearchBot (ai-search-blocked)",
+      "quelle": "Offizielle AI-Operator-Dokumentation (u.a. OpenAI OAI-SearchBot, Google-Crawler-Übersicht) — Provenienz + lastVerified je Bot in config/ai-bots.SOURCES.md",
+      "datum": "2026-07"
+    },
+    {
+      "ruleId": "geo:llms-txt-malformed",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "llms.txt fehlt oder ist strukturell fehlerhaft",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "llms.txt ungültig: missing-h1: first non-empty line must start with \"# \" (H1 heading); missing-blockquote: no \"> \" summary line found",
+      "quelle": "https://llmstxt.org – llms.txt Specification",
+      "datum": "2024-11"
+    },
+    {
+      "ruleId": "geo:missing-citations",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Keine Quellen aus der kuratierten Autoritäts-Liste (GEO: Cite Sources)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/no-citations.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/no-citations.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Keine Outlinks zu kuratierten Autoritäts-Domains (.gov/.edu/Wikipedia + Liste). Hinweis: nicht-gelistete seriöse Quellen werden hier (noch) nicht erkannt — volle Erkennung folgt mit outlinksExternal.",
+      "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
+      "datum": "2023-11"
+    },
+    {
+      "ruleId": "geo:no-faq-howto",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "info",
+      "title": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces) auf der gesamten Site gefunden",
+      "quelle": "GEO-Praxis — strukturierte Q&A erhöht AI-Answer-Surface; Google-FAQ/HowTo-Rich-Results sind entfallen (2023/2026)",
+      "datum": "2026-06"
+    },
+    {
+      "ruleId": "crawl:orphan-page",
+      "kategorie": "crawl",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Verwaiste Seiten (keine internen Eingangslinks)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/orphan.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/orphan.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Seiten ohne interne Eingangslinks",
+      "quelle": "Google Search Central – Internal Linking",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:title-missing",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "Fehlender Seitentitel",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/missing-title.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/missing-title.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Title Tags",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:title-long",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Seitentitel zu lang (wird in SERPs gekürzt)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/long-title.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/long-title.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Titel länger als 60 Zeichen — Heuristik: 60 Zeichen ist eine SERP-Pixel-Faustregel, kein von Google genannter Grenzwert.",
+      "quelle": "Google Search Central – Title Tags (Heuristik: Google kürzt pixelbasiert bei ~600px, nennt KEINE feste Zeichenzahl — 60 ist ein Praktiker-Richtwert)",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:title-dup",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Doppelter Seitentitel",
+      "count": 2,
+      "pctOfPages": 9.5,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/dup-title-b.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Title Tags",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:meta-missing",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Fehlende Meta-Beschreibung",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/missing-meta.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/missing-meta.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Meta Descriptions",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:meta-dup",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Doppelte Meta-Beschreibung",
+      "count": 2,
+      "pctOfPages": 9.5,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/dup-meta-a.html",
+        "http://127.0.0.1:59896/dup-meta-b.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Meta Descriptions",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:h1-multi",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Mehrere H1-Überschriften (Dokumentstruktur/Barrierefreiheit — kein Ranking-Defekt)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/multi-h1.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/multi-h1.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Mehrere H1 sind laut Google kein Ranking-Problem; Hinweis auf Dokumentstruktur/Barrierefreiheit",
+      "quelle": "WCAG 2.1 – Headings / MDN HTML Document Structure",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:heading-skip",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Überschriften-Hierarchie übersprungen",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/multi-h1.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/multi-h1.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "WCAG 2.1 – Headings / Google Accessibility",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:alt-missing",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Bilder ohne Alt-Text",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/no-alt.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/no-alt.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "WCAG 2.1 – Non-text Content / Google Image SEO",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:thin",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Wenig Textinhalt (manueller Review-Hinweis — keine Google-Wortzahl-Schwelle)",
+      "count": 17,
+      "pctOfPages": 81,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/dup-meta-a.html",
+        "http://127.0.0.1:59896/no-alt.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/long-title.html",
+        "http://127.0.0.1:59896/redirect-final.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/xss.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/perfect.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Wenig Text (< 100 Wörter) — Kandidat für manuelle Inhaltsprüfung; Google nutzt keine Wortzahl-Schwelle",
+      "quelle": "Heuristik — Google: Wortzahl ist KEIN Qualitätssignal (Mueller/Sullivan 2025); manuell prüfen",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:meta-desc-length",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Meta-Beschreibung zu kurz oder zu lang (Snippet-Heuristik)",
+      "count": 10,
+      "pctOfPages": 47.6,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/long-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/dup-title-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/noindex.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/no-alt.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/xss.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/invalid-schema.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/long-title.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/missing-title.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Meta-Beschreibung außerhalb 70–160 Zeichen — Heuristik: Google legt keine feste Länge fest; sehr kurze/lange Snippets werden in den Suchergebnissen gekürzt oder beschreiben die Seite unzureichend",
+      "quelle": "Google Search Central – Snippets steuern (Google nennt KEINE feste Länge — Heuristik zur SERP-Kürzung)",
+      "datum": "2026-04"
+    },
+    {
+      "ruleId": "onpage:title-short",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Seitentitel sehr kurz (Heuristik — kein Google-Mindestwert)",
+      "count": 3,
+      "pctOfPages": 14.3,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/xss.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/invalid-schema.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/thin.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/xss.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Titel kürzer als 30 Zeichen — Heuristik (Google schreibt keine Mindestlänge vor); sehr kurze Titel beschreiben den Seiteninhalt oft unzureichend",
+      "quelle": "Google Search Central – Title-Links beeinflussen (keine Mindestlänge — Heuristik)",
+      "datum": "2025-12"
+    },
+    {
+      "ruleId": "onpage:non-modern-image-format",
+      "kategorie": "performance",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Bilder nur in Legacy-Format (JPG ohne WebP/AVIF-Alternative)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/no-alt.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/no-alt.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Bilder in Legacy-Format (JPG) ohne WebP/AVIF-Alternative",
+      "quelle": "Google Core Web Vitals – Image Optimization",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "perf:text-compression-missing",
+      "kategorie": "performance",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "HTML ohne Text-Kompression (gzip/Brotli)",
+      "count": 18,
+      "pctOfPages": 85.7,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "HTML-Antwort ohne Text-Kompression (kein Content-Encoding gzip/br/deflate/zstd) — unkomprimiertes HTML erhöht die Transfergröße und verlangsamt das Laden. Empfehlung: gzip oder Brotli serverseitig aktivieren. Performance-Heuristik, KEIN Google-Ranking-Signal. Hinweis: erkannt wird nur der Content-Encoding-Header der gecrawlten Antwort.",
+      "quelle": "Lighthouse / Chrome DevTools – Enable text compression (uses-text-compression); Performance-Heuristik, kein Ranking-Signal",
+      "datum": "2024-06"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "kategorie": "structured-data",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "Ungültiges JSON-LD (Parse-Fehler)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/invalid-schema.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/invalid-schema.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Rich Results – Structured Data",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "schema:product-no-aggregate",
+      "kategorie": "structured-data",
+      "scope": "ecommerce",
+      "severity": "mittel",
+      "title": "Produkt ohne AggregateRating (nur mit echten Bewertungen ergänzen)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/invalid-schema.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/invalid-schema.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "AggregateRating nur mit echten, nutzergenerierten Bewertungen ergänzen — fabrizierte/Self-serving Ratings riskieren eine Manual Action",
+      "quelle": "Google Rich Results – Product / Review-Snippet-Policy (keine fabrizierten Ratings)",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "schema:org-missing-same-as",
+      "kategorie": "structured-data",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Organization-Schema ohne sameAs (Entity-Erkennung für KI-Suche eingeschränkt)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Organization-Schema ohne sameAs (Entity-Erkennung eingeschränkt)",
+      "quelle": "Schema.org – Organization / Google Knowledge Graph",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "schema:merchant-shipping-returns",
+      "kategorie": "structured-data",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Product/Offer ohne shippingDetails/Rückgabepolicy (empfohlen)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/invalid-schema.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/invalid-schema.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Product/Offer ohne shippingDetails und/oder hasMerchantReturnPolicy. Diese Properties sind für Merchant-Listing-Erlebnisse EMPFOHLEN (nicht erforderlich) — ihr Fehlen unterbindet nur die Versand-/Rückgabe-Annotationen im Rich Result, das Produktergebnis bleibt gültig. Hinweis: Versand-/Rückgabe-Angaben können alternativ im Google Merchant Center hinterlegt werden — Fehlen im Markup bedeutet daher nicht zwingend fehlende Angabe. KEIN Ranking-Signal.",
+      "quelle": "Google Search Central – Merchant Listing / Shipping- & Return-Policy Structured Data (shippingDetails + hasMerchantReturnPolicy empfohlen; alternativ via Merchant Center; kein Ranking)",
+      "datum": "2026-05"
+    },
+    {
+      "ruleId": "schema:organization-logo",
+      "kategorie": "structured-data",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Organization ohne logo",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Organization-Markup ohne logo-Property. logo ist eine empfohlene Organization-Property — Google nutzt sie für das Logo in Suchergebnissen und im Knowledge Panel. Rich-Result-/Knowledge-Panel-Eligibility, KEIN Ranking-Signal.",
+      "quelle": "Google Search Central – Organization Structured Data (logo empfohlen für Logo in Suche/Knowledge Panel; kein Ranking)",
+      "datum": "2026-04"
+    },
+    {
+      "ruleId": "schema:organization-contact",
+      "kategorie": "structured-data",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Organization ohne contactPoint",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Organization-Markup ohne contactPoint-Property. contactPoint ist eine empfohlene Organization-Property — sie reichert Googles Entity-Verständnis und das Knowledge-Panel-Profil an. Knowledge-Panel-Eligibility/Entity-Disambiguierung, KEIN Ranking-Signal.",
+      "quelle": "Google Search Central – Organization Structured Data (contactPoint empfohlen; Entity-/Knowledge-Panel-Anreicherung; kein Ranking)",
+      "datum": "2026-04"
+    },
+    {
+      "ruleId": "crawl:client-rendered",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Client-gerenderete Seiten erkannt (JS-Guard)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/client-rendered.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/client-rendered.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Client-seitig gerenderte Seiten ohne SSR-Fallback erkannt",
+      "quelle": "Crawl-Analyse",
+      "datum": "2025-01"
+    },
+    {
+      "ruleId": "tech:non-2xx",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "Seiten mit nicht-2xx HTTP-Status",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/gone-page.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/gone-page.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – HTTP Status Codes",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:redirect-chain",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Redirect-Ketten (≥2 Hops)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/redirect-1"
+      ],
+      "clusters": [
+        {
+          "pattern": "/redirect-1/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Redirects",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:canonical-nonself",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Canonical zeigt nicht auf sich selbst",
+      "count": 18,
+      "pctOfPages": 85.7,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Canonical URLs",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:noindex-conflict",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "Noindex-Seite in Sitemap (Konflikt)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/noindex.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/noindex.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Sitemaps & Robots",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:sitemap-quality",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Sitemap enthält fehlerhafte URLs",
+      "count": 3,
+      "pctOfPages": 14.3,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/noindex.html",
+        "http://127.0.0.1:59896/redirect-1",
+        "http://127.0.0.1:59896/gone-page.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/gone-page.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/noindex.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/redirect-1/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – Sitemaps",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:https",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "Seiten ohne HTTPS oder mit Mixed-Content",
+      "count": 21,
+      "pctOfPages": 100,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/dup-meta-a.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/xss.html",
+        "http://127.0.0.1:59896/redirect-final.html",
+        "http://127.0.0.1:59896/gone-page.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/client-rendered.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "",
+      "quelle": "Google Search Central – HTTPS",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:noindex-canonical-conflict",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "noindex und canonical gleichzeitig (widersprüchliche Signale)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/noindex.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/noindex.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Seite trägt noindex UND ein rel=canonical — widersprüchliche Indexierungssignale: noindex blockiert die Seite komplett aus der Suche, während canonical eine bevorzugte Index-Version signalisiert. Google empfiehlt, noindex nicht mit rel=canonical zu kombinieren.",
+      "quelle": "Google Search Central – Canonical festlegen (noindex nicht mit rel=canonical kombinieren)",
+      "datum": "2026-03"
+    },
+    {
+      "ruleId": "tech:robots-sitemap-conflict",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Sitemap listet per robots.txt gesperrte URL",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [
+        "http://demo.example/private/secret.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/private/*",
+          "count": 1
+        }
+      ],
+      "detail": "Die Sitemap enthält URL(s), die robots.txt (User-agent: *) per Disallow blockiert — widersprüchliches Signal („indexieren wollen\" vs. „crawlen verbieten\") und verschwendetes Crawl-Budget. Sitemaps sollten nur crawlbare, indexierbare URLs listen.",
+      "quelle": "Google Search Central – Sitemap erstellen & einreichen (keine robots-gesperrten URLs listen)",
+      "datum": "2025-12"
+    },
+    {
+      "ruleId": "tech:viewport-missing",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Fehlendes Viewport-Meta-Tag (Mobile Usability)",
+      "count": 17,
+      "pctOfPages": 81,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/long-title.html",
+        "http://127.0.0.1:59896/dup-title-b.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/noindex.html",
+        "http://127.0.0.1:59896/no-alt.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Fehlendes <meta name=\"viewport\"> — mobile Browser können die Seite nicht korrekt skalieren (Responsive-Design-Voraussetzung). (as-served HTML — bei JS-injizierten Tags ggf. False Positive)",
+      "quelle": "Google Search Central – Mobile-First Indexing Best Practices (developers.google.com/search/docs/crawling-indexing/mobile/mobile-sites-mobile-first-indexing) — Mobile Usability-Voraussetzung, KEIN direkter Ranking-Score-Claim",
+      "datum": "2025-12"
+    },
+    {
+      "ruleId": "tech:frame-protection-missing",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Kein Clickjacking-Schutz (X-Frame-Options / CSP frame-ancestors)",
+      "count": 18,
+      "pctOfPages": 85.7,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Seite ohne Clickjacking-Schutz: weder X-Frame-Options noch CSP frame-ancestors gesetzt. Ohne einen dieser Header kann die Seite in fremde <iframe>s eingebettet werden (Clickjacking-Risiko). CSP frame-ancestors ist der moderne Nachfolger von X-Frame-Options; einer genügt. Sicherheitsbefund, KEIN Ranking-Signal.",
+      "quelle": "OWASP Clickjacking Defense Cheat Sheet + MDN X-Frame-Options / CSP frame-ancestors (kein Ranking-Signal)",
+      "datum": "2026-03"
+    },
+    {
+      "ruleId": "tech:nosniff-missing",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Fehlender X-Content-Type-Options: nosniff-Header (Security-Härtung)",
+      "count": 18,
+      "pctOfPages": 85.7,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Antwort ohne X-Content-Type-Options: nosniff. Ohne diesen Header darf der Browser den MIME-Type per Content-Sniffing erraten — das kann z. B. hochgeladene Dateien als ausführbares Skript interpretieren (MIME-Confusion-/XSS-Risiko). Setze X-Content-Type-Options: nosniff. KEIN Ranking-Signal — Trust/Security-Härtung (keine Rich-Result-Eignung).",
+      "quelle": "OWASP Secure Headers Project (X-Content-Type-Options) + MDN X-Content-Type-Options — nosniff verhindert MIME-Type-Sniffing; KEIN Ranking-Signal",
+      "datum": "2026-06"
+    },
+    {
+      "ruleId": "tech:referrer-policy-missing",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Fehlender Referrer-Policy-Header (Security-Härtung)",
+      "count": 18,
+      "pctOfPages": 85.7,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Antwort ohne Referrer-Policy-Header. Ohne explizite Policy kann der vollständige Referer (inkl. Pfad/Query) an Drittseiten übertragen werden und so interne URLs/Tokens leaken. Empfehlung: z. B. strict-origin-when-cross-origin. KEIN Ranking-Signal — Trust/Security-Härtung (keine Rich-Result-Eignung).",
+      "quelle": "OWASP Secure Headers Project (Referrer-Policy) + MDN Referrer-Policy — kontrolliert Referer-Leak an Dritte; KEIN Ranking-Signal",
+      "datum": "2026-06"
+    },
+    {
+      "ruleId": "tech:permissions-policy-missing",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Fehlender Permissions-Policy-Header (Security-Härtung)",
+      "count": 18,
+      "pctOfPages": 85.7,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Antwort ohne Permissions-Policy-Header. Dieser Header schränkt ein, welche Browser-Features (Kamera, Mikrofon, Geolocation, Payment usw.) die Seite und ihre eingebetteten Drittinhalte nutzen dürfen. Fehlt er, gelten die Default-Berechtigungen — größere Angriffsfläche bei kompromittierten Skripten/Frames. KEIN Ranking-Signal — Trust/Security-Härtung (keine Rich-Result-Eignung).",
+      "quelle": "OWASP Secure Headers Project (Permissions-Policy) + MDN Permissions-Policy — schränkt Browser-Feature-Zugriff (Kamera/Geolocation usw.) ein; KEIN Ranking-Signal",
+      "datum": "2026-06"
+    },
+    {
+      "ruleId": "tech:csp-missing",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Fehlende Content-Security-Policy (Security-Härtung)",
+      "count": 18,
+      "pctOfPages": 85.7,
+      "affectedUrls": [
+        "http://127.0.0.1:59896/index.html",
+        "http://127.0.0.1:59896/missing-title.html",
+        "http://127.0.0.1:59896/dup-title-a.html",
+        "http://127.0.0.1:59896/missing-meta.html",
+        "http://127.0.0.1:59896/dup-meta-b.html",
+        "http://127.0.0.1:59896/multi-h1.html",
+        "http://127.0.0.1:59896/thin.html",
+        "http://127.0.0.1:59896/invalid-schema.html",
+        "http://127.0.0.1:59896/orphan.html",
+        "http://127.0.0.1:59896/redirect-final.html"
+      ],
+      "clusters": [
+        {
+          "pattern": "/dup-meta-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-meta-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-a.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/dup-title-b.html/*",
+          "count": 1
+        },
+        {
+          "pattern": "/index.html/*",
+          "count": 1
+        }
+      ],
+      "detail": "Antwort ohne Content-Security-Policy (CSP). CSP ist die wichtigste Abwehrschicht gegen Cross-Site-Scripting und Daten-Injection: sie schränkt ein, aus welchen Quellen Skripte/Styles/Frames geladen werden dürfen. (Hinweis: separat zu prüfen vom Clickjacking-Schutz frame-ancestors.) KEIN Ranking-Signal — Trust/Security-Härtung (keine Rich-Result-Eignung).",
+      "quelle": "OWASP Secure Headers Project (Content-Security-Policy) + MDN Content-Security-Policy — wichtigste XSS-/Injection-Abwehrschicht; KEIN Ranking-Signal",
+      "datum": "2026-06"
+    },
+    {
+      "ruleId": "trust:contact-pages-missing",
+      "kategorie": "trust",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Keine erkennbare Kontakt-/Über-uns-/Impressums-/Datenschutz-Seite (Trust)",
+      "count": 1,
+      "pctOfPages": 4.8,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "Kein erkennbarer Kontakt-, Über-uns-, Impressums- oder Datenschutz-Bereich unter den gecrawlten/entdeckten URLs gefunden. Vertrauenssignal gemäß Google Quality Rater Guidelines (Sept. 2025: „Trust is the most important member of the E-E-A-T family\"; transaktionale Seiten verlangen „satisfying customer service information\") — KEIN direkter Ranking-Faktor. Für gewerbliche deutsche Websites zudem RECHTSPFLICHT: Impressum (DDG §5, seit Mai 2024) + Datenschutzerklärung (DSGVO Art. 13). Heuristik (Seiten können unter untypischen URLs liegen oder ungecrawlt sein) — bitte manuell verifizieren.",
+      "quelle": "Google Search Quality Rater Guidelines (2025-09, „Trust is the most important member of the E-E-A-T family“; transaktionale Seiten: „satisfying customer service information“) + DE-Rechtspflicht: Impressum DDG §5 (2024-05) / Datenschutzerklärung DSGVO Art. 13 — Vertrauens-/Rechtssignal, KEIN Ranking-Faktor",
+      "datum": "2025-09"
+    }
+  ],
+  "positives": [
+    {
+      "ruleId": "a11y:control-no-name",
+      "title": "Interaktives Element ohne zugänglichen Namen (WCAG 4.1.2)"
+    },
+    {
+      "ruleId": "geo:ai-snippet-suppressed",
+      "title": "AI-Snippet unterdrückt (nosnippet / max-snippet:0 — keine AI-Overview-/AI-Mode-Zitierung)"
+    },
+    {
+      "ruleId": "geo:noimageindex",
+      "title": "Bilder von der Indexierung ausgeschlossen (noimageindex)"
+    },
+    {
+      "ruleId": "geo:content-stale",
+      "title": "Artikel ohne dateModified (Recency-Signal fehlt)"
+    },
+    {
+      "ruleId": "geo:ai-user-fetcher-blocked",
+      "title": "On-Demand-KI-Fetcher per robots.txt gesperrt (keine Live-Zitation)"
+    },
+    {
+      "ruleId": "geo:poor-chunkability",
+      "title": "Lange Seite ohne Zwischenüberschriften (KI-Chunkability — struktureller Hinweis)"
+    },
+    {
+      "ruleId": "hygiene:oos-noindexed",
+      "title": "Temporär ausverkaufte Produkte fälschlich deindexiert (noindex → Ranking-/Backlink-Verlust)"
+    },
+    {
+      "ruleId": "hygiene:duplicate-content",
+      "title": "Strukturelle Content-Dublette (identischer Titel + Meta-Beschreibung)"
+    },
+    {
+      "ruleId": "hygiene:url-inconsistency",
+      "title": "URL-Hygiene/Host-Kanonisierung inkonsistent (Heuristik, kein Ranking-Faktor)"
+    },
+    {
+      "ruleId": "i18n:html-lang-hreflang-mismatch",
+      "title": "html lang widerspricht dem self-referenziellen hreflang"
+    },
+    {
+      "ruleId": "i18n:hreflang-invalid-code",
+      "title": "Ungültige hreflang-Codes"
+    },
+    {
+      "ruleId": "i18n:hreflang-no-x-default",
+      "title": "hreflang-Cluster ohne x-default (empfohlen)"
+    },
+    {
+      "ruleId": "i18n:hreflang-on-noindex",
+      "title": "hreflang auf noindex-Seite"
+    },
+    {
+      "ruleId": "i18n:hreflang-canonical-conflict",
+      "title": "hreflang mit fremdem Canonical (Konflikt)"
+    },
+    {
+      "ruleId": "i18n:hreflang-not-reciprocal",
+      "title": "hreflang nicht reziprok / ohne Self-Referenz / relativ (Targeting-Defekt)"
+    },
+    {
+      "ruleId": "i18n:hreflang-target-broken",
+      "title": "hreflang-Ziel ist fehlerhaft (4xx/Redirect)"
+    },
+    {
+      "ruleId": "links:deep",
+      "title": "Seiten zu tief im Klick-Pfad (>maxDepth Klicks von der Startseite)"
+    },
+    {
+      "ruleId": "links:dead-end",
+      "title": "Sackgassen-Seite (keine ausgehenden internen Links — Link-Equity-Heuristik)"
+    },
+    {
+      "ruleId": "links:generic-anchor",
+      "title": "Generischer oder leerer Linktext (Barrierefreiheit/Usability)"
+    },
+    {
+      "ruleId": "links:internal-broken",
+      "title": "Interner Link auf tote URL (4xx/5xx)"
+    },
+    {
+      "ruleId": "links:internal-redirect",
+      "title": "Interner Link auf eine Weiterleitung (Link-Equity-Verlust)"
+    },
+    {
+      "ruleId": "onpage:h1-missing",
+      "title": "Fehlende oder leere H1-Überschrift"
+    },
+    {
+      "ruleId": "onpage:html-lang-missing",
+      "title": "Fehlendes lang-Attribut am <html>-Element (Barrierefreiheit & Sprach-Erkennung)"
+    },
+    {
+      "ruleId": "onpage:viewport-zoom-disabled",
+      "title": "Zoom/Skalierung im Viewport unterdrückt (Barrierefreiheit WCAG 2.2 SC 1.4.4)"
+    },
+    {
+      "ruleId": "onpage:og-missing",
+      "title": "Unvollständiges Open-Graph-Markup (Social-/Link-Preview)"
+    },
+    {
+      "ruleId": "onpage:favicon-missing",
+      "title": "Startseite ohne deklariertes Favicon (SERP-Darstellung)"
+    },
+    {
+      "ruleId": "onpage:img-missing-dimensions",
+      "title": "Bilder ohne width/height (Layout-Shift / CLS)"
+    },
+    {
+      "ruleId": "onpage:lcp-image-lazy",
+      "title": "Erstes Content-Bild lazy-geladen (LCP-Risiko)"
+    },
+    {
+      "ruleId": "onpage:excessive-dom",
+      "title": "Übermäßige DOM-Größe (Performance-Heuristik)"
+    },
+    {
+      "ruleId": "onpage:render-blocking-head",
+      "title": "Render-blockierende Ressourcen im <head>"
+    },
+    {
+      "ruleId": "schema:context-invalid",
+      "title": "JSON-LD ohne schema.org-@context (nicht rich-result-fähig)"
+    },
+    {
+      "ruleId": "schema:no-organization",
+      "title": "Kein Organization-Schema auf der gesamten Site"
+    },
+    {
+      "ruleId": "schema:missing-dates",
+      "title": "Article-/News-/Blog-Schema ohne datePublished"
+    },
+    {
+      "ruleId": "schema:breadcrumb-missing",
+      "title": "Tiefe Seite ohne BreadcrumbList-Schema (Breadcrumb-Rich-Result)"
+    },
+    {
+      "ruleId": "schema:article-no-author",
+      "title": "Artikel-Schema ohne author (E-E-A-T-Signal — empfohlen)"
+    },
+    {
+      "ruleId": "schema:offer-no-price",
+      "title": "Produkt ohne Preis im Offer (price ist für Rich-Results erforderlich)"
+    },
+    {
+      "ruleId": "schema:date-inconsistent",
+      "title": "Widersprüchliche Datumsangaben (dateModified vor datePublished)"
+    },
+    {
+      "ruleId": "schema:aggregaterating-incomplete",
+      "title": "AggregateRating unvollständig (ratingValue/-Count fehlt)"
+    },
+    {
+      "ruleId": "schema:microdata-only",
+      "title": "Strukturierte Daten nur als Microdata/RDFa (JSON-LD empfohlen, kein Defekt)"
+    },
+    {
+      "ruleId": "tech:canonical-missing",
+      "title": "Fehlendes Canonical-Tag"
+    },
+    {
+      "ruleId": "tech:sitemap-scale-limit",
+      "title": "Sitemap überschreitet das 50.000-URL-Limit"
+    },
+    {
+      "ruleId": "tech:charset-missing",
+      "title": "Fehlende UTF-8-Charset-Deklaration"
+    },
+    {
+      "ruleId": "tech:canonical-multiple",
+      "title": "Mehrere widersprüchliche Canonical-Tags"
+    },
+    {
+      "ruleId": "tech:x-robots-noindex",
+      "title": "X-Robots-Tag: noindex im HTTP-Header (oft unsichtbar)"
+    },
+    {
+      "ruleId": "tech:hsts-missing",
+      "title": "HTTPS-Seite ohne HSTS-Header (Security-Härtung)"
+    },
+    {
+      "ruleId": "tech:cookie-insecure",
+      "title": "Set-Cookie ohne Secure/HttpOnly/SameSite (Security-Härtung)"
+    },
+    {
+      "ruleId": "tech:version-disclosure",
+      "title": "Server/X-Powered-By legt Software-Version offen (Security-Härtung)"
+    },
+    {
+      "ruleId": "tech:http-not-redirected",
+      "title": "HTTP leitet nicht auf HTTPS um (Kanonisierung/Sicherheit)"
+    },
+    {
+      "ruleId": "tech:robots-site-blocked",
+      "title": "robots.txt sperrt die gesamte Site (Disallow: / für User-agent: *)"
+    },
+    {
+      "ruleId": "tech:robots-noindex-directive",
+      "title": "robots.txt enthält unwirksame noindex-Direktive"
+    },
+    {
+      "ruleId": "tech:robots-no-sitemap",
+      "title": "robots.txt referenziert keine Sitemap"
+    },
+    {
+      "ruleId": "tech:robots-blocked-resources",
+      "title": "Render-Ressource (CSS/JS) per robots.txt gesperrt"
+    },
+    {
+      "ruleId": "tech:canonical-target-broken",
+      "title": "Canonical zeigt auf fehlerhaftes Ziel (4xx/Redirect/noindex)"
+    }
+  ],
+  "signals": {
+    "robots": {
+      "exists": true,
+      "raw": "User-agent: *\nDisallow: /private/\n\n# DEFECT: falsche AI-Bot-Direktive — würde ChatGPT-Search-Citations blockieren.\n# OAI-SearchBot ist der offizielle Bot für ChatGPT Search (Quellenangaben).\n# \"Disallow: /\" hier killt die GEO-Sichtbarkeit vollständig.\n# Korrekt wäre: Disallow: (leer) oder gezielte Pfade.\nUser-agent: OAI-SearchBot\nDisallow: /\n\nSitemap: http://demo.example/sitemap.xml\n",
+      "disallow": [
+        "/private/"
+      ],
+      "allow": [],
+      "aiBots": [
+        {
+          "agent": "OAI-SearchBot",
+          "disallowAll": true,
+          "disallowPaths": [
+            "/"
+          ],
+          "kategorie": "ai-search",
+          "operator": "OpenAI"
+        }
+      ],
+      "sitemapRefs": [
+        "http://demo.example/sitemap.xml"
+      ]
+    },
+    "llms": {
+      "exists": true,
+      "valid": false,
+      "problems": [
+        "missing-h1: first non-empty line must start with \"# \" (H1 heading)",
+        "missing-blockquote: no \"> \" summary line found"
+      ],
+      "raw": "Demo Kaffeerösterei\n\nDEFECT: Diese llms.txt ist strukturell fehlerhaft.\nEs fehlt der obligatorische H1-Titel (Zeile mit \"# Titel\") sowie die Pflicht-Summary\nals Blockquote (Zeile mit \"> Zusammenfassung\"). Beides wird von der llms.txt-Spezifikation\nunter https://llmstxt.org verlangt.\n\nAbschnitte:\n- Über uns: http://demo.example/perfect.html\n- Produkte: http://demo.example/no-alt.html\n- Kontakt: http://demo.example/no-citations.html\n"
+    },
+    "aiBots": [
+      {
+        "agent": "OAI-SearchBot",
+        "disallowAll": true,
+        "disallowPaths": [
+          "/"
+        ],
+        "kategorie": "ai-search",
+        "operator": "OpenAI"
+      }
+    ]
+  }
+}

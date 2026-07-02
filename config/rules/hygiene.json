@@ -1,0 +1,35 @@
+[
+  {
+    "id": "hygiene:oos-noindexed",
+    "kategorie": "hygiene",
+    "scope": "ecommerce",
+    "severity": "mittel",
+    "title": "Temporär ausverkaufte Produkte fälschlich deindexiert (noindex → Ranking-/Backlink-Verlust)",
+    "quelle": "Google Search Central / John Mueller – temporäre Out-of-Stock-Produkte indexiert lassen",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "hygiene:duplicate-content",
+    "kategorie": "hygiene",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Strukturelle Content-Dublette (identischer Titel + Meta-Beschreibung)",
+    "quelle": "Google Search Central – Duplicate Content",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "hygiene:url-inconsistency",
+    "kategorie": "hygiene",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "URL-Hygiene/Host-Kanonisierung inkonsistent (Heuristik, kein Ranking-Faktor)",
+    "quelle": "Google Search Central – URL structure (sprechende URLs, konsistente Host-/Trailing-Slash-Kanonisierung, keine Session-IDs — Lesbarkeit/Deduplizierung, KEIN Ranking-Faktor)",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": { "maxUrlLength": 115 }
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "url": "https://demo.example",
+    "crawledAt": "2026-06-27T10:00:00Z",
+    "modelId": "claude-opus-4",
+    "rulesetVersion": "1.0.0",
+    "sampleSize": 12,
+    "coveragePct": 100,
+    "siteType": "blog"
+  },
+  "execSummary": {
+    "metrics": ["12 pages crawled"],
+    "patterns": ["<script>alert('pattern')</script> appears in titles"],
+    "quickWins": ["Escape all crawled strings on render"]
+  },
+  "sections": [
+    {
+      "id": "sec-1",
+      "num": 1,
+      "title": "Untrusted strings <b>section</b>",
+      "findings": [
+        {
+          "id": "f-1-1",
+          "title": "<script>alert(1)</script>",
+          "category": "on-page & <markup>",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "\"><img src=x onerror=alert(1)>",
+          "beleg": "raw crawl title field for /seite-1",
+          "evidence": "crawl row 1: title=<script>alert(1)</script>",
+          "auswirkung": "Fixture finding — demonstrates that untrusted crawled strings are escaped.",
+          "empfehlung": "Escape '<', '>', '&', '\"' and \"'\" in every crawled string before rendering.",
+          "ice": { "i": 3, "c": 3, "e": 3, "score": 27 },
+          "kbSources": [
+            { "source": "05-meta-tags.md", "heading": "<em>inject</em> heading", "date": "2024-09" }
+          ]
+        }
+      ]
+    }
+  ],
+  "positives": ["<i>fixture positive</i> — no real positives"],
+  "strategy": {
+    "levers": ["technical"],
+    "todos": ["<script>alert('todo')</script>"]
+  },
+  "confidence": {
+    "sampleSize": 12,
+    "minNMet": true,
+    "caveats": ["<script>alert('caveat')</script>"]
+  }
+}

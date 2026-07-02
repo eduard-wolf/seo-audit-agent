@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Demo Kaffeerösterei – Produkt</title>
+  <meta name="description" content="Produktseite mit fehlerhaftem JSON-LD Schema.">
+  <link rel="canonical" href="http://demo.example/invalid-schema.html">
+
+  <!-- DEFECT 1: JSON-LD mit Syntaxfehler (fehlendes schließendes "}" und fehlerhaftes Komma) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Demo Produktseite",
+    "description": "Eine Testseite mit ungültigem JSON-LD"
+  </script>
+
+  <!-- DEFECT 2: Product-JSON-LD ohne aggregateRating -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Premium Arabica Kaffee",
+    "description": "Unser bester Spezialitätenkaffee aus Äthiopien.",
+    "brand": {
+      "@type": "Brand",
+      "name": "Demo Kaffeerösterei"
+    },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "EUR",
+      "price": "14.90",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+  </script>
+</head>
+<body>
+  <nav><a href="/">← Startseite</a></nav>
+  <h1>Premium Arabica Kaffee</h1>
+  <p>
+    Diese Testseite der Demo Kaffeerösterei enthält zwei fehlerhafte JSON-LD-Blöcke:
+    einen mit Syntaxfehler (fehlendes schließendes „}") und einen Product-Block ohne
+    <code>aggregateRating</code>. Test der Regeln „JSON-LD Syntaxfehler" und
+    „Product ohne Bewertung".
+  </p>
+</body>
+</html>

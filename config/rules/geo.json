@@ -1,0 +1,101 @@
+[
+  {
+    "id": "geo:ai-bot-blocked",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "hoch",
+    "title": "KI-Suchbot blockiert (GEO-Sichtbarkeit gefährdet)",
+    "quelle": "Offizielle AI-Operator-Dokumentation (u.a. OpenAI OAI-SearchBot, Google-Crawler-Übersicht) — Provenienz + lastVerified je Bot in config/ai-bots.SOURCES.md",
+    "datum": "2026-07",
+    "lastReviewed": "2026-07",
+    "params": {}
+  },
+  {
+    "id": "geo:llms-txt-malformed",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "llms.txt fehlt oder ist strukturell fehlerhaft",
+    "quelle": "https://llmstxt.org – llms.txt Specification",
+    "datum": "2024-11",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "geo:missing-citations",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "Keine Quellen aus der kuratierten Autoritäts-Liste (GEO: Cite Sources)",
+    "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
+    "datum": "2023-11",
+    "lastReviewed": "2026-06",
+    "params": { "minCitationWords": 80 }
+  },
+  {
+    "id": "geo:no-faq-howto",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "info",
+    "title": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces)",
+    "quelle": "GEO-Praxis — strukturierte Q&A erhöht AI-Answer-Surface; Google-FAQ/HowTo-Rich-Results sind entfallen (2023/2026)",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "geo:ai-snippet-suppressed",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "hoch",
+    "title": "AI-Snippet unterdrückt (nosnippet / max-snippet:0 — keine AI-Overview-/AI-Mode-Zitierung)",
+    "quelle": "Google Search Central – Robots-Meta/X-Robots-Spezifikation: nosnippet & max-snippet:0",
+    "datum": "2026-03",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "geo:noimageindex",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Bilder von der Indexierung ausgeschlossen (noimageindex)",
+    "quelle": "Google Search Central – Robots-Meta/X-Robots-Spezifikation: noimageindex",
+    "datum": "2026-03",
+    "lastReviewed": "2026-07",
+    "params": {}
+  },
+  {
+    "id": "geo:content-stale",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Artikel ohne dateModified (Recency-Signal fehlt)",
+    "quelle": "Google Search Central – Article (dateModified empfohlen) + Ranking Systems Guide (QDF ist query-abhängig)",
+    "datum": "2025-12",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "geo:ai-user-fetcher-blocked",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "mittel",
+    "title": "On-Demand-KI-Fetcher per robots.txt gesperrt (keine Live-Zitation)",
+    "quelle": "Offizielle Crawler-Doku: Anthropic privacy.claude.com (Claude-User, 2026-04), OpenAI (ChatGPT-User), Perplexity (Perplexity-User), Meta (meta-externalfetcher) — On-Demand-Fetcher rufen Inhalte live bei Nutzeranfragen ab; Sperre = keine Live-Zitation. Neutral (Publisher-Wahl), kein Ranking",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "geo:poor-chunkability",
+    "kategorie": "geo",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Lange Seite ohne Zwischenüberschriften (KI-Chunkability — struktureller Hinweis)",
+    "quelle": "RAG-Chunking-Praxis (Unstructured.io / Firecrawl 2026: heading-basiertes Chunking schlägt Fixed-Size-Splitting) + GEO-Praxis (Backlinko 2025-26); Google bestätigt: Wortzahl ist KEIN Qualitäts-/Ranking-Signal (Mueller/Sullivan) — struktureller Hinweis für KI-Extrahierbarkeit, kein Ranking-Claim, Praktiker-Evidenz (keine Google-Primärquelle)",
+    "datum": "2026-01",
+    "lastReviewed": "2026-06",
+    "params": { "minWords": 900, "maxHeadings": 1 }
+  }
+]

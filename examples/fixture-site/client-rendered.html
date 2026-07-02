@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Demo App</title>
+  <!-- DEFECT: fast leerer Body – nur <div id="app"> + JS-Bundle-Referenz.
+       Simuliert eine client-seitig gerenderte SPA ohne SSR-Fallback.
+       Test des Empty-/JS-Guard: Crawler soll erkennen, dass kein sichtbarer
+       Text-Content vorhanden ist und ein Coverage-Flag setzen. -->
+</head>
+<body>
+  <div id="app"></div>
+  <script src="/app.bundle.js"></script>
+</body>
+</html>

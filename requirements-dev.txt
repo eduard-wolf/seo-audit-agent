@@ -1,0 +1,10 @@
+# Dev tooling for the optional Python adapters (crawl/gsc.py, kb/pgvector_store.py).
+# These are NOT runtime deps: the graceful-skip + mocked tests need none of the
+# heavy runtime packages in requirements.txt (no live Google client / Postgres).
+#
+#   pip install -r requirements-dev.txt
+#
+# Mirrors the [project.optional-dependencies] "dev" group in pyproject.toml.
+pytest>=8.0
+ruff>=0.6
+mypy>=1.10

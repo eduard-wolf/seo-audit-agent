@@ -1,0 +1,64 @@
+[project]
+name = "seo-audit-agent-python"
+version = "0.1.0"
+description = "Optional Python adapters for the (Node-first) SEO/GEO audit agent: Google Search Console enrichment (crawl/gsc.py) and a pgvector RAG store (kb/pgvector_store.py)."
+requires-python = ">=3.11"
+readme = "README.md"
+license = { file = "LICENSE" }
+# Runtime dependencies live in requirements.txt and are OPTIONAL — each adapter
+# guards its heavy imports with try/except. They are intentionally NOT listed
+# here so that linting/typing/tests run with only the dev tools installed.
+dependencies = []
+
+[project.optional-dependencies]
+# Dev tooling only. The skip-path + mocked tests need none of the runtime deps.
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "mypy>=1.10",
+]
+
+[tool.setuptools]
+# This project is a loose collection of scripts, not an installable package.
+py-modules = []
+
+# ── pytest ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+python_files = ["test_*.py"]
+addopts = "-q"
+
+# ── ruff ──────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Lint only the Python surface we own; the Node tree is out of scope.
+include = ["crawl/gsc.py", "kb/pgvector_store.py", "tests/python/*.py", "pyproject.toml"]
+
+[tool.ruff.lint]
+# pyflakes + pycodestyle (incl. E501 line-length) plus import sorting,
+# bugbears, and pyupgrade.
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+# The adapters are imported by bare module name in tests (see conftest.py).
+known-first-party = ["gsc", "pgvector_store"]
+
+# ── mypy ──────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+warn_unused_configs = true
+warn_redundant_casts = true
+no_implicit_optional = true
+check_untyped_defs = true
+
+# The optional runtime deps ship no type stubs (and aren't installed in CI),
+# so ignore missing imports for exactly those modules.
+[[tool.mypy.overrides]]
+module = [
+    "googleapiclient.*",
+    "google.*",
+    "psycopg",
+    "psycopg2",
+]
+ignore_missing_imports = true

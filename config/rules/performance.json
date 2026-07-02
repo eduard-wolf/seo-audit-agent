@@ -1,0 +1,35 @@
+[
+  {
+    "id": "onpage:non-modern-image-format",
+    "kategorie": "performance",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "Bilder nur in Legacy-Format (JPG ohne WebP/AVIF-Alternative)",
+    "quelle": "Google Core Web Vitals – Image Optimization",
+    "datum": "2024-01",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "perf:text-compression-missing",
+    "kategorie": "performance",
+    "scope": "agnostic",
+    "severity": "niedrig",
+    "title": "HTML ohne Text-Kompression (gzip/Brotli)",
+    "quelle": "Lighthouse / Chrome DevTools – Enable text compression (uses-text-compression); Performance-Heuristik, kein Ranking-Signal",
+    "datum": "2024-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  },
+  {
+    "id": "perf:cwv-field-fail",
+    "kategorie": "performance",
+    "scope": "agnostic",
+    "severity": "hoch",
+    "title": "Core Web Vitals (Felddaten/CrUX) nicht im »good«-Bereich",
+    "quelle": "Google CrUX-API (chromeuxreport.googleapis.com, queryRecord) + web.dev Core-Web-Vitals-Schwellen (LCP 2500/4000 ms, INP 200/500 ms, CLS 0,10/0,25; INP ersetzte FID 2024) — gemessene Felddaten (28-Tage-Rollup), kein Ranking-Magnitude-Claim",
+    "datum": "2026-06",
+    "lastReviewed": "2026-06",
+    "params": {}
+  }
+]
