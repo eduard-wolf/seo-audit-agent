@@ -60,12 +60,12 @@ try:
     _PGVECTOR_AVAILABLE = True
 except ImportError:
     try:
-        import psycopg2 as psycopg  # type: ignore[no-redef]
+        import psycopg2 as psycopg
 
         _PGVECTOR_AVAILABLE = True
     except ImportError:
         _PGVECTOR_AVAILABLE = False
-        psycopg = None  # type: ignore[assignment]
+        psycopg = None
 
 
 def _format_vector(vector: list[float]) -> str:
