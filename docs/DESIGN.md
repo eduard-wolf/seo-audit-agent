@@ -11,7 +11,7 @@ nachprüfbar**". Die Antwort ist, die Modellrolle radikal zu begrenzen.
 Jeder Modellaufruf ist eine potenzielle Halluzinationsquelle. Rohdaten sammeln
 (Crawl), Regeln auswerten (Analyze) und HTML erzeugen (Render) sind
 **geschlossene, verifizierbare Probleme** — sie brauchen kein Urteil, nur
-korrekten Code. Nur die Verdichtung von 42 Roh-Regel-Treffern zu 29
+korrekten Code. Nur die Verdichtung von 40 Roh-Regel-Treffern zu 27
 priorisierten Befunden ist echtes *Senior-Urteil*. Genau diese eine Stelle ist
 das Modell. Alles andere deterministisch zu halten macht die Frage „hat das
 Modell hier fantasiert?" auf **einen einzigen, eng umrissenen Schritt**
@@ -56,7 +56,7 @@ auslieferbare Datei — der Report ist ein Artefakt, kein Programm.
 
 | Kompetenz | Konkrete Evidenz im Repo |
 |---|---|
-| **Technical SEO / GEO** | `config/rules/*.json` (96 Checks über 10 Kategorien: on-page, tech-index, structured-data, GEO, performance, links, a11y, i18n, trust, hygiene); `analyze/engine.mjs` + `analyze/analyze.mjs` (Detektoren, ICE, affected-urls); `crawl/parse.mjs` + `crawl/run.mjs` (Robots-Enforcement, Redirect-Ketten, Link-Graph/Orphans/Click-Depth); `config/rules/geo.json` (AI-Bot-Direktiven, `llms.txt`, Zitier-/Entity-Signale) |
+| **Technical SEO / GEO** | `config/rules/*.json` (96 Checks über 10 Kategorien: on-page, tech-index, structured-data, GEO, performance, links, a11y, i18n, trust, hygiene — die `kategorie`-Felder entsprechen exakt diesen 10; zwei Regeln tragen aus historischen Gründen den ID-Präfix `crawl:` (`crawl:orphan-page` → Kategorie *links*, `crawl:client-rendered` → *tech-index*)); `analyze/engine.mjs` + `analyze/analyze.mjs` (Detektoren, ICE, affected-urls); `crawl/parse.mjs` + `crawl/run.mjs` (Robots-Enforcement, Redirect-Ketten, Link-Graph/Orphans/Click-Depth); `config/rules/geo.json` (AI-Bot-Direktiven, `llms.txt`, Zitier-/Entity-Signale) |
 | **Automatisierung** | `bin/crawl-and-analyze.mjs` (deterministischer CLI-Bookend); `crawl/profiles.mjs` + `config/crawl-profiles.json` (`--profile`); `crawl/run.mjs` (Streaming, Checkpoint/`--resume`, Bounded Concurrency); `scripts/leak-scan.mjs` (Secret-Gate); `.github/workflows/ci.yml` (Node-Matrix 20/22/24 + Python-Job); `npm run clean` |
 | **Python** | `crawl/gsc.py` (Search-Console-Enrichment, gemockt/skip-fähig); `kb/pgvector_store.py` (pgvector-Store für Produktion); `tests/python/*` (pytest); `pyproject.toml` + `requirements-dev.txt` (Ruff + Mypy im CI) |
 | **LLM / RAG / Agent-Design** | `skills/interpret.md` (der eine LLM-Schritt), `skills/strategy.md`, `skills/context-handoff.md` (verlustfreie Kontext-Rotation aus Artefakten); `kb/retrieve.mjs` + `kb/chunk.mjs` + `kb/embed.mjs` + `kb/corpus/` (RAG mit lokalem Fallback-Embedder); `lib/findings-schema.mjs` (erzwungener LLM↔Renderer-Vertrag); `report/build-report.mjs` (statischer, CSP-reiner Renderer) |

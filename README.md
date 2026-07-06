@@ -8,6 +8,12 @@ in **einem** RAG-geerdeten LLM-Schritt interpretieren, statisch rendern.
 > Source-available, **all rights reserved** (siehe [`LICENSE`](LICENSE)). Nur
 > eigene/autorisierte Sites auditieren — siehe [`DISCLAIMER.md`](DISCLAIMER.md).
 
+> **English (TL;DR).** An agentic SEO/GEO audit workspace: collect & check
+> **deterministically**, interpret in **one** RAG-grounded LLM step, render a
+> single self-contained HTML report **statically**. Runs inside a coding agent
+> (Claude Code); the Node core (crawler, rule engine, renderer) is dependency-free.
+> The detailed docs below are in German. Security policy: [`SECURITY.md`](SECURITY.md).
+
 ---
 
 ## In 30 Sekunden — Was, Warum, Wirkung
@@ -224,10 +230,10 @@ node report/build-report.mjs data/<host>/findings.json
 |---|---|
 | `--profile quick-scan` | Schnell-Triage / sehr kleine Site: ≤ 50 URLs, Tiefe 2, ~25 s — klärt `minNMet` (≥ 5). |
 | `--profile standard` | **Default.** ≤ 300 URLs, Tiefe 4, ~2,5 min — die meisten Marketing-/KMU-Sites. |
-| `--profile full-audit` | Große Sites, Near-Complete-Coverage: ≤ 25 000 URLs, Tiefe 8; Off-Peak, nutzt Streaming + Resume. |
+| `--profile full-audit` | Große Sites, Near-Complete-Coverage: ≤ 25 000 URLs, Tiefe 8; Off-Peak. Verwirft HTML pro Seite (speicherschonend, kein DOM-Retain); Resume ab **sauberem Stopp**. |
 | `--max <n>` | Harte Seitenobergrenze; überschreibt das Profil. |
 | `--rps <n>` | Requests/Sekunde (Politeness-Drossel); überschreibt das Profil. |
-| `--resume` | Setzt einen unterbrochenen Crawl aus `crawl-state.json` fort (byte-identisch). |
+| `--resume` | Setzt einen an einem **sauberen Stopp** (Cap/Drain) unterbrochenen Crawl aus `crawl-state.json` fort (byte-identisch). Ein Hard-Crash *mitten* im Crawl ist bewusst nicht resumebar — die Zwischenzeilen sind noch nicht persistiert; der Resume-Guard bricht dann **laut** ab statt still korrumpierte Daten zu liefern. |
 
 Vollständiges Runbook: [`CLAUDE.md`](CLAUDE.md). Tests: `npm test`
 (`node --test`, dependency-frei).
@@ -255,7 +261,8 @@ Vollständiges Runbook: [`CLAUDE.md`](CLAUDE.md). Tests: `npm test`
   source-available, nicht Open Source. Klonen/Ausführen zur **persönlichen,
   nicht-kommerziellen Evaluierung** ist erlaubt; Weiterverbreitung, Modifikation
   und kommerzielle Nutzung bleiben vorbehalten und bedürfen schriftlicher
-  Erlaubnis — siehe [`LICENSE`](LICENSE).
+  Erlaubnis — siehe [`LICENSE`](LICENSE). Externe Code-Beiträge werden derzeit
+  **nicht** angenommen (Eval-only-Lizenz) — siehe [`SECURITY.md`](SECURITY.md).
 - **Recht:** Nur **eigene oder ausdrücklich autorisierte** Sites auditieren. Der
   Crawler trifft echte Server. ToS, § 87 UrhG (Datenbankrecht), § 7 UWG und
   DSGVO-Datenminimierung beachten — siehe [`DISCLAIMER.md`](DISCLAIMER.md).

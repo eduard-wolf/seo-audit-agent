@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/);
 this project uses static, manually-set dates (no wall-clock at build time).
 
+> **Note on git history.** This public repository was published as a curated,
+> squashed commit; the granular development history (conventional commits across
+> several review rounds) was kept in private working branches. The ruleset
+> progression below is the authoritative record of *what* changed and *when*.
+
 ## Ruleset progression (`config/rules-version.json`)
 
 The rule catalogue is versioned independently of the package release. From the

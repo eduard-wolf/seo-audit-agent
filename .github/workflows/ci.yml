@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Syntax check (node --check, dependency-free)
+        run: npm run lint
+
       - name: Run tests
         run: npm test
 
