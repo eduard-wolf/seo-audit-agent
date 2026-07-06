@@ -34,9 +34,16 @@ const BOT_MAP = new Map(AI_BOTS.map(b => [b.agent.toLowerCase(), b]));
  *   crawlDelay: number|undefined
  * }}
  */
-function parseRobots(raw) {
-  const disallow = [];
-  const allow = [];
+export function parseRobots(raw, productToken = 'seo-audit-agent') {
+  // Per-agent groups: lowercased agent token → { disallow, allow }. RFC 9309
+  // §2.2.1: enforce the most-specific group whose user-agent value is a
+  // case-insensitive prefix of our product token; fall back to `*`.
+  const groups = new Map();
+  const groupFor = (agentLower) => {
+    let g = groups.get(agentLower);
+    if (!g) { g = { disallow: [], allow: [] }; groups.set(agentLower, g); }
+    return g;
+  };
   const aiBots = [];
   const sitemapRefs = [];
   /** @type {number|undefined} */
@@ -76,9 +83,9 @@ function parseRobots(raw) {
       case 'disallow':
         inDirectives = true;
         for (const agent of currentAgents) {
-          if (agent === '*') {
-            if (val) disallow.push(val);
-          } else {
+          if (val) groupFor(agent.toLowerCase()).disallow.push(val);
+          // AI-bot categorization (report-only; independent of enforcement).
+          if (agent !== '*') {
             const botDef = BOT_MAP.get(agent.toLowerCase());
             if (botDef) {
               let entry = aiBots.find(b => b.agent === agent);
@@ -96,10 +103,7 @@ function parseRobots(raw) {
       case 'allow':
         inDirectives = true;
         for (const agent of currentAgents) {
-          if (agent === '*') {
-            if (val) allow.push(val);
-          }
-          // AI-bot Allow directives are intentionally ignored (same pattern as Disallow).
+          if (val) groupFor(agent.toLowerCase()).allow.push(val);
         }
         break;
 
@@ -124,7 +128,20 @@ function parseRobots(raw) {
     }
   }
 
-  return { disallow, allow, aiBots, sitemapRefs, crawlDelay };
+  // Select the effective group for our product token (most-specific prefix match,
+  // else the wildcard group). RFC 9309: a robots user-agent value matches when it
+  // is a case-insensitive prefix of the crawler's product token.
+  const pt = productToken.toLowerCase();
+  let bestToken = null;
+  for (const token of groups.keys()) {
+    if (token === '*') continue;
+    if (pt.startsWith(token) && (bestToken === null || token.length > bestToken.length)) {
+      bestToken = token;
+    }
+  }
+  const eff = groups.get(bestToken ?? '*') ?? { disallow: [], allow: [] };
+
+  return { disallow: eff.disallow, allow: eff.allow, aiBots, sitemapRefs, crawlDelay };
 }
 
 // ── llms.txt validator ────────────────────────────────────────────────────────

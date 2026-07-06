@@ -28,7 +28,10 @@ const MAX_CRAWL_DELAY_SEC = 10;
  * @returns {number} effective interval in milliseconds
  */
 export function effectiveIntervalMs(rps, crawlDelaySec = 0) {
-  const rpsInterval = 1000 / rps;
+  // rps <= 0 means "unbounded" (0 ms between requests) — never 1000/0 = Infinity,
+  // which would hang the limiter. The CLI already rejects non-positive rps; this
+  // guards the library entry point.
+  const rpsInterval = rps > 0 ? 1000 / rps : 0;
   if (!crawlDelaySec) return rpsInterval;
   return Math.max(rpsInterval, Math.min(crawlDelaySec, MAX_CRAWL_DELAY_SEC) * 1000);
 }
