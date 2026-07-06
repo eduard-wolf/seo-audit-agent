@@ -15,10 +15,14 @@
  * ground the RAG retrieval for testing without any API call.
  *
  * Runtime provider contract (not tested in this offline build):
- *   opts.provider = async (text) => number[]   // must return length-256+ vector
+ *   opts.provider = async (text) => number[]   // must return a length-EMBED_DIM
+ *   vector — EXACTLY 256 dims (the pgvector column is vector(256) and store.mjs
+ *   cosine() requires equal lengths). Re-embed the corpus if you change EMBED_DIM.
  */
 
-const DIM = 256;
+/** The single source of truth for the embedding dimension (see kb/pgvector_store.py vector(256)). */
+export const EMBED_DIM = 256;
+const DIM = EMBED_DIM;
 
 /**
  * djb2 hash — returns a 32-bit unsigned integer.

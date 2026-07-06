@@ -67,12 +67,19 @@ export async function ingestDir(dir, store, embedFn) {
 
     for (let i = 0; i < chunks.length; i++) {
       const { text: chunkText, heading } = chunks[i];
-      if (!chunkText.trim()) continue;
+      // An empty-body heading (e.g. an H1 with no text before the first H2) still
+      // carries the document's most topical line — embed the heading itself rather
+      // than dropping it. Skip only when BOTH body and heading are empty.
+      const body      = chunkText.trim();
+      const embedText = body || heading;
+      if (!embedText) continue;
 
-      const id     = `${source}#${i}`;
-      const vector = await Promise.resolve(embedFn(chunkText));
+      // id keyed by filename (unique within the dir), NOT `source` — two docs may
+      // share a canonical `source` URL in front-matter, which would collide.
+      const id     = `${file}#${i}`;
+      const vector = await Promise.resolve(embedFn(embedText));
 
-      store.add(id, vector, { source, heading, date, text: chunkText });
+      store.add(id, vector, { source, heading, date, text: body || heading });
       total++;
     }
   }
