@@ -22,7 +22,7 @@
       "severity": "hoch",
       "title": "KI-Suchbot blockiert (GEO-Sichtbarkeit gefährdet)",
       "count": 1,
-      "pctOfPages": 4.8,
+      "pctOfPages": null,
       "affectedUrls": [],
       "clusters": [],
       "detail": "OAI-SearchBot (ai-search-blocked)",
@@ -36,7 +36,7 @@
       "severity": "mittel",
       "title": "llms.txt fehlt oder ist strukturell fehlerhaft",
       "count": 1,
-      "pctOfPages": 4.8,
+      "pctOfPages": null,
       "affectedUrls": [],
       "clusters": [],
       "detail": "llms.txt ungültig: missing-h1: first non-empty line must start with \"# \" (H1 heading); missing-blockquote: no \"> \" summary line found",
@@ -48,7 +48,7 @@
       "kategorie": "geo",
       "scope": "agnostic",
       "severity": "mittel",
-      "title": "Keine Quellen aus der kuratierten Autoritäts-Liste (GEO: Cite Sources)",
+      "title": "Keine externen Quellenangaben (GEO: Cite Sources)",
       "count": 1,
       "pctOfPages": 4.8,
       "affectedUrls": [
@@ -60,7 +60,7 @@
           "count": 1
         }
       ],
-      "detail": "Keine Outlinks zu kuratierten Autoritäts-Domains (.gov/.edu/Wikipedia + Liste). Hinweis: nicht-gelistete seriöse Quellen werden hier (noch) nicht erkannt — volle Erkennung folgt mit outlinksExternal.",
+      "detail": "Substanzielle Seiten ohne jegliche externe Quellenangabe (kein Outlink zu einer anderen Domain). \"Cite Sources\" ist der stärkste GEO-Hebel für KI-Sichtbarkeit.",
       "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
       "datum": "2023-11"
     },
@@ -71,7 +71,7 @@
       "severity": "info",
       "title": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces)",
       "count": 1,
-      "pctOfPages": 4.8,
+      "pctOfPages": null,
       "affectedUrls": [],
       "clusters": [],
       "detail": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces) auf der gesamten Site gefunden",
@@ -80,7 +80,7 @@
     },
     {
       "ruleId": "crawl:orphan-page",
-      "kategorie": "crawl",
+      "kategorie": "links",
       "scope": "agnostic",
       "severity": "niedrig",
       "title": "Verwaiste Seiten (keine internen Eingangslinks)",
@@ -1125,7 +1125,7 @@
       "severity": "mittel",
       "title": "Keine erkennbare Kontakt-/Über-uns-/Impressums-/Datenschutz-Seite (Trust)",
       "count": 1,
-      "pctOfPages": 4.8,
+      "pctOfPages": null,
       "affectedUrls": [],
       "clusters": [],
       "detail": "Kein erkennbarer Kontakt-, Über-uns-, Impressums- oder Datenschutz-Bereich unter den gecrawlten/entdeckten URLs gefunden. Vertrauenssignal gemäß Google Quality Rater Guidelines (Sept. 2025: „Trust is the most important member of the E-E-A-T family\"; transaktionale Seiten verlangen „satisfying customer service information\") — KEIN direkter Ranking-Faktor. Für gewerbliche deutsche Websites zudem RECHTSPFLICHT: Impressum (DDG §5, seit Mai 2024) + Datenschutzerklärung (DSGVO Art. 13). Heuristik (Seiten können unter untypischen URLs liegen oder ungecrawlt sein) — bitte manuell verifizieren.",

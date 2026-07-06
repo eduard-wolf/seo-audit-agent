@@ -145,7 +145,12 @@ export function runRules(ctx, rules) {
       continue;
     }
 
-    const pctOfPages = minNMet
+    // Site-level findings (a sentinel with no affected URLs, e.g. a robots.txt
+    // directive) have no per-page denominator — count/pageCount would be a
+    // nonsensical "N % of pages". Report pctOfPages = null for them.
+    const fullUrls    = result.affectedUrls ?? [];
+    const isSiteLevel = fullUrls.length === 0;
+    const pctOfPages  = (minNMet && !isSiteLevel)
       ? +((result.count / pageCount) * 100).toFixed(1)
       : null;
 
@@ -153,7 +158,6 @@ export function runRules(ctx, rules) {
       ? (result.detail ?? '')
       : `kleine Stichprobe (N=${pageCount}), absolute Zahlen statt Quoten`;
 
-    const fullUrls = result.affectedUrls ?? [];
     findings.push({
       ruleId:       rule.id,
       kategorie:    rule.kategorie,

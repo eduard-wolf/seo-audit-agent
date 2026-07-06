@@ -62,13 +62,17 @@ export const detectors = [
   const affected = rows.filter(r => {
     const wc = parseInt(r.wordCount, 10);
     if (isNaN(wc) || wc < minWords) return false;
-    const n = parseInt(r.outlinksAuthoritative, 10);
-    return !isNaN(n) && n === 0;
+    // Flag only pages with NO external outlinks at all — a page that cites any
+    // off-site source (authoritative or not) is making an effort to attribute,
+    // so flagging it on the narrower "no authoritative domain" test was a false
+    // positive. outlinksExternal counts every cross-origin <a href>.
+    const ext = parseInt(r.outlinksExternal, 10);
+    return !isNaN(ext) && ext === 0;
   });
   return {
     count:        affected.length,
     affectedUrls: affected.map(r => r.url),
-    detail:       'Keine Outlinks zu kuratierten Autoritäts-Domains (.gov/.edu/Wikipedia + Liste). Hinweis: nicht-gelistete seriöse Quellen werden hier (noch) nicht erkannt — volle Erkennung folgt mit outlinksExternal.',
+    detail:       'Substanzielle Seiten ohne jegliche externe Quellenangabe (kein Outlink zu einer anderen Domain). "Cite Sources" ist der stärkste GEO-Hebel für KI-Sichtbarkeit.',
   };
 }],
 

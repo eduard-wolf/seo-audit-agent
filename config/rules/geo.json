@@ -26,7 +26,7 @@
     "kategorie": "geo",
     "scope": "agnostic",
     "severity": "mittel",
-    "title": "Keine Quellen aus der kuratierten Autoritäts-Liste (GEO: Cite Sources)",
+    "title": "Keine externen Quellenangaben (GEO: Cite Sources)",
     "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
     "datum": "2023-11",
     "lastReviewed": "2026-06",
