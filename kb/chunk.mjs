@@ -31,9 +31,27 @@ export function chunkMarkdown(text, opts = {}) {
   // Strip YAML front-matter
   const body = text.replace(FRONTMATTER_RE, '');
 
-  // Split on heading boundaries, keeping the heading line as a delimiter
-  // Use a lookahead so headings are kept as separate tokens
-  const parts = body.split(/(?=^#{1,6} )/m);
+  // Split at ATX headings that are NOT inside a fenced code block, so a `# ` line
+  // inside a ``` / ~~~ fence (e.g. a shell comment) does not shatter the block
+  // into mis-headed chunks. (Fence-free documents split identically to before.)
+  const parts = [];
+  let cur = '';
+  let inFence = false;
+  let fenceChar = '';
+  for (const line of body.split('\n')) {
+    const fm = line.match(/^\s*(```+|~~~+)/);
+    if (fm) {
+      if (!inFence) { inFence = true; fenceChar = fm[1][0]; }
+      else if (line.trimStart().startsWith(fenceChar)) { inFence = false; }
+    }
+    if (!inFence && /^#{1,6} /.test(line) && cur !== '') {
+      parts.push(cur);
+      cur = line + '\n';
+    } else {
+      cur += line + '\n';
+    }
+  }
+  if (cur !== '') parts.push(cur);
 
   const raw = [];
 

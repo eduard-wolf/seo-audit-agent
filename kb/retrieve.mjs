@@ -49,11 +49,16 @@ async function getDefaultStore() {
  *
  * @param {string} query
  * @param {number} [k=4]
- * @param {{ store?: object, embedFn?: Function }} [opts]
+ * @param {{ store?: object, embedFn?: Function, minScore?: number }} [opts]
+ *   minScore — drop hits whose cosine score is below this floor (default 0 = keep
+ *   all). Pass a relevance threshold so an off-topic query can legitimately return
+ *   `[]` (→ the interpret step marks a finding ungrounded) instead of citing
+ *   real-but-irrelevant chunks (see skills/interpret.md §4 embedder disclosure).
  * @returns {Promise<Array<{text: string, source: string, heading: string, score: number, date: string}>>}
  */
 export async function retrieve(query, k = 4, opts = {}) {
   let { store, embedFn } = opts;
+  const minScore = opts.minScore ?? 0;
 
   if (!store || !embedFn) {
     const defaults = await getDefaultStore();
@@ -62,7 +67,7 @@ export async function retrieve(query, k = 4, opts = {}) {
   }
 
   const queryVector = await Promise.resolve(embedFn(query));
-  const hits = store.search(queryVector, k);
+  const hits = store.search(queryVector, k).filter(hit => hit.score >= minScore);
 
   return hits.map(hit => ({
     text:    hit.meta.text    ?? '',
