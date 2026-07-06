@@ -22,7 +22,14 @@
  * @param {string} pattern
  * @returns {RegExp}
  */
+// Compiled-pattern cache: isPathAllowed compiles the same Disallow/Allow patterns
+// once per URL; on a full-audit crawl (25k URLs × N patterns) that is a lot of
+// redundant RegExp construction. The pattern set is small and stable, so memoise.
+const _compileCache = new Map();
+
 function compilePattern(pattern) {
+  const cached = _compileCache.get(pattern);
+  if (cached !== undefined) return cached;
   // Split on '*' to process wildcards; escape everything else.
   // Trailing '$' becomes a regex end-anchor; elsewhere it is literal.
   // RFC 9309 §2.2.3: '$' designates the end of the match. Only a '$' at the end
@@ -44,7 +51,9 @@ function compilePattern(pattern) {
     })
     .join('.*');
 
-  return new RegExp('^' + compiled);
+  const re = new RegExp('^' + compiled);
+  _compileCache.set(pattern, re);
+  return re;
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
