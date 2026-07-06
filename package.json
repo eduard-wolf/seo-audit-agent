@@ -6,7 +6,8 @@
   "type": "module",
   "engines": { "node": ">=20" },
   "scripts": {
-    "test": "node --test",
+    "test": "node --test --test-concurrency=1",
+    "lint": "git ls-files '*.mjs' | xargs -n1 node --check",
     "leak-scan": "node scripts/leak-scan.mjs",
     "audit": "node bin/crawl-and-analyze.mjs",
     "render": "node report/build-report.mjs",
