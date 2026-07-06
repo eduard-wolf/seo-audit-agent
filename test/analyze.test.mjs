@@ -379,16 +379,16 @@ describe('analyzeFromFiles — engine + rules II (D2)', () => {
   });
 
   // U0.4a: pin updated framing strings (wording-only reframe, no logic change)
-  it('geo:missing-citations — title und detail reflect 2026-06 reframe (kuratierte Liste, nicht autoritativ)', () => {
+  it('geo:missing-citations — title und detail reflect the outlinksExternal reframe (any external citation counts)', () => {
     const f = findFinding('geo:missing-citations');
     assert.ok(f, 'geo:missing-citations finding should exist');
     assert.ok(
-      f.title.includes('kuratierten Autoritäts-Liste'),
-      `geo:missing-citations title should mention kuratierten Autoritäts-Liste, got: "${f.title}"`,
+      f.title.includes('externen Quellenangaben'),
+      `geo:missing-citations title should mention externen Quellenangaben, got: "${f.title}"`,
     );
     assert.ok(
-      f.detail.includes('outlinksExternal'),
-      `geo:missing-citations detail should mention outlinksExternal, got: "${f.detail}"`,
+      f.detail.includes('externe Quellenangabe'),
+      `geo:missing-citations detail should describe the missing external citation, got: "${f.detail}"`,
     );
   });
 

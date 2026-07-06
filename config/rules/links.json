@@ -1,7 +1,7 @@
 [
   {
     "id": "crawl:orphan-page",
-    "kategorie": "crawl",
+    "kategorie": "links",
     "scope": "agnostic",
     "severity": "niedrig",
     "title": "Verwaiste Seiten (keine internen Eingangslinks)",
