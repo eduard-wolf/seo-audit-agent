@@ -42,14 +42,20 @@ export function parseCruxRecord(json) {
  * @param {(url,opts)=>Promise<{status:number, json:()=>Promise<any>}>} [fetchImpl=fetch]  injected for tests
  * @param {string} [formFactor='PHONE']
  */
-export async function fetchCruxOrigin(origin, apiKey, fetchImpl = fetch, formFactor = 'PHONE') {
+export async function fetchCruxOrigin(origin, apiKey, fetchImpl = fetch, formFactor = 'PHONE', timeoutMs = 8000) {
   if (!apiKey) return { ok: false, reason: 'CRUX_API_KEY not set' };
   const url = `https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=${encodeURIComponent(apiKey)}`;
   const body = JSON.stringify({ origin, formFactor,
     metrics: ['largest_contentful_paint', 'interaction_to_next_paint', 'cumulative_layout_shift'] });
   let res;
-  try { res = await fetchImpl(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }); }
-  catch (e) { return { ok: false, reason: `fetch-error: ${e?.message ?? e}` }; }
+  try { res = await fetchImpl(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(timeoutMs) }); }
+  catch (e) {
+    // The API key lives in the URL query string — redact it before persisting the
+    // reason into runtime-signals.json, and normalise a timeout to a stable token.
+    const msg  = e?.name === 'TimeoutError' ? 'timeout' : (e?.message ?? String(e));
+    const safe = apiKey ? String(msg).split(apiKey).join('REDACTED') : String(msg);
+    return { ok: false, reason: `fetch-error: ${safe}` };
+  }
   if (res.status === 404) return { ok: true, noData: true };           // CrUX has no data for this origin → graceful skip
   if (res.status < 200 || res.status >= 300) return { ok: false, reason: `crux-status-${res.status}` };
   let json; try { json = await res.json(); } catch { return { ok: false, reason: 'crux-bad-json' }; }

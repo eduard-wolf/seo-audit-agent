@@ -14,7 +14,7 @@ export function classifySafeBrowsingResponse(json) {
  * @param {string} targetUrl  @param {string} apiKey
  * @param {(url,opts)=>Promise<{status:number, json:()=>Promise<any>}>} [fetchImpl=fetch]  injected for tests
  */
-export async function fetchSafeBrowsing(targetUrl, apiKey, fetchImpl = fetch) {
+export async function fetchSafeBrowsing(targetUrl, apiKey, fetchImpl = fetch, timeoutMs = 8000) {
   if (!apiKey) return { ok: false, reason: 'SAFEBROWSING_API_KEY not set' };
   if (!targetUrl) return { ok: false, reason: 'no target url' };
   const url = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${encodeURIComponent(apiKey)}`;
@@ -28,8 +28,13 @@ export async function fetchSafeBrowsing(targetUrl, apiKey, fetchImpl = fetch) {
     },
   });
   let res;
-  try { res = await fetchImpl(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }); }
-  catch (e) { return { ok: false, reason: `fetch-error: ${e?.message ?? e}` }; }
+  try { res = await fetchImpl(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(timeoutMs) }); }
+  catch (e) {
+    // Redact the URL-embedded API key before the reason is persisted; normalise timeout.
+    const msg  = e?.name === 'TimeoutError' ? 'timeout' : (e?.message ?? String(e));
+    const safe = apiKey ? String(msg).split(apiKey).join('REDACTED') : String(msg);
+    return { ok: false, reason: `fetch-error: ${safe}` };
+  }
   if (res.status < 200 || res.status >= 300) return { ok: false, reason: `safebrowsing-status-${res.status}` };
   let json; try { json = await res.json(); } catch { return { ok: false, reason: 'safebrowsing-bad-json' }; }
   const c = classifySafeBrowsingResponse(json);

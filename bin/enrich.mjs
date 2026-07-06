@@ -74,6 +74,12 @@ if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
     console.error(`enrich: ${dir} not found or has no signals.json — run bin/crawl-and-analyze.mjs first`);
     process.exit(1);
   }
-  enrich(dir).then(o => { console.error(`enrich: available=${o.available}${o.reason ? ' ('+o.reason+')' : ''}`); console.log(path.resolve(dir, 'runtime-signals.json')); })
-    .catch(e => { console.error(`enrich failed: ${e?.message ?? e}`); process.exit(1); });
+  // `o.available` is the CrUX-scoped flag (the documented {available:false} no-key
+  // contract). Report all three vehicles so a keyless run does not read as "nothing
+  // happened" when the keyless TLS probe actually ran.
+  enrich(dir).then(o => {
+    const st = (p) => (p && p.available ? 'yes' : `no${p && p.reason ? ' (' + p.reason + ')' : ''}`);
+    console.error(`enrich: crux=${st(o)} tls=${st(o.tls)} safeBrowsing=${st(o.safeBrowsing)}`);
+    console.log(path.resolve(dir, 'runtime-signals.json'));
+  }).catch(e => { console.error(`enrich failed: ${e?.message ?? e}`); process.exit(1); });
 }
