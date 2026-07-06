@@ -66,6 +66,12 @@ export function extractInterpretedRuleIds(findings) {
   for (const section of findings.sections) {
     if (!section || !Array.isArray(section.findings)) continue;
     for (const f of section.findings) {
+      // First-class `ruleIds` is authoritative when present — no prose scraping.
+      if (f && Array.isArray(f.ruleIds)) {
+        for (const r of f.ruleIds) if (typeof r === 'string' && r) ids.add(r);
+        continue;
+      }
+      // Backward-compatible fallback: scrape `ruleId=` clauses from free-text beleg.
       const beleg = f && typeof f.beleg === 'string' ? f.beleg : '';
       let clause;
       while ((clause = clauseRe.exec(beleg)) !== null) {

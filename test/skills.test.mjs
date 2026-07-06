@@ -153,6 +153,20 @@ describe('skills/interpret.md contract', () => {
     }
   });
 
+  it('frames crawled content as untrusted data, not instructions (prompt-injection)', () => {
+    const md = read('skills/interpret.md');
+    assert.ok(/prompt.?injection/i.test(md), 'interpret.md should name the prompt-injection risk');
+    assert.ok(
+      /data,?\s*never\s*instructions/i.test(md),
+      'interpret.md should instruct treating crawled content as data, never instructions',
+    );
+  });
+
+  it('CLAUDE.md carries a prompt-injection quality anchor', () => {
+    const md = read('CLAUDE.md');
+    assert.ok(/prompt.?injection/i.test(md), 'CLAUDE.md quality anchors should mention prompt-injection');
+  });
+
   // ── U0.2 assertions ──────────────────────────────────────────────────────────
 
   it('reads rulesetVersion from top-level analysis.rulesetVersion, not analysis.meta', () => {
