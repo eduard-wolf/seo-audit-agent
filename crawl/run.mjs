@@ -21,8 +21,8 @@
  * written under data/<host>/ (host derived from the origin). Pass opts.dataDir
  * to redirect all three artifacts to a caller-supplied directory instead.
  *
- * Concurrency / isolation: the CSV write is a single fs.writeFileSync (atomic at
- * the OS level), which only guards against a single run's own write being torn —
+ * Concurrency / isolation: the CSV write is an atomic tmp+rename (writeFileAtomic),
+ * which only guards against a single run's own write being torn —
  * it provides NO cross-process isolation. Two runs that share the same output
  * directory (e.g. parallel test files, which all derive host '127.0.0.1' from the
  * loopback fixture server) will clobber each other's files. Callers that may run
@@ -43,6 +43,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR  = path.resolve(__dirname, '../data');
 
 /**
+ * Write a file atomically: write to a sibling *.tmp, then rename over the target.
+ * rename(2) is atomic within a filesystem, so a crash mid-write leaves either the
+ * old file or the complete new one — never a torn/truncated artifact. (Bare
+ * writeFileSync truncates-then-writes and can leave a partial file on crash.)
+ *
+ * @param {string} file
+ * @param {string} data
+ */
+export function writeFileAtomic(file, data) {
+  const tmp = `${file}.tmp`;
+  fs.writeFileSync(tmp, data, 'utf8');
+  fs.renameSync(tmp, file);
+}
+
+/**
  * Build a single CSV row from a page (C1 fields) and its parsed result (C2 fields).
  *
  * @param {{ url:string, type:string, status:number, finalUrl:string,
@@ -55,7 +70,7 @@ const DATA_DIR  = path.resolve(__dirname, '../data');
  * @param {object} parsed — result of parsePage(), or {} when html was null
  * @returns {object} — plain object with keys matching COLS
  */
-function buildRow(page, parsed) {
+export function buildRow(page, parsed) {
   const p = parsed ?? {};
   return {
     // C1 fields
@@ -89,6 +104,7 @@ function buildRow(page, parsed) {
     headingOutline:        p.headingOutline       ?? '',
     ldTypes:               p.ldTypes              ?? '',
     ldValid:               p.ldValid              ?? '',
+    ldContextOk:           p.ldContextOk          ?? '',
     hasProduct:            p.hasProduct           ?? '',
     hasAgg:                p.hasAgg               ?? '',
     hasBreadcrumb:         p.hasBreadcrumb        ?? '',
@@ -107,6 +123,7 @@ function buildRow(page, parsed) {
     imgAvif:               p.imgAvif              ?? '',
     outlinksInternal:      p.outlinksInternal     ?? '',
     outlinksAuthoritative: p.outlinksAuthoritative ?? '',
+    outlinksExternal:      p.outlinksExternal     ?? '',
     wordCount:             p.wordCount            ?? '',
     rawWordCount:          p.rawWordCount         ?? '',
     mixedContent:          p.mixedContent         ?? '',
@@ -151,6 +168,27 @@ function buildRow(page, parsed) {
 
     hreflangLinks:   p.hreflangLinks      ?? '',
   };
+}
+
+/**
+ * Parse one page's HTML, catching ANY parser error so a single malformed page
+ * cannot abort the whole crawl (a crawler hitting arbitrary HTML will meet
+ * corrupted/adversarial markup). Returns {} — the same shape the null-HTML path
+ * uses, which buildRow renders as an empty-signal row — and warns on stderr.
+ * `parseFn` is injectable for testing the failure path.
+ *
+ * @param {string} html
+ * @param {string} url
+ * @param {(html:string,url:string)=>object} [parseFn]
+ * @returns {object}
+ */
+export function safeParse(html, url, parseFn = parsePage) {
+  try {
+    return parseFn(html, url);
+  } catch (err) {
+    console.error(`parse failed for ${url}: ${err?.message || err} — page skipped (empty row)`);
+    return {};
+  }
 }
 
 /**
@@ -260,8 +298,8 @@ export async function runCrawl(origin, opts = {}) {
 
   // ── Accumulate new rows in memory ─────────────────────────────────────────
   // Both fresh and resume paths collect rows as objects and write the CSV in a
-  // single atomic fs.writeFileSync at the end, so a given run's own write is
-  // never torn. This does NOT isolate concurrent runs sharing the same output
+  // single atomic tmp+rename (writeFileAtomic) at the end, so a given run's own
+  // write is never torn. This does NOT isolate concurrent runs sharing the output
   // directory — cross-run isolation is the caller's job via opts.dataDir.
   const newRows = [];  // Array<object> — result of buildRow()
 
@@ -273,15 +311,14 @@ export async function runCrawl(origin, opts = {}) {
     // Checkpoint callback: merge run-side data and persist crawl-state.json.
     // Called every checkpointEvery pages AND once after the loop ends.
     onCheckpoint(crawlState) {
-      fs.writeFileSync(
+      writeFileAtomic(
         statePath,
         JSON.stringify({ ...crawlState, edges, htmlPageCount, emptyCount }),
-        'utf8',
       );
     },
     onPage(page) {
       const pageUrl = page.finalUrl || page.url;
-      const parsed  = page.html ? parsePage(page.html, pageUrl) : {};
+      const parsed  = page.html ? safeParse(page.html, pageUrl) : {};
 
       newRows.push(buildRow(page, parsed));
 
@@ -309,7 +346,7 @@ export async function runCrawl(origin, opts = {}) {
       // Resume — append new rows after the existing content
       csvContent = existingCsvText + (newLines.length > 0 ? '\n' + newLines.join('\n') : '');
     }
-    fs.writeFileSync(csvPath, csvContent, 'utf8');
+    writeFileAtomic(csvPath, csvContent);
   }
 
   // ── 3. Link graph ─────────────────────────────────────────────────────────
@@ -347,7 +384,7 @@ export async function runCrawl(origin, opts = {}) {
       edges:       edges.map(e => ({ url: e.url, internalLinks: e.internalLinks ?? [] })),
     },
   };
-  fs.writeFileSync(signalsPath, JSON.stringify(signalsOut, null, 2), 'utf8');
+  writeFileAtomic(signalsPath, JSON.stringify(signalsOut, null, 2));
 
   return { csvPath, signalsPath, siteType, stats };
 }
