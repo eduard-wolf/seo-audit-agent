@@ -32,6 +32,7 @@ describe('COLS', () => {
       'nosniffPresent', 'referrerPolicyPresent', 'permissionsPolicyPresent',
       'cspPresent', 'cookieInsecure', 'versionDisclosure',
       'hasMicrodata', 'hasRdfa', 'resourcePaths',
+      'outlinksExternal',
     ];
     assert.deepEqual(COLS, expected);
   });

@@ -22,6 +22,7 @@ export const COLS = [
   'nosniffPresent', 'referrerPolicyPresent', 'permissionsPolicyPresent',
   'cspPresent', 'cookieInsecure', 'versionDisclosure',
   'hasMicrodata', 'hasRdfa', 'resourcePaths',
+  'outlinksExternal',
 ];
 
 /**
@@ -48,20 +49,23 @@ export function toCsvRow(obj) {
 
 /**
  * Parse CSV text (first line = header = COLS) into an array of plain objects.
- * Handles RFC 4180 quoting (double-quoted fields, escaped quotes as "").
+ * A proper RFC 4180 state machine over the WHOLE text: quoted fields may contain
+ * commas, escaped quotes (""), AND newlines (\n / \r\n). csvEscape emits such
+ * multiline quoted fields (e.g. a title with an embedded newline), so the reader
+ * must honour them — splitting on \n first would corrupt resume dedup.
  * @param {string} text
  * @returns {Array<Record<string, string>>}
  */
 export function parseCsv(text) {
-  const lines = text.split(/\r?\n/);
-  if (lines.length < 2) return [];
+  const records = parseRecords(text);
+  if (records.length < 2) return [];
 
-  // Skip header line (index 0) — we trust COLS order
+  // Skip header record (index 0) — we trust COLS order
   const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trim() === '') continue;
-    const fields = parseFields(line);
+  for (let r = 1; r < records.length; r++) {
+    const fields = records[r];
+    // Skip a blank record (a lone empty field — e.g. the trailing newline at EOF)
+    if (fields.length === 1 && fields[0] === '') continue;
     const obj = {};
     for (let j = 0; j < COLS.length; j++) {
       obj[COLS[j]] = fields[j] ?? '';
@@ -72,43 +76,36 @@ export function parseCsv(text) {
 }
 
 /**
- * Split a single CSV line into an array of field strings,
- * handling RFC 4180 quoted fields.
+ * Split CSV text into records (arrays of field strings), honouring RFC 4180
+ * quoting: a `"`-quoted field may contain `,`, `""` (an escaped quote), and raw
+ * newlines. A record boundary is an UNQUOTED \n or \r\n (or lone \r).
+ * @param {string} text
+ * @returns {string[][]}
  */
-function parseFields(line) {
-  const fields = [];
+function parseRecords(text) {
+  const records = [];
+  let record = [];
+  let field = '';
+  let inQuotes = false;
   let i = 0;
-  while (i <= line.length) {
-    if (line[i] === '"') {
-      // Quoted field
-      i++; // skip opening quote
-      let val = '';
-      while (i < line.length) {
-        if (line[i] === '"') {
-          if (line[i + 1] === '"') {
-            val += '"';
-            i += 2;
-          } else {
-            i++; // skip closing quote
-            break;
-          }
-        } else {
-          val += line[i++];
-        }
+  const endField = () => { record.push(field); field = ''; };
+  const endRecord = () => { endField(); records.push(record); record = []; };
+
+  while (i < text.length) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
       }
-      fields.push(val);
-      // skip trailing comma
-      if (line[i] === ',') i++;
-    } else {
-      // Unquoted field
-      const end = line.indexOf(',', i);
-      if (end === -1) {
-        fields.push(line.slice(i));
-        break;
-      }
-      fields.push(line.slice(i, end));
-      i = end + 1;
+      field += ch; i++; continue;
     }
+    if (ch === '"') { inQuotes = true; i++; continue; }
+    if (ch === ',') { endField(); i++; continue; }
+    if (ch === '\r') { if (text[i + 1] === '\n') i++; endRecord(); i++; continue; }
+    if (ch === '\n') { endRecord(); i++; continue; }
+    field += ch; i++;
   }
-  return fields;
+  endRecord(); // flush the final field + record
+  return records;
 }
