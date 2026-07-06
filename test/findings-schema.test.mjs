@@ -242,6 +242,7 @@ describe('validateFindings', () => {
   it('accepts ice.c = 1 when confidence.minNMet === false (#10, positive)', () => {
     const good = buildValidFindings();
     good.confidence.sampleSize = 3; // keep minNMet=false consistent with the deterministic gate
+    good.meta.sampleSize = 3;       // meta + confidence describe the same crawl
     good.confidence.minNMet = false;
     good.sections[0].findings[0].ice = { i: 3, c: 1, e: 2, score: 6 };
     const { valid, errors } = validateFindings(good);
@@ -287,6 +288,7 @@ describe('validateFindings', () => {
   it('accepts a consistent small sample (sampleSize < 5, minNMet=false, c<=1)', () => {
     const good = buildValidFindings();
     good.confidence.sampleSize = 3;
+    good.meta.sampleSize = 3;       // meta + confidence describe the same crawl
     good.confidence.minNMet = false;
     good.sections[0].findings[0].ice = { i: 3, c: 1, e: 2, score: 6 };
     const { valid, errors } = validateFindings(good);
