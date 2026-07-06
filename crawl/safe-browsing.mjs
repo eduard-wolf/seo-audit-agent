@@ -1,4 +1,5 @@
 /** crawl/safe-browsing.mjs — Google Safe Browsing v4 Lookup (threatMatches:find), key-gated runtime. */
+import { fetchWithTimeout } from './enrich-fetch.mjs';
 
 /** Classify a Safe Browsing API response. PURE → unit-testable. Clean = {} (no matches). */
 export function classifySafeBrowsingResponse(json) {
@@ -27,14 +28,11 @@ export async function fetchSafeBrowsing(targetUrl, apiKey, fetchImpl = fetch, ti
       threatEntries: [{ url: targetUrl }],
     },
   });
-  let res;
-  try { res = await fetchImpl(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(timeoutMs) }); }
-  catch (e) {
-    // Redact the URL-embedded API key before the reason is persisted; normalise timeout.
-    const msg  = e?.name === 'TimeoutError' ? 'timeout' : (e?.message ?? String(e));
-    const safe = apiKey ? String(msg).split(apiKey).join('REDACTED') : String(msg);
-    return { ok: false, reason: `fetch-error: ${safe}` };
-  }
+  const r0 = await fetchWithTimeout(fetchImpl, url,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body },
+    { apiKey, timeoutMs });
+  if (!r0.ok) return { ok: false, reason: r0.reason };
+  const res = r0.res;
   if (res.status < 200 || res.status >= 300) return { ok: false, reason: `safebrowsing-status-${res.status}` };
   let json; try { json = await res.json(); } catch { return { ok: false, reason: 'safebrowsing-bad-json' }; }
   const c = classifySafeBrowsingResponse(json);

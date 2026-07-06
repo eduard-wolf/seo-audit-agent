@@ -25,6 +25,19 @@ describe('enrich clients — request timeout armed', () => {
   });
 });
 
+describe('enrich clients — TimeoutError normalisation', () => {
+  it('CrUX normalises a TimeoutError to a stable reason', async () => {
+    const mock = async () => { const e = new Error('aborted'); e.name = 'TimeoutError'; throw e; };
+    const r = await fetchCruxOrigin('https://x/', 'k', mock);
+    assert.equal(r.reason, 'fetch-error: timeout');
+  });
+  it('Safe Browsing normalises a TimeoutError to a stable reason', async () => {
+    const mock = async () => { const e = new Error('aborted'); e.name = 'TimeoutError'; throw e; };
+    const r = await fetchSafeBrowsing('https://x/', 'k', mock);
+    assert.equal(r.reason, 'fetch-error: timeout');
+  });
+});
+
 describe('enrich clients — API key redaction in error reason', () => {
   it('CrUX redacts the key from a fetch-error reason', async () => {
     const mock = async () => { throw new Error('connect refused key=SECRET-CRUX'); };

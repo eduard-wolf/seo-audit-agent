@@ -84,6 +84,20 @@ describe('writeFileAtomic — no torn artifacts', () => {
       fs.rmSync(dir, { recursive: true, force: true });
     }
   });
+
+  it('cleans up the .tmp file and rethrows when the rename fails', () => {
+    const calls = [];
+    const fakeFs = {
+      writeFileSync: (p) => calls.push(['write', p]),
+      renameSync: () => { throw new Error('rename failed'); },
+      unlinkSync: (p) => calls.push(['unlink', p]),
+    };
+    assert.throws(() => writeFileAtomic('/d/crawl.csv', 'data', fakeFs), /rename failed/);
+    assert.ok(
+      calls.some(c => c[0] === 'unlink' && c[1] === '/d/crawl.csv.tmp'),
+      'the temp file must be unlinked when the rename fails (no leftover turd)',
+    );
+  });
 });
 
 describe('safeParse — one bad page must not kill the crawl', () => {

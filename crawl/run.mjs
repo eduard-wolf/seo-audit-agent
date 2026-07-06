@@ -51,10 +51,15 @@ const DATA_DIR  = path.resolve(__dirname, '../data');
  * @param {string} file
  * @param {string} data
  */
-export function writeFileAtomic(file, data) {
+export function writeFileAtomic(file, data, fsImpl = fs) {
   const tmp = `${file}.tmp`;
-  fs.writeFileSync(tmp, data, 'utf8');
-  fs.renameSync(tmp, file);
+  fsImpl.writeFileSync(tmp, data, 'utf8');
+  try {
+    fsImpl.renameSync(tmp, file);
+  } catch (err) {
+    try { fsImpl.unlinkSync(tmp); } catch { /* best-effort cleanup — never mask the original error */ }
+    throw err;
+  }
 }
 
 /**

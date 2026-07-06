@@ -1,4 +1,5 @@
 /** crawl/crux.mjs — Google CrUX (Chrome UX Report) field-data client. Built-in fetch; key-gated. */
+import { fetchWithTimeout } from './enrich-fetch.mjs';
 // CWV thresholds (web.dev/articles/vitals, 2026): good ≤ X, poor > Y. INP replaced FID (2024).
 const CWV_THRESHOLDS = {
   lcp: { good: 2500, poor: 4000 },   // ms
@@ -47,15 +48,11 @@ export async function fetchCruxOrigin(origin, apiKey, fetchImpl = fetch, formFac
   const url = `https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=${encodeURIComponent(apiKey)}`;
   const body = JSON.stringify({ origin, formFactor,
     metrics: ['largest_contentful_paint', 'interaction_to_next_paint', 'cumulative_layout_shift'] });
-  let res;
-  try { res = await fetchImpl(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(timeoutMs) }); }
-  catch (e) {
-    // The API key lives in the URL query string — redact it before persisting the
-    // reason into runtime-signals.json, and normalise a timeout to a stable token.
-    const msg  = e?.name === 'TimeoutError' ? 'timeout' : (e?.message ?? String(e));
-    const safe = apiKey ? String(msg).split(apiKey).join('REDACTED') : String(msg);
-    return { ok: false, reason: `fetch-error: ${safe}` };
-  }
+  const r0 = await fetchWithTimeout(fetchImpl, url,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body },
+    { apiKey, timeoutMs });
+  if (!r0.ok) return { ok: false, reason: r0.reason };
+  const res = r0.res;
   if (res.status === 404) return { ok: true, noData: true };           // CrUX has no data for this origin → graceful skip
   if (res.status < 200 || res.status >= 300) return { ok: false, reason: `crux-status-${res.status}` };
   let json; try { json = await res.json(); } catch { return { ok: false, reason: 'crux-bad-json' }; }
