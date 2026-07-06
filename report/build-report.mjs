@@ -412,7 +412,7 @@ export function render(findings) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
   <title>SEO-Audit-Report — ${esc(host)}</title>
   <style>${STYLES}</style>
 </head>
@@ -438,11 +438,17 @@ export function render(findings) {
  * @returns {string}
  */
 export function hostOf(url) {
+  let h;
   try {
-    return new URL(url).hostname || 'report';
+    h = new URL(url).hostname || 'report';
   } catch {
-    return String(url).replace(/[^a-z0-9.-]+/gi, '-').replace(/^-+|-+$/g, '') || 'report';
+    h = String(url).replace(/[^a-z0-9.-]+/gi, '-').replace(/^-+|-+$/g, '') || 'report';
   }
+  // Never let a path-traversal ('.', '..') or separator-bearing component reach the
+  // filesystem writer, which does path.resolve(reportDir, host) — a crafted meta.url
+  // with hostname '..' would otherwise write one directory above report/<host>/.
+  if (h === '.' || h === '..' || h === '' || /[/\\]/.test(h)) return 'report';
+  return h;
 }
 
 // ── CLI entry point ─────────────────────────────────────────────────────────────
