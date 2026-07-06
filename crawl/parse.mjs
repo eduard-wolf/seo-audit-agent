@@ -38,10 +38,18 @@ const GENERIC_ANCHOR_TEXTS = new Set([
  * @param {string} str
  * @returns {string}
  */
+function decodeCodePoint(cp) {
+  // Out-of-range numeric character references (> U+10FFFF) are a parse error;
+  // browsers substitute U+FFFD. String.fromCodePoint would throw a RangeError —
+  // and since parsePage is called unguarded per page, that would abort the whole
+  // crawl on a single corrupted/adversarial entity.
+  return cp > 0x10ffff ? '�' : String.fromCodePoint(cp);
+}
+
 function decodeEntities(str) {
   return str
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#([0-9]+);/g, (_, d) => String.fromCodePoint(parseInt(d, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => decodeCodePoint(parseInt(h, 16)))
+    .replace(/&#([0-9]+);/g, (_, d) => decodeCodePoint(parseInt(d, 10)))
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
@@ -51,6 +59,28 @@ function decodeEntities(str) {
 }
 
 // ── Meta / link attribute helpers ───────────────────────────────────────────────
+
+// Quote-aware tag body: a `>` only closes the tag when NOT inside a quoted value,
+// so `<meta content="a > b">` is captured whole (fixes truncation). The three
+// alternatives are disambiguated by their first char (", ', or neither) → linear,
+// no catastrophic backtracking.
+const META_TAG = /<meta\b((?:"[^"]*"|'[^']*'|[^"'>])*)>/gi;
+const LINK_TAG = /<link\b((?:"[^"]*"|'[^']*'|[^"'>])*)>/gi;
+
+/**
+ * Extract an attribute value from a tag's attribute string. Accepts double-quoted,
+ * single-quoted, OR unquoted (HTML5-legal) values, and spaces around `=`. Returns
+ * null when the attribute is absent, '' when present but empty.
+ *
+ * @param {string} attrs
+ * @param {string} name  — a static attribute name (no regex metacharacters)
+ * @returns {string|null}
+ */
+function attrValue(attrs, name) {
+  const m = attrs.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'>]+))`, 'i'));
+  if (!m) return null;
+  return m[1] ?? m[2] ?? m[3] ?? '';
+}
 
 /**
  * Build a Map of <meta> name/property → content in a SINGLE pass over the HTML.
@@ -70,15 +100,13 @@ function decodeEntities(str) {
  */
 function buildMetaMap(html) {
   const map = new Map();
-  for (const [, attrs] of html.matchAll(/<meta\b([^>]*)>/gi)) {
-    const nameM =
-      attrs.match(/\bname=["']([^"']*)["']/i) ??
-      attrs.match(/\bproperty=["']([^"']*)["']/i);
-    if (!nameM) continue;
-    const key = nameM[1].toLowerCase();
+  for (const [, attrs] of html.matchAll(META_TAG)) {
+    const name = attrValue(attrs, 'name') ?? attrValue(attrs, 'property');
+    if (name === null) continue;
+    const key = name.toLowerCase();
     if (map.has(key)) continue;          // first occurrence wins
-    const contentM = attrs.match(/\bcontent=["']([^"']*)["']/i);
-    map.set(key, contentM ? contentM[1] : '');
+    const content = attrValue(attrs, 'content');
+    map.set(key, content !== null ? content : '');
   }
   return map;
 }
@@ -105,10 +133,9 @@ function getMetaContent(metaMap, name) {
  */
 function getCanonical(linkMatches) {
   for (const [, attrs] of linkMatches) {
-    const relM = attrs.match(/\brel=["']([^"']*)["']/i);
-    if (relM && relM[1].toLowerCase() === 'canonical') {
-      const hrefM = attrs.match(/\bhref=["']([^"']*)["']/i);
-      return hrefM ? hrefM[1] : '';
+    const rel = attrValue(attrs, 'rel');
+    if (rel && rel.toLowerCase() === 'canonical') {
+      return attrValue(attrs, 'href') ?? '';
     }
   }
   return '';
@@ -318,10 +345,20 @@ function extractLdDate(obj, field) {
 
 // ── Text / word-count helpers ───────────────────────────────────────────────────
 
-/** Count whitespace-separated tokens in a string. */
+// Ranges: Hiragana/Katakana U+3040-30FF, CJK Ext-A U+3400-4DBF, CJK Unified
+// U+4E00-9FFF, Hangul Syllables U+AC00-D7A3, CJK Compat Ideographs U+F900-FAFF.
+// CJK ideographs / Kana / Hangul: scripts written without inter-word spaces, where
+// ~1 character ≈ 1 word. Counting them individually stops whitespace-only splitting
+// from reading a space-less Chinese/Japanese/Korean page as a single word (which
+// otherwise trips the rawWordCount<10 "empty JS-shell" guard → whole page skipped).
+const CJK_CHAR = /[぀-ヿ㐀-䶿一-鿿가-힣豈-﫿]/g;
+
+/** Count word-tokens: whitespace-separated runs, plus each CJK char as one token. */
 function countWords(text) {
   if (!text) return 0;
-  return text.split(/\s+/).filter((w) => w.length > 0).length;
+  const cjk = (text.match(CJK_CHAR) || []).length;
+  const rest = text.replace(CJK_CHAR, ' ').split(/\s+/).filter((w) => w.length > 0).length;
+  return cjk + rest;
 }
 
 /**
@@ -369,7 +406,7 @@ function emptyResult() {
     hasMicrodata: 0, hasRdfa: 0, resourcePaths: '',
     datePublished: '', dateModified: '', offerPrice: '', availability: '',
     imgTotal: 0, imgNoAlt: 0, imgJpg: 0, imgWebp: 0, imgAvif: 0,
-    outlinksInternal: 0, outlinksAuthoritative: 0,
+    outlinksInternal: 0, outlinksAuthoritative: 0, outlinksExternal: 0,
     wordCount: 0, rawWordCount: 0,
     mixedContent: 0,
     viewportContent: '',
@@ -431,7 +468,7 @@ export function parsePage(html, url) {
   // <link> matchAll ran ~4x. Build each structure ONCE over strippedHtml and
   // have the canonical/hreflang/favicon/canonicalCount/meta lookups read these.
   const metaMap     = buildMetaMap(strippedHtml);
-  const linkMatches = [...strippedHtml.matchAll(/<link\b([^>]*)>/gi)];
+  const linkMatches = [...strippedHtml.matchAll(LINK_TAG)];
 
   // ── Title ────────────────────────────────────────────────────────────────────
   const titleM = strippedHtml.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
@@ -471,20 +508,20 @@ export function parsePage(html, url) {
   const robotsMeta = getMetaContent(metaMap, 'robots') ?? '';
 
   // ── HTML lang ────────────────────────────────────────────────────────────────
-  const langM = strippedHtml.match(/<html\b[^>]*\blang=["']([^"']*)["']/i);
-  const htmlLang = langM ? langM[1] : '';
+  const htmlTagM = strippedHtml.match(/<html\b((?:"[^"]*"|'[^']*'|[^"'>])*)>/i);
+  const htmlLang = htmlTagM ? (attrValue(htmlTagM[1], 'lang') ?? '') : '';
 
   // ── Hreflang ─────────────────────────────────────────────────────────────────
   const hreflangValues = [];
   const hreflangLinkPairs = []; // {lang, href} for cross-page reciprocity check
   for (const [, attrs] of linkMatches) {
-    const relM = attrs.match(/\brel=["']alternate["']/i);
-    if (!relM) continue;
-    const hlM = attrs.match(/\bhreflang=["']([^"']*)["']/i);
-    if (!hlM) continue;
-    hreflangValues.push(hlM[1]);
-    const hrefM = attrs.match(/\bhref=["']([^"']*)["']/i);
-    hreflangLinkPairs.push({ lang: hlM[1], href: hrefM ? decodeEntities(hrefM[1]) : '' });
+    const rel = attrValue(attrs, 'rel');
+    if (!rel || rel.toLowerCase() !== 'alternate') continue;
+    const hl = attrValue(attrs, 'hreflang');
+    if (hl === null) continue;
+    hreflangValues.push(hl);
+    const href = attrValue(attrs, 'href');
+    hreflangLinkPairs.push({ lang: hl, href: href !== null ? decodeEntities(href) : '' });
   }
   const hreflangCount = hreflangValues.length;
   const hreflang = hreflangValues.join(',');
@@ -804,6 +841,7 @@ export function parsePage(html, url) {
 
   let outlinksInternal      = 0;
   let outlinksAuthoritative = 0;
+  let outlinksExternal      = 0;
   const internalLinksSet = new Set();
   const internalLinks    = [];
 
@@ -834,6 +872,7 @@ export function parsePage(html, url) {
         internalLinks.push(norm);
       }
     } else {
+      outlinksExternal++;
       if (isAuthoritative(resolved.hostname)) outlinksAuthoritative++;
     }
   }
@@ -917,8 +956,8 @@ export function parsePage(html, url) {
   // ── Favicon presence ──────────────────────────────────────────────────────────
   let hasFavicon = 0;
   for (const [, attrs] of linkMatches) {
-    const relM = attrs.match(/\brel=["']([^"']*)["']/i);
-    if (relM && relM[1].toLowerCase().includes('icon')) { hasFavicon = 1; break; }
+    const rel = attrValue(attrs, 'rel');
+    if (rel && rel.toLowerCase().includes('icon')) { hasFavicon = 1; break; }
   }
 
   // ── Distinct canonical count ───────────────────────────────────────────────────
@@ -926,10 +965,9 @@ export function parsePage(html, url) {
   // Counts DISTINCT non-empty rel=canonical href values (deduplicated).
   const canonicalHrefs = new Set();
   for (const [, attrs] of linkMatches) {
-    const relM = attrs.match(/\brel=["']([^"']*)["']/i);
-    if (relM && relM[1].toLowerCase() === 'canonical') {
-      const hrefM = attrs.match(/\bhref=["']([^"']*)["']/i);
-      const href  = hrefM ? hrefM[1].trim() : '';
+    const rel = attrValue(attrs, 'rel');
+    if (rel && rel.toLowerCase() === 'canonical') {
+      const href = (attrValue(attrs, 'href') ?? '').trim();
       if (href !== '') canonicalHrefs.add(href);
     }
   }
@@ -953,7 +991,7 @@ export function parsePage(html, url) {
     datePublished, dateModified,
     offerPrice, availability,
     imgTotal, imgNoAlt, imgJpg, imgWebp, imgAvif,
-    outlinksInternal, outlinksAuthoritative,
+    outlinksInternal, outlinksAuthoritative, outlinksExternal,
     wordCount, rawWordCount,
     mixedContent,
     viewportContent,
