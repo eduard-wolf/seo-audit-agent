@@ -9,6 +9,7 @@ import { scoreCitations } from '../eval/scorers/citation.mjs';
 import { buildCitationAllowlist } from '../eval/lib/kb-citations.mjs';
 import { scoreSchema } from '../eval/scorers/schema.mjs';
 import { scoreFabrication } from '../eval/scorers/fabrication.mjs';
+import { scoreProvenance } from '../eval/scorers/provenance.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../examples/example-run/findings.json', import.meta.url), 'utf8'));
 
@@ -72,5 +73,18 @@ describe('eval/scorers/fabrication', () => {
     assert.ok(r.items.some(i => i.kind === 'not-in-analysis' && i.ruleId === 'ghost:invented'), 'invented flagged');
     assert.ok(r.items.some(i => i.kind === 'on-positive' && i.ruleId === 'p:passed'), 'positive-claim flagged');
     assert.ok(r.items.some(i => i.kind === 'must-not-contain' && i.ruleId === 'trap:x'), 'trap flagged');
+  });
+});
+
+describe('eval/scorers/provenance', () => {
+  it('golden findings satisfy all provenance/anti-overclaim invariants', () => {
+    const r = scoreProvenance(golden);
+    assert.deepEqual(r.issues, [], `golden must be clean; issues: ${r.issues.join('; ')}`);
+  });
+  it('detects a c-cap violation under a sub-minimum sample', () => {
+    const bad = { meta: { sampleSize: 3 }, confidence: { sampleSize: 3, minNMet: false },
+      sections: [{ findings: [{ prov: 'gemessen', severity: 'hoch', ice: { i: 3, c: 2, e: 1, score: 6 } }] }] };
+    const r = scoreProvenance(bad);
+    assert.equal(r.checks.cCapOk, false, 'c=2 with minNMet=false violates the cap');
   });
 });
