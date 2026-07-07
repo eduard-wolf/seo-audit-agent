@@ -5,6 +5,7 @@
  */
 
 import fs from 'node:fs';
+import path from 'node:path';
 
 const DEFAULT_CORPUS_DIR = new URL('../../kb/corpus/', import.meta.url);
 const FRONT_MATTER_RE = /^---\n([\s\S]*?)\n---/;
@@ -16,16 +17,19 @@ const SOURCE_LINE_RE = /^source:\s*(.+)$/m;
  * contributes its trimmed value to `urls`; the file's own basename is added
  * to `basenames` so citing the corpus file directly is also valid.
  *
+ * Accepts either a `URL` (resolved relative to this module by default) or a
+ * plain filesystem path string — both are valid `fs` directory references.
+ *
  * @param {string|URL} [corpusDir] — defaults to kb/corpus/ relative to this module
  * @returns {{ urls: Set<string>, basenames: Set<string> }}
  */
 export function buildCitationAllowlist(corpusDir = DEFAULT_CORPUS_DIR) {
   const urls = new Set();
   const basenames = new Set();
-  const dir = corpusDir instanceof URL ? corpusDir : new URL(corpusDir);
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
+  const files = fs.readdirSync(corpusDir).filter(f => f.endsWith('.md'));
   for (const file of files) {
-    const text = fs.readFileSync(new URL(file, dir), 'utf8');
+    const filePath = corpusDir instanceof URL ? new URL(file, corpusDir) : path.join(corpusDir, file);
+    const text = fs.readFileSync(filePath, 'utf8');
     const fmMatch = FRONT_MATTER_RE.exec(text);
     if (!fmMatch) continue;
     const srcMatch = SOURCE_LINE_RE.exec(fmMatch[1]);
