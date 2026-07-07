@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { findingRuleIds, producedRuleIds, analysisRuleIds, positiveRuleIds } from '../eval/lib/ruleids.mjs';
 import { extractInterpretedRuleIds } from '../bin/handoff.mjs';
+import { buildCitationAllowlist, isValidCitation } from '../eval/lib/kb-citations.mjs';
 
 describe('eval/lib/ruleids', () => {
   it('findingRuleIds prefers first-class ruleIds[]', () => {
@@ -27,5 +28,18 @@ describe('eval/lib/ruleids', () => {
     const a = { findings: [{ ruleId: 'a:1' }, { ruleId: 'a:1' }, { ruleId: 'b:2' }], positives: [{ ruleId: 'c:3' }] };
     assert.deepEqual(analysisRuleIds(a), ['a:1', 'b:2'], 'analysis rule ids sorted+deduped');
     assert.deepEqual(positiveRuleIds(a), ['c:3'], 'positive rule ids sorted+deduped');
+  });
+});
+
+describe('eval/lib/kb-citations', () => {
+  const allow = buildCitationAllowlist();
+  it('collects all 8 corpus source URLs', () => {
+    assert.equal(allow.urls.size, 8, 'exactly 8 KB corpus files → 8 source URLs');
+    assert.ok(allow.urls.has('https://arxiv.org/abs/2311.09735'), 'geo cite-sources URL present');
+  });
+  it('accepts a real corpus URL and the filename form, rejects a fabricated one', () => {
+    assert.equal(isValidCitation('https://web.dev/articles/vitals', allow), true, 'real URL is valid');
+    assert.equal(isValidCitation('05-meta-tags.md', allow), true, 'basename form is valid');
+    assert.equal(isValidCitation('https://example.com/made-up', allow), false, 'fabricated URL is invalid');
   });
 });
