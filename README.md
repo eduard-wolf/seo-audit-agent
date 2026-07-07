@@ -240,6 +240,40 @@ Vollständiges Runbook: [`CLAUDE.md`](CLAUDE.md). Tests: `npm test`
 
 ---
 
+## Evals — der LLM-Schritt wird gemessen, nicht nur getestet
+
+Der crawl→analyze-Kern ist deterministisch und golden-getestet. Der **eine
+nicht-deterministische Schritt** — der LLM-Interpretationsschritt (`skills/interpret.md`:
+`analysis.json` → `findings.json`) — ist zusätzlich **automatisiert evaluiert**. Unit-Tests
+prüfen exakten Output; **Evals** prüfen offenen Modell-Output gegen kuratierte Erwartungen +
+Grounding.
+
+```bash
+npm run eval    # deterministisch, KEY-FREI: scored den committeten Golden-Snapshot + Gate
+```
+
+Gemessen über **6 Fixtures** (5 synthetische Archetypen + der reale `example-run`), **k=3**
+unabhängige Läufe je Fixture, **16 Läufe / 103 LLM-as-Judge-Verdikte**:
+
+| Recall | Citation-Validität | Fabrications | Faithfulness (Judge) | Stabilität pass³ |
+|---|---|---|---|---|
+| 1.00 | 1.00 | 0 | **0.9806** | 1.00 |
+
+- **Deterministische Scorer** (key-frei): Recall/Coverage (ruleId-Matching), Citation-Existenz
+  gegen die KB, Schema, strukturelle No-Fabrication, Provenienz/Anti-Overclaim, `pass^k`.
+- **LLM-as-Judge** (Cross-Model, `claude-sonnet-5` bewertet `claude-opus-4-8`-Output): semantische
+  Faithfulness je Finding gegen `analysis.json`. Die 98,06 % sind **echt, nicht 100 %** — der
+  Judge fand im realen `example-run` zwei genuine Faithfulness-Bugs. Genau dafür ist er da.
+- **CI-gegated:** harte Invarianten (Schema, Fabrications = 0, Citations = 100 %) + No-Regression
+  gegen committete Baseline + konservativer Floor. **Kein API-Key, keine Modell-Calls in CI** —
+  die modell-berührenden Schritte werden manuell erzeugt und als versionierter Snapshot committet.
+
+Methodik, Grenzen und der Refresh-Ritus: [`eval/README.md`](eval/README.md). **Ehrlich:** misst
+gegen kuratierte Erwartungen + Grounding auf einem kleinen Golden-Set — nicht gegen absolute
+Wahrheit, kein „misst Korrektheit absolut".
+
+---
+
 ## Repo-Karte
 
 | Pfad | Schicht | Inhalt |
@@ -251,6 +285,7 @@ Vollständiges Runbook: [`CLAUDE.md`](CLAUDE.md). Tests: `npm test`
 | `lib/findings-schema.mjs` | 3↔5 | Vertrag zwischen LLM-Ausgabe und Renderer |
 | `report/` | 5 | Deterministischer, CSP-reiner HTML-Renderer |
 | `examples/example-run/` | — | Eingefrorener Beleg-Lauf (Proof of Generation) |
+| `eval/` | — | Evals des LLM-Schritts: Golden-Set, deterministische Scorer, Cross-Model-Judge, `npm run eval` |
 | `test/` | — | `node --test`-Suite + synthetische Fixture |
 
 ---
