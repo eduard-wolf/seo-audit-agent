@@ -17,6 +17,10 @@
     {
       "ruleId": "onpage:title-dup",
       "note": "duplicate titles across product pages"
+    },
+    {
+      "ruleId": "hygiene:oos-noindexed",
+      "note": "accidentally-noindexed out-of-stock products — most business-critical e-commerce issue"
     }
   ],
   "mustNotContain": [

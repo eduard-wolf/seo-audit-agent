@@ -26,7 +26,12 @@
       "affectedUrls": [
         "https://example-clean.test/leistungen"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/leistungen/*",
+          "count": 1
+        }
+      ],
       "detail": "Eine Unterseite ohne Meta-Beschreibung.",
       "quelle": "Google Search Central – Meta Descriptions",
       "datum": "2024-01"

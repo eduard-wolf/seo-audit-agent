@@ -28,7 +28,12 @@
         "https://example-corp.test/leistungen/entwurf",
         "https://example-corp.test/leistungen/intern"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/leistungen/*",
+          "count": 3
+        }
+      ],
       "detail": "noindex-Seiten sind zugleich in der Sitemap gelistet (widersprüchliches Indexierungssignal).",
       "quelle": "Google Search Central – Sitemaps & Robots",
       "datum": "2024-01"
@@ -47,7 +52,12 @@
         "https://example-corp.test/produkte/c",
         "https://example-corp.test/produkte/d"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/produkte/*",
+          "count": 4
+        }
+      ],
       "detail": "Canonical zeigt auf eine andere URL als die Seite selbst.",
       "quelle": "Google Search Central – Canonical URLs",
       "datum": "2024-01"
@@ -64,7 +74,12 @@
         "https://example-corp.test/alt/kontakt",
         "https://example-corp.test/alt/impressum"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/alt/*",
+          "count": 2
+        }
+      ],
       "detail": "Interne Ziele über eine Redirect-Kette mit ≥2 Hops erreichbar.",
       "quelle": "Google Search Central – Redirects",
       "datum": "2024-01"
@@ -82,7 +97,12 @@
         "https://example-corp.test/fehler/500-eintrag",
         "https://example-corp.test/fehler/leerer-eintrag"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/fehler/*",
+          "count": 3
+        }
+      ],
       "detail": "Sitemap listet URLs, die nicht mit 2xx antworten.",
       "quelle": "Google Search Central – Sitemaps",
       "datum": "2024-01"
@@ -99,7 +119,12 @@
         "https://example-corp.test/gesperrt/report",
         "https://example-corp.test/gesperrt/export"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/gesperrt/*",
+          "count": 2
+        }
+      ],
       "detail": "Sitemap listet per robots.txt gesperrte URLs.",
       "quelle": "Google Search Central – Sitemap erstellen & einreichen (keine robots-gesperrten URLs listen)",
       "datum": "2025-12"
@@ -115,7 +140,12 @@
       "affectedUrls": [
         "https://example-corp.test/verwaist/altseite"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/verwaist/*",
+          "count": 1
+        }
+      ],
       "detail": "Seite ohne interne Eingangslinks.",
       "quelle": "Google Search Central – Internal Linking",
       "datum": "2024-01"

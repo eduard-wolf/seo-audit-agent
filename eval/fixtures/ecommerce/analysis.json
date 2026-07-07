@@ -34,7 +34,12 @@
         "https://example-shop.test/produkt/probierset",
         "https://example-shop.test/produkt/abo-box"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/produkt/*",
+          "count": 9
+        }
+      ],
       "detail": "Produktseiten ohne AggregateRating-Markup (nur mit echten Bewertungen ergänzen).",
       "quelle": "Google Rich Results – Product / Review-Snippet-Policy (keine fabrizierten Ratings)",
       "datum": "2024-01"
@@ -53,7 +58,12 @@
         "https://example-shop.test/produkt/probierset",
         "https://example-shop.test/produkt/kapseln"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/produkt/*",
+          "count": 4
+        }
+      ],
       "detail": "Offer-Objekt ohne price — nicht für Merchant-Rich-Results qualifiziert.",
       "quelle": "Google Search Central – Product snippet / Merchant listing (structured data): price erforderlich",
       "datum": "2025-12"
@@ -74,7 +84,12 @@
         "https://example-shop.test/produkt/cold-brew",
         "https://example-shop.test/produkt/kapseln"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/produkt/*",
+          "count": 6
+        }
+      ],
       "detail": "Sechs Produktseiten teilen denselben generischen Seitentitel.",
       "quelle": "Google Search Central – Title Tags",
       "datum": "2024-01"
@@ -97,7 +112,12 @@
         "https://example-shop.test/produkt/kapseln",
         "https://example-shop.test/produkt/probierset"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/produkt/*",
+          "count": 8
+        }
+      ],
       "detail": "Produktbilder ohne alt-Attribut.",
       "quelle": "WCAG 2.1 – Non-text Content / Google Image SEO",
       "datum": "2024-01"
@@ -113,7 +133,12 @@
       "affectedUrls": [
         "https://example-shop.test/"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/",
+          "count": 1
+        }
+      ],
       "detail": "Organization-Schema auf der Startseite ohne logo-Eigenschaft.",
       "quelle": "Google Search Central – Organization Structured Data (logo empfohlen für Logo in Suche/Knowledge Panel; kein Ranking)",
       "datum": "2026-04"
@@ -130,7 +155,12 @@
         "https://example-shop.test/produkt/saisonale-edition",
         "https://example-shop.test/produkt/limited-drop"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/produkt/*",
+          "count": 2
+        }
+      ],
       "detail": "Temporär ausverkaufte Produkte fälschlich auf noindex gesetzt.",
       "quelle": "Google Search Central / John Mueller – temporäre Out-of-Stock-Produkte indexiert lassen",
       "datum": "2024-01"

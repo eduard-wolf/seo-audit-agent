@@ -89,6 +89,27 @@ function round1(n) {
   return Math.round(n * 10) / 10;
 }
 
+/**
+ * Cluster affected URLs by their first path segment, mirroring the grouping
+ * `pathCluster()` performs in analyze/engine.mjs (`{pattern: "/<segment>/*",
+ * count}`; the root path clusters under `/`). Sorted by pattern for
+ * determinism. Returns `[]` for an empty input (site-level sentinels).
+ *
+ * @param {string[]} urls — full affected URLs (origin + path)
+ * @returns {{ pattern: string, count: number }[]}
+ */
+function clusterUrls(urls) {
+  const counts = new Map();
+  for (const u of urls) {
+    const seg = new URL(u).pathname.split('/').filter(Boolean)[0];
+    const key = seg ? `/${seg}/*` : '/';
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([pattern, count]) => ({ pattern, count }))
+    .sort((a, b) => (a.pattern < b.pattern ? -1 : a.pattern > b.pattern ? 1 : 0));
+}
+
 // ── Compact spec → analysis.json shapes ──────────────────────────────────────
 
 /**
@@ -141,7 +162,7 @@ function buildFinding(origin, spec, pageCount) {
     count,
     pctOfPages,
     affectedUrls,
-    clusters: [],
+    clusters: affectedUrls.length > 0 ? clusterUrls(affectedUrls) : [],
     detail: spec.detail || '',
     quelle: r.quelle,
     datum: r.datum,
@@ -258,6 +279,7 @@ const FIXTURES = [
         { ruleId: 'schema:offer-no-price', note: 'missing price blocks merchant listing rich results' },
         { ruleId: 'onpage:alt-missing', note: 'image accessibility + image SEO on product pages' },
         { ruleId: 'onpage:title-dup', note: 'duplicate titles across product pages' },
+        { ruleId: 'hygiene:oos-noindexed', note: 'accidentally-noindexed out-of-stock products — most business-critical e-commerce issue' },
       ],
       mustNotContain: [
         { ruleId: 'schema:invalid', reason: 'JSON-LD parses cleanly (in positives) — must not claim a parse error' },

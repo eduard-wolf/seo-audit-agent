@@ -14,7 +14,9 @@
  *   (d) expected-findings.json passes validateExpected;
  *   (e) every mustContain[].ruleId is present in the analysis findings ruleIds;
  *   (f) every mustNotContain[].ruleId is ABSENT from the analysis findings
- *       ruleIds (a real trap, not a demand the fixture also fulfils).
+ *       ruleIds (a real trap, not a demand the fixture also fulfils);
+ *   (g) analysis.findings[].ruleId and analysis.positives[].ruleId are
+ *       disjoint (a rule cannot both fire and pass).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -119,6 +121,14 @@ describe('eval/fixtures integrity', () => {
           assert.ok(!analysisRuleIds.has(ruleId),
             `${name}: mustNotContain "${ruleId}" must NOT appear in analysis.findings (it does)`);
         }
+      });
+
+      // (g) findings ∩ positives === ∅ — a rule cannot both fire and pass
+      it('(g) analysis.findings and analysis.positives ruleIds are disjoint', () => {
+        const positiveRuleIds = new Set((analysis.positives || []).map(p => p.ruleId));
+        const overlap = [...analysisRuleIds].filter(id => positiveRuleIds.has(id));
+        assert.deepEqual(overlap, [],
+          `${name}: ruleId(s) ${overlap.join(', ')} appear in BOTH findings and positives`);
       });
     });
   }

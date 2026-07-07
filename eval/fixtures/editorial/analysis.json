@@ -32,7 +32,12 @@
         "https://example-journal.test/artikel/entkoffeinierung",
         "https://example-journal.test/artikel/wasserqualitaet"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 7
+        }
+      ],
       "detail": "Artikel-Schema ohne author (E-E-A-T-Signal fehlt).",
       "quelle": "Google Search Central – Article (structured data): author = empfohlen (E-E-A-T)",
       "datum": "2025-12"
@@ -53,7 +58,12 @@
         "https://example-journal.test/artikel/wasserqualitaet",
         "https://example-journal.test/artikel/koffein-mythen"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 6
+        }
+      ],
       "detail": "Substanzielle Artikel ohne jegliche externe Quellenangabe (kein Outlink zu einer anderen Domain).",
       "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
       "datum": "2023-11"
@@ -73,7 +83,12 @@
         "https://example-journal.test/artikel/entkoffeinierung",
         "https://example-journal.test/artikel/koffein-mythen"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 5
+        }
+      ],
       "detail": "Artikel ohne dateModified — Recency-Signal fehlt.",
       "quelle": "Google Search Central – Article (dateModified empfohlen) + Ranking Systems Guide (QDF ist query-abhängig)",
       "datum": "2025-12"
@@ -92,7 +107,12 @@
         "https://example-journal.test/artikel/oeffnungszeiten",
         "https://example-journal.test/artikel/danksagung"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 4
+        }
+      ],
       "detail": "Sehr kurze Inhaltsseiten — manueller Review-Hinweis.",
       "quelle": "Heuristik — Google: Wortzahl ist KEIN Qualitätssignal (Mueller/Sullivan 2025); manuell prüfen",
       "datum": "2024-01"
@@ -110,7 +130,12 @@
         "https://example-journal.test/artikel/archiv/2018/rueckblick",
         "https://example-journal.test/artikel/archiv/2017/anfaenge"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 3
+        }
+      ],
       "detail": "Archivseiten jenseits der maximalen Klicktiefe von der Startseite.",
       "quelle": "Google Search Central – Site Structure & Internal Linking",
       "datum": "2024-01"
@@ -127,7 +152,12 @@
         "https://example-journal.test/artikel/verwaist",
         "https://example-journal.test/artikel/alte-aktion"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 2
+        }
+      ],
       "detail": "Seiten ohne interne Eingangslinks.",
       "quelle": "Google Search Central – Internal Linking",
       "datum": "2024-01"

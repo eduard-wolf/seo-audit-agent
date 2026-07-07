@@ -72,7 +72,12 @@
         "https://example-answers.test/wissen/kosten",
         "https://example-answers.test/wissen/haltbarkeit"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/wissen/*",
+          "count": 5
+        }
+      ],
       "detail": "Substanzielle Antwort-Seiten ohne externe Quellenangabe (schwächt die KI-Zitierbarkeit).",
       "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
       "datum": "2023-11"
@@ -90,7 +95,12 @@
         "https://example-answers.test/wissen/glossar",
         "https://example-answers.test/wissen/faq-langform"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/wissen/*",
+          "count": 3
+        }
+      ],
       "detail": "Lange Seite ohne Zwischenüberschriften — erschwert heading-basiertes Chunking.",
       "quelle": "RAG-Chunking-Praxis (Unstructured.io / Firecrawl 2026: heading-basiertes Chunking schlägt Fixed-Size-Splitting) + GEO-Praxis (Backlinko 2025-26); Google bestätigt: Wortzahl ist KEIN Qualitäts-/Ranking-Signal (Mueller/Sullivan) — struktureller Hinweis für KI-Extrahierbarkeit, kein Ranking-Claim, Praktiker-Evidenz (keine Google-Primärquelle)",
       "datum": "2026-01"
@@ -107,7 +117,12 @@
         "https://example-answers.test/wissen/definition",
         "https://example-answers.test/wissen/vergleich"
       ],
-      "clusters": [],
+      "clusters": [
+        {
+          "pattern": "/wissen/*",
+          "count": 2
+        }
+      ],
       "detail": "nosnippet / max-snippet:0 verhindert Zitierung in AI-Overviews.",
       "quelle": "Google Search Central – Robots-Meta/X-Robots-Spezifikation: nosnippet & max-snippet:0",
       "datum": "2026-03"
