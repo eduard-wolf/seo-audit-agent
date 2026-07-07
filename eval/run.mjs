@@ -151,32 +151,28 @@ function buildGateResult(aggregate, gate, baseline) {
   const floors = (gate && gate.floors) || {};
   const baselineAgg = (baseline && baseline.aggregate) || null;
 
-  // Soft metric spec: [aggregate key, floors.json key, candidate baseline.aggregate keys
-  // (self-produced baseline.json is expected to reuse the report's own aggregate key,
-  // "stabilityPassK"; the design brief also names the shorter "stability" — accept either)].
+  // Soft metric spec: [report.aggregate key, gate.floors key]. The baseline key
+  // is IDENTICAL to the aggregate key (baseline.json is expected to store the
+  // report's own aggregate verbatim, so its stability field is "stabilityPassK",
+  // never the shorter "stability") — no accept-either fallback.
   const softMetrics = [
-    { key: 'recall', floorKey: 'recall', baselineKeys: ['recall'] },
-    { key: 'faithfulness', floorKey: 'faithfulness', baselineKeys: ['faithfulness'] },
-    { key: 'stabilityPassK', floorKey: 'stability', baselineKeys: ['stabilityPassK', 'stability'] },
+    { aggKey: 'recall', floorKey: 'recall' },
+    { aggKey: 'faithfulness', floorKey: 'faithfulness' },
+    { aggKey: 'stabilityPassK', floorKey: 'stability' },
   ];
 
-  for (const { key, floorKey, baselineKeys } of softMetrics) {
-    const value = aggregate[key];
-    if (value === null) continue; // absent data — cannot gate
+  for (const { aggKey, floorKey } of softMetrics) {
+    const current = aggregate[aggKey];
+    if (current === null) continue; // absent data — cannot gate
 
     const floor = floors[floorKey];
-    if (typeof floor === 'number' && value < floor - EPS) {
-      softFailures.push(`${key} (${value}) is below the gate floor for "${floorKey}" (${floor})`);
+    if (typeof floor === 'number' && current < floor - EPS) {
+      softFailures.push(`${aggKey} (${current}) is below the gate floor for "${floorKey}" (${floor})`);
     }
 
-    if (baselineAgg) {
-      const baselineKey = baselineKeys.find(k => typeof baselineAgg[k] === 'number');
-      if (baselineKey !== undefined) {
-        const baselineValue = baselineAgg[baselineKey];
-        if (value < baselineValue - EPS) {
-          softFailures.push(`${key} (${value}) regressed vs baseline "${baselineKey}" (${baselineValue})`);
-        }
-      }
+    const baselineValue = baselineAgg ? baselineAgg[aggKey] : undefined;
+    if (typeof baselineValue === 'number' && current < baselineValue - EPS) {
+      softFailures.push(`${aggKey} (${current}) regressed vs baseline "${aggKey}" (${baselineValue})`);
     }
   }
 

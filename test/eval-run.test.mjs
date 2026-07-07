@@ -16,7 +16,9 @@ function scratch() { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'seo-eval-'
 after(() => { for (const d of tmps) fs.rmSync(d, { recursive: true, force: true }); });
 
 // Minimal schema-valid findings factory (fill required fields) — implementer completes to satisfy validateFindings.
-function validFindings(ruleId) {
+// `kbSources` defaults to [] (no citations to check); pass entries like
+// `[{ source: 'https://example.com/fabricated' }]` to exercise the citation scorer.
+function validFindings(ruleId, kbSources = []) {
   return {
     meta: {
       url: 'http://example.test',
@@ -46,7 +48,7 @@ function validFindings(ruleId) {
             auswirkung: 'Test auswirkung text.',
             empfehlung: 'Test empfehlung text.',
             ice: { i: 1, c: 1, e: 1, score: 1 },
-            kbSources: [],
+            kbSources,
           },
         ],
       },
@@ -58,14 +60,15 @@ function validFindings(ruleId) {
 }
 
 /**
- * Write a single-fixture scratch tree (fixtures/<name> + runs/<name>/run-1) and
- * return its {fixturesDir, runsDir}. The fixture's analysis.json declares one
- * real finding (ruleId 'a:real'); `runFindings` is committed as run-1's findings.json.
+ * Write a single-fixture scratch tree (fixtures/<name> + runs/<name>/run-N) with
+ * a configurable set of "real" ruleIds (each becomes both an analysis.json
+ * finding and an expected-findings.json mustContain anchor) and one findings.json
+ * per run. General-purpose helper behind `buildTree()`.
  *
- * @param {object} runFindings
+ * @param {{ ruleIds: string[], runsFindings: object[] }} opts
  * @returns {{ fixturesDir: string, runsDir: string, fixtureName: string }}
  */
-function buildTree(runFindings) {
+function writeTree({ ruleIds, runsFindings }) {
   const root = scratch();
   const fixtureName = 'fix1';
   const fixturesDir = path.join(root, 'fixtures');
@@ -74,20 +77,32 @@ function buildTree(runFindings) {
   fs.mkdirSync(path.join(fixturesDir, fixtureName), { recursive: true });
   fs.writeFileSync(
     path.join(fixturesDir, fixtureName, 'analysis.json'),
-    JSON.stringify({ findings: [{ ruleId: 'a:real' }], positives: [] }),
+    JSON.stringify({ findings: ruleIds.map(ruleId => ({ ruleId })), positives: [] }),
   );
   fs.writeFileSync(
     path.join(fixturesDir, fixtureName, 'expected-findings.json'),
-    JSON.stringify({ fixture: fixtureName, mustContain: [{ ruleId: 'a:real' }], mustNotContain: [] }),
+    JSON.stringify({ fixture: fixtureName, mustContain: ruleIds.map(ruleId => ({ ruleId })), mustNotContain: [] }),
   );
 
-  fs.mkdirSync(path.join(runsDir, fixtureName, 'run-1'), { recursive: true });
-  fs.writeFileSync(
-    path.join(runsDir, fixtureName, 'run-1', 'findings.json'),
-    JSON.stringify(runFindings),
-  );
+  runsFindings.forEach((runFindings, i) => {
+    const runDir = path.join(runsDir, fixtureName, `run-${i + 1}`);
+    fs.mkdirSync(runDir, { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'findings.json'), JSON.stringify(runFindings));
+  });
 
   return { fixturesDir, runsDir, fixtureName };
+}
+
+/**
+ * Write a single-fixture scratch tree (fixtures/<name> + runs/<name>/run-1) and
+ * return its {fixturesDir, runsDir}. The fixture's analysis.json declares one
+ * real finding (ruleId 'a:real'); `runFindings` is committed as run-1's findings.json.
+ *
+ * @param {object} runFindings
+ * @returns {{ fixturesDir: string, runsDir: string, fixtureName: string }}
+ */
+function buildTree(runFindings) {
+  return writeTree({ ruleIds: ['a:real'], runsFindings: [runFindings] });
 }
 
 describe('eval/run', () => {
@@ -125,15 +140,84 @@ describe('eval/run', () => {
     assert.ok(md.includes('PASS'), 'markdown summary should mention PASS for the clean gate result');
   });
 
-  it('produces a byte-identical report on repeated runs (determinism)', () => {
+  it('produces a byte-identical report and markdown on repeated runs (determinism)', () => {
     const clean = buildTree(validFindings('a:real'));
     const runOnce = () => runEval({ fixturesDir: clean.fixturesDir, runsDir: clean.runsDir, gate: GATE, baseline: null });
-    const { report: reportA } = runOnce();
-    const { report: reportB } = runOnce();
+    const { report: reportA, gateResult: gateA } = runOnce();
+    const { report: reportB, gateResult: gateB } = runOnce();
     assert.equal(
       JSON.stringify(reportA),
       JSON.stringify(reportB),
       'runEval must produce a byte-identical report across repeated runs on the same inputs',
+    );
+    assert.equal(
+      buildReportMarkdown(reportA, gateA),
+      buildReportMarkdown(reportB, gateB),
+      'buildReportMarkdown must render byte-identical markdown across repeated runs on the same inputs',
+    );
+  });
+
+  it('fails the gate on a no-regression violation even when the floor itself is met', () => {
+    // Two must-contain anchors, but only one run covering one of them: recall = 0.5,
+    // which meets the floor (0.5) exactly but regresses against a baseline of 1.0.
+    const tree = writeTree({ ruleIds: ['a:real', 'b:real'], runsFindings: [validFindings('a:real')] });
+    const { gateResult } = runEval({
+      fixturesDir: tree.fixturesDir,
+      runsDir: tree.runsDir,
+      gate: GATE,
+      baseline: { aggregate: { recall: 1.0 } },
+    });
+    assert.equal(gateResult.passed, false, 'a recall regression vs. baseline must fail the gate even though the floor is met');
+    assert.ok(
+      gateResult.softFailures.some(f => /regress/i.test(f) && /recall/i.test(f)),
+      `softFailures should contain a recall regression entry, got ${JSON.stringify(gateResult.softFailures)}`,
+    );
+  });
+
+  it('skips a null current metric against baseline instead of treating it as a regression', () => {
+    // Single anchor, single run, full recall and passK=1 so recall/stability exactly
+    // meet their baseline values — only faithfulness (no judge.json anywhere, so null)
+    // is under test here.
+    const clean = buildTree(validFindings('a:real'));
+    const { gateResult } = runEval({
+      fixturesDir: clean.fixturesDir,
+      runsDir: clean.runsDir,
+      gate: GATE,
+      baseline: { aggregate: { recall: 1.0, faithfulness: 0.99, stabilityPassK: 1.0 } },
+    });
+    assert.ok(
+      !gateResult.softFailures.some(f => /faithfulness/i.test(f)),
+      `a null current faithfulness must be skipped, not compared against the baseline, got ${JSON.stringify(gateResult.softFailures)}`,
+    );
+  });
+
+  it('fails the gate on a hard citation-validity violation (fabricated kbSource)', () => {
+    const tree = buildTree(validFindings('a:real', [{ source: 'https://example.com/fabricated' }]));
+    const { gateResult } = runEval({
+      fixturesDir: tree.fixturesDir,
+      runsDir: tree.runsDir,
+      gate: GATE,
+      baseline: null,
+    });
+    assert.equal(gateResult.passed, false, 'a fabricated kbSource citation should fail the gate');
+    assert.ok(
+      gateResult.hardFailures.some(f => /citation/i.test(f)),
+      `hardFailures should mention citation validity, got ${JSON.stringify(gateResult.hardFailures)}`,
+    );
+  });
+
+  it('fails the gate on a hard schema-validity violation (empty findings object)', () => {
+    const tree = buildTree({});
+    const { gateResult } = runEval({
+      fixturesDir: tree.fixturesDir,
+      runsDir: tree.runsDir,
+      gate: GATE,
+      baseline: null,
+    });
+    assert.equal(gateResult.passed, false, 'a schema-invalid run findings.json should fail the gate');
+    assert.ok(
+      gateResult.hardFailures.some(f => /schema/i.test(f)),
+      `hardFailures should mention schema validity, got ${JSON.stringify(gateResult.hardFailures)}`,
     );
   });
 
