@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "url": "https://example-answers.test",
+    "crawledAt": null,
+    "modelId": "claude-opus-4-8",
+    "rulesetVersion": "1.7.0",
+    "sampleSize": 8,
+    "coveragePct": 89,
+    "siteType": "server-rendered"
+  },
+  "execSummary": {
+    "metrics": [
+      "8 von 9 bekannten/entdeckten Seiten gecrawlt (Abdeckung 89 %; sampleSize=8, sitemapTotal=9, discovered=9) — server-rendered.",
+      "6 GEO-Regel-Treffer über die geprüften KI-Sichtbarkeits-Signale; der Schwerpunkt liegt auf der Zitierbarkeit der /wissen/*-Antwort-Seiten.",
+      "5 sauber bestandene Regel-Checks (u. a. HTTPS ohne Mixed-Content, kein fehlender Titel, valides JSON-LD, dateModified/Recency gesetzt, keine noimageindex-Sperre).",
+      "Höchste Priorität: OAI-SearchBot ist per robots.txt global blockiert — die GEO-Sichtbarkeit für ChatGPT Search fällt auf diesem Kanal auf null."
+    ],
+    "patterns": [
+      "Doppelte KI-Zugangs-Sperre: OAI-SearchBot ist per robots.txt global ausgesperrt (Crawl-Verbot) UND zwei /wissen/*-Answer-Seiten unterdrücken zusätzlich per nosnippet/max-snippet:0 jede Snippet-/AI-Overview-Zitierung — Crawl- und Ausspiel-Kanal sind unabhängig voneinander blockiert.",
+      "Die /wissen/*-Answer-Segmente sind der GEO-Schwerpunkt: fehlende externe Quellenangaben (5 Seiten), unterdrückte AI-Snippets (2) und lange Seiten ohne Zwischenüberschriften (3) clustern allesamt unter /wissen/*.",
+      "llms.txt ist vorhanden, aber spec-widrig (fehlende H1-Titelzeile) — der beabsichtigte KI-Steuerungseffekt der Datei entfällt."
+    ],
+    "quickWins": [
+      "robots.txt: Disallow:/ für OAI-SearchBot entfernen oder pfadgenau beschränken, damit ChatGPT Search die Site wieder crawlen und zitieren darf.",
+      "nosnippet / max-snippet:0 auf /wissen/definition und /wissen/vergleich entfernen, damit AI Overviews die Antworten zitieren dürfen.",
+      "llms.txt-Titelzeile ergänzen: erste nicht-leere Zeile als H1 (\"# Markenname\") setzen."
+    ]
+  },
+  "sections": [
+    {
+      "id": "sec-geo-access",
+      "num": 1,
+      "title": "GEO-Zugang & KI-Zitierbarkeit",
+      "findings": [
+        {
+          "id": "f-geo-1",
+          "title": "KI-Suchbot OAI-SearchBot per robots.txt global blockiert",
+          "category": "geo",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Die robots.txt sperrt OAI-SearchBot — den offiziellen Crawler für ChatGPT-Search-Quellenangaben — mit \"Disallow: /\" vollständig aus.",
+          "beleg": "analysis.json signals.robots.aiBots + signals.aiBots: [{agent:\"OAI-SearchBot\", disallowAll:true, disallowPaths:[\"/\"], operator:\"OpenAI\", kategorie:\"ai-search\"}]; ruleId=geo:ai-bot-blocked",
+          "evidence": "1 KI-Bot betroffen (count=1, site-weit; affectedUrls leer, pctOfPages=null — Site-Level-Sentinel, kein Einzelseiten-Anteil). OAI-SearchBot (Operator OpenAI, Kategorie ai-search) ist per \"Disallow: /\" komplett gesperrt.",
+          "auswirkung": "Solange OAI-SearchBot global ausgesperrt ist, kann ChatGPT Search die Domain nicht crawlen und sie damit nicht als Quelle zitieren — die GEO-Sichtbarkeit fällt für diesen Kanal auf null. Ein Crawl-Verbot (robots.txt) ist kein Index-Verbot, aber ohne Crawl gibt es keine Zitierung. Mechanismus-basiert, kein garantierter Traffic-Effekt.",
+          "empfehlung": "Den \"Disallow: /\"-Block für OAI-SearchBot entfernen oder auf wirklich schützenswerte Pfade beschränken; Direktiven für KI-Such-Bots bewusst und pfadgenau setzen statt pauschal alles zu sperren (analog zur Trennung robots-Disallow = Crawl vs. noindex = Index). Provenienz/lastVerified je Bot siehe config/ai-bots.SOURCES.md.",
+          "ice": { "i": 3, "c": 3, "e": 3, "score": 27 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "noindex vs. Disallow", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "Crawlability, robots.txt, and XML Sitemaps", "date": "2025-12-10" }
+          ],
+          "ruleIds": ["geo:ai-bot-blocked"]
+        },
+        {
+          "id": "f-geo-2",
+          "title": "AI-Snippet unterdrückt (nosnippet / max-snippet:0) auf zwei Answer-Seiten",
+          "category": "geo",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Zwei inhaltstragende /wissen/*-Antwort-Seiten setzen per Robots-Meta bzw. X-Robots-Tag nosnippet / max-snippet:0 und verbieten damit jede Snippet-Anzeige.",
+          "beleg": "ruleId=geo:ai-snippet-suppressed; analysis.json affectedUrls + clusters",
+          "evidence": "2 Seiten betroffen (count=2, pctOfPages=25 der gecrawlten Teilmenge): https://example-answers.test/wissen/definition und https://example-answers.test/wissen/vergleich — nosnippet / max-snippet:0. Cluster: /wissen/* (2).",
+          "auswirkung": "nosnippet/max-snippet:0 verhindert, dass Google für diese Seiten überhaupt einen Textausschnitt anzeigt — inklusive der Zitierung in AI Overviews / AI Mode. Selbst bei erlaubtem Crawl wird der Inhalt nicht als Snippet ausgespielt; die GEO-Zitierbarkeit dieser beiden Answer-Seiten fällt auf null. Betrifft eine Teilmenge (25 % der gecrawlten Seiten), nicht die gesamte Site.",
+          "empfehlung": "Sofern diese Seiten in Suche und KI-Antworten zitierbar sein sollen: die nosnippet- bzw. max-snippet:0-Direktive im Robots-Meta-Tag bzw. X-Robots-Tag-Header entfernen (oder auf einen sinnvollen positiven max-snippet-Wert setzen) und nur dort belassen, wo Snippet-Unterdrückung bewusst gewünscht ist. Die spezifische nosnippet/max-snippet-Direktive ist im lokalen KB-Korpus nicht dokumentiert (kbSources daher leer, Konfidenz reduziert); die Empfehlung folgt der etablierten Google-Robots-Meta-/X-Robots-Spezifikation.",
+          "ice": { "i": 2, "c": 2, "e": 3, "score": 12 },
+          "kbSources": [],
+          "ruleIds": ["geo:ai-snippet-suppressed"]
+        },
+        {
+          "id": "f-geo-3",
+          "title": "llms.txt strukturell fehlerhaft (fehlende H1-Titelzeile)",
+          "category": "geo",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Die vorhandene llms.txt verletzt die Spezifikation: die erste nicht-leere Zeile ist keine H1-Titelzeile (\"# …\").",
+          "beleg": "ruleId=geo:llms-txt-malformed; analysis.json signals.llms.problems",
+          "evidence": "1 Datei betroffen (count=1, site-weit; pctOfPages=null — Site-Level). signals.llms = {exists:true, valid:false, problems:[\"missing-h1: first non-empty line must start with '# ' (H1 heading)\"]}.",
+          "auswirkung": "Eine spec-widrige llms.txt kann von LLM-Tooling nicht zuverlässig als kuratierte Einstiegskarte interpretiert werden; der gewünschte KI-Steuerungseffekt entfällt. Der Effekt ist GEO-spezifisch und — bei heute noch begrenzter Adoption des Standards — sekundär gegenüber robots.txt. KEIN klassisches Ranking-Signal.",
+          "empfehlung": "Die Datei spec-konform aufbauen: erste Zeile als H1 (\"# Markenname\"), darunter optional eine Blockquote-Summary (\"> Kurzbeschreibung\") und thematische Linklisten; an der offiziellen llms.txt-Spezifikation (llmstxt.org) ausrichten. Der lokale KB-Korpus deckt die llms.txt-Spezifikation nicht ab (kbSources daher leer, Konfidenz niedrig).",
+          "ice": { "i": 2, "c": 1, "e": 3, "score": 6 },
+          "kbSources": [],
+          "ruleIds": ["geo:llms-txt-malformed"]
+        }
+      ]
+    },
+    {
+      "id": "sec-geo-content",
+      "num": 2,
+      "title": "GEO-Content-Struktur für KI-Antworten",
+      "findings": [
+        {
+          "id": "f-geo-4",
+          "title": "Answer-Seiten ohne externe Quellenangaben (GEO: Cite Sources)",
+          "category": "geo",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Fünf substanzielle /wissen/*-Antwort-Seiten belegen ihre Aussagen mit keiner externen, autoritativen Quelle (kein Outbound-Zitat).",
+          "beleg": "ruleId=geo:missing-citations; analysis.json affectedUrls + clusters",
+          "evidence": "5 Seiten betroffen (count=5, pctOfPages=62,5 der gecrawlten Teilmenge): /wissen/definition, /wissen/vergleich, /wissen/anleitung, /wissen/kosten, /wissen/haltbarkeit. Cluster: /wissen/* (5).",
+          "auswirkung": "Generative Engines bevorzugen belegte Aussagen; fehlende autoritative Quellen senken die Chance, in KI-Antworten zitiert zu werden, und schwächen das E-E-A-T-Signal. Der Effekt betrifft KI-Zitierbarkeit und Vertrauens-Signale, ist aber kein direkter, garantierter Ranking-Faktor — GEO ist ein junges Feld ohne belastbare Kausal-Metriken.",
+          "empfehlung": "Faktische und statistische Aussagen mit Outbound-Links auf autoritative Primärquellen (offizielle Dokumentation, Studien, Behörden-/Fachquellen) belegen und die Quelle sichtbar nahe der Behauptung im Fließtext platzieren; nur tatsächlich einschlägige, vertrauenswürdige Quellen verlinken. Optional citation-Properties in Article-/ClaimReview-Schema maschinenlesbar ergänzen.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "kbSources": [
+            { "source": "https://arxiv.org/abs/2311.09735", "heading": "How to Cite Sources in Your Own Content", "date": "2024-06" },
+            { "source": "https://arxiv.org/abs/2311.09735", "heading": "Why Citations Matter", "date": "2024-06" },
+            { "source": "https://arxiv.org/abs/2311.09735", "heading": "Authoritative Domain Signals", "date": "2024-06" }
+          ],
+          "ruleIds": ["geo:missing-citations"]
+        },
+        {
+          "id": "f-geo-5",
+          "title": "Kein FAQPage-/HowTo-Schema (ungenutzte AI-Answer-Surface)",
+          "category": "geo",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Auf keiner gecrawlten Seite ist FAQPage- oder HowTo-Schema ausgezeichnet.",
+          "beleg": "ruleId=geo:no-faq-howto; analysis.json detail (Site-Level; Roh-Severity \"info\" → niedrig gemappt)",
+          "evidence": "Site-Level-Befund (count=1, affectedUrls leer, pctOfPages=null — Site-Level-Sentinel, kein Einzelseiten-Anteil). Kein FAQPage-/HowTo-Schema über die gesamte gecrawlte Site.",
+          "auswirkung": "FAQPage- und HowTo-Schema erzeugen seit 2023/2026 keine Google-Rich-Results mehr; ihr verbleibender Wert liegt in AI-Answer-Surfaces: strukturierte Q&A- und Schritt-für-Schritt-Paare helfen KI-Engines (ChatGPT Search, Perplexity, AI Overviews) beim zuverlässigen Extrahieren und Zitieren. Eine ungenutzte, nachgelagerte GEO-Chance — KEIN Ranking-Hebel und keine Google-Rich-Result-Eignung.",
+          "empfehlung": "Auf Seiten mit echten Q&A- oder Schritt-für-Schritt-Inhalten (z. B. /wissen/faq-langform, /wissen/anleitung) valides FAQPage- bzw. HowTo-JSON-LD ergänzen — ausschließlich für tatsächlich sichtbaren Seiteninhalt, nicht für erfundene Fragen.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/article", "heading": "FAQPage Schema", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/article", "heading": "HowTo Schema", "date": "2025-12-10" }
+          ],
+          "ruleIds": ["geo:no-faq-howto"]
+        },
+        {
+          "id": "f-geo-6",
+          "title": "Lange Answer-Seiten ohne Zwischenüberschriften (KI-Chunkability)",
+          "category": "geo",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Drei lange /wissen/*-Seiten haben keine (ausreichenden) Zwischenüberschriften, was heading-basiertes Chunking erschwert.",
+          "beleg": "ruleId=geo:poor-chunkability; analysis.json affectedUrls + clusters",
+          "evidence": "3 Seiten betroffen (count=3, pctOfPages=37,5 der gecrawlten Teilmenge): /wissen/grosser-ratgeber, /wissen/glossar, /wissen/faq-langform. Cluster: /wissen/* (3).",
+          "auswirkung": "Ohne Zwischenüberschriften müssen RAG-/KI-Pipelines lange Seiten per Fixed-Size-Splitting statt heading-basiert zerlegen, was zusammenhängende Antwort-Passagen schlechter isolierbar macht. Struktureller Hinweis für die KI-Extrahierbarkeit, KEIN Ranking-Claim: Google bestätigt, dass Wortzahl kein Qualitäts-/Ranking-Signal ist; die Wirkungs-Annahme ist Praktiker-basiert (keine Google-Primärquelle) und damit geschätzt.",
+          "empfehlung": "Lange Seiten mit einer klaren H2/H3-Zwischenstruktur gliedern, sodass jede Teilfrage unter einer eigenen Überschrift steht — das begünstigt heading-basiertes Chunking und saubere Passage-Extraktion. Der lokale KB-Korpus deckt heading-basiertes Chunking nicht ab (kbSources daher leer, Konfidenz niedrig).",
+          "ice": { "i": 1, "c": 1, "e": 2, "score": 2 },
+          "kbSources": [],
+          "ruleIds": ["geo:poor-chunkability"]
+        }
+      ]
+    }
+  ],
+  "positives": [
+    "Recency-Signal intakt: Artikel tragen ein dateModified — kein Befund veralteter Inhalte (geo:content-stale sauber).",
+    "Bilder sind nicht per noimageindex von der Indexierung ausgeschlossen (geo:noimageindex sauber).",
+    "Strukturierte Daten sind syntaktisch valide — kein JSON-LD-Parse-Fehler (schema:invalid sauber).",
+    "Alle Seiten werden über HTTPS ohne Mixed-Content ausgeliefert (tech:https sauber).",
+    "Jede Seite hat einen <title> — kein fehlender Seitentitel (onpage:title-missing sauber)."
+  ],
+  "strategy": {
+    "levers": [
+      "KI-Crawl- und Ausspiel-Zugang wiederherstellen: OAI-SearchBot in robots.txt freigeben und die nosnippet/max-snippet:0-Suppression auf den Answer-Seiten aufheben.",
+      "Zitierbarkeit der /wissen/*-Antwort-Seiten stärken: autoritative externe Quellenangaben und eine heading-basierte Struktur für saubere KI-Extraktion.",
+      "KI-Steuer-Signale spec-konform machen: valide llms.txt und optional FAQ/HowTo-JSON-LD auf echten Q&A-Seiten."
+    ],
+    "todos": [
+      "Sofort (e=3, hoher Impact): robots.txt-Disallow für OAI-SearchBot entfernen; nosnippet/max-snippet:0 auf /wissen/definition und /wissen/vergleich entfernen.",
+      "Kurzfristig (e=3): llms.txt-H1-Titelzeile ergänzen (spec-konform nach llmstxt.org).",
+      "Mittelfristig: /wissen/*-Answer-Seiten mit externen Quellenangaben belegen, lange Seiten mit H2/H3-Zwischenüberschriften strukturieren, FAQ/HowTo-JSON-LD auf echten Q&A-Seiten ergänzen."
+    ]
+  },
+  "confidence": {
+    "sampleSize": 8,
+    "minNMet": true,
+    "caveats": [
+      "Teilabdeckung: 8 von 9 bekannten/entdeckten URLs gecrawlt (coveragePct=89, fetched=8, sitemapTotal=9, discovered=9). Häufigkeits-Angaben (pctOfPages) sind daher Schätzungen der gecrawlten Teilmenge, keine site-weite Vollerhebung; bei BFS-Crawl ohne vollständige Sitemap-Abdeckung ist coveragePct eine Obergrenze.",
+      "Der Crawl-Zeitstempel (analysis.meta.crawledAt) ist null — meta.crawledAt bleibt entsprechend null; ein Datum wurde nicht erfunden.",
+      "KB-Retrieval nutzt den deterministischen lokalen Fallback-Embedder (lexikalisch, nicht semantisch). Für die llms.txt-Spezifikation, heading-basiertes Chunking und die spezifische nosnippet/max-snippet-Direktive liegen keine belastbaren KB-Treffer vor — diese Empfehlungen (f-geo-2, f-geo-3, f-geo-6) tragen bewusst keine kbSources und eine reduzierte Konfidenz (c).",
+      "GEO-/KI-Zitierbarkeits-Effekte (Cite Sources, llms.txt, FAQ/HowTo als AI-Answer-Surface, Chunkability) sind mechanistisch plausibel, aber ein junges, sich entwickelndes Feld ohne belastbare kausale Zitier-/Ranking-Metriken — die auswirkung-Aussagen sind als Mechanismus, nicht als garantierter Effekt formuliert."
+    ]
+  }
+}

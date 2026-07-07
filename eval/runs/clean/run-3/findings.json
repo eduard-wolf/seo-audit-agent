@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "url": "https://example-clean.test",
+    "crawledAt": null,
+    "modelId": "claude-opus-4-8",
+    "rulesetVersion": "1.7.0",
+    "sampleSize": 3,
+    "coveragePct": 100,
+    "siteType": "server-rendered"
+  },
+  "execSummary": {
+    "metrics": [
+      "3 von 3 bekannten Seiten gecrawlt (Abdeckung 100 %, sampleSize=3, capped=false).",
+      "Nur 2 Roh-Regel-Treffer über das gesamte Regelwerk 1.7.0 — die Site ist weitgehend sauber.",
+      "10 sauber bestandene Regel-Checks (Positiv-Befunde), u. a. <title>, H1, HTTPS, Canonical, valides JSON-LD und kein blockierter KI-Suchbot."
+    ],
+    "patterns": [
+      "Sehr kleine Stichprobe (3 Seiten, < 5): Häufigkeits-Angaben sind nicht generalisierbar — die Konfidenz jedes Befunds ist per Anti-Overclaim auf c ≤ 1 gedeckelt.",
+      "Keine strukturellen oder Indexierungs-Defekte gefunden; die beiden Befunde sind niedrigprior: eine fehlende Meta-Beschreibung (CTR) und ein fehlendes FAQ/HowTo-Schema (GEO-Chance, kein Ranking-Hebel).",
+      "GEO-Grundlage intakt: robots.txt und eine spec-valide llms.txt vorhanden, kein KI-Suchbot ausgesperrt — die Site ist für KI-Such-Crawler erreichbar."
+    ],
+    "quickWins": [
+      "Fehlende Meta-Beschreibung auf /leistungen ergänzen — die einzige konkrete offene On-Page-Baustelle, eine kurze Content-Ergänzung."
+    ]
+  },
+  "sections": [
+    {
+      "id": "sec-onpage",
+      "num": 1,
+      "title": "On-Page: Meta-Beschreibungen",
+      "findings": [
+        {
+          "id": "f-op-1",
+          "title": "Fehlende Meta-Beschreibung auf einer Unterseite",
+          "category": "on-page",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Eine gecrawlte Unterseite hat kein Meta-Description-Tag.",
+          "beleg": "analysis.json ruleId=onpage:meta-missing; affectedUrls",
+          "evidence": "1 Seite betroffen (count=1): https://example-clean.test/leistungen — kein <meta name=\"description\">. Bei nur 3 gecrawlten Seiten (Stichprobe < 5) wird die Rohquote pctOfPages=33,3 bewusst NICHT als site-repräsentativ gewertet — es zählt allein die absolute Anzahl (1 Seite).",
+          "auswirkung": "Die Meta-Beschreibung ist KEIN direktes Ranking-Signal, beeinflusst aber die Click-Through-Rate (CTR) als indirektes Signal. Fehlt sie, generiert Google den SERP-Snippet selbst aus dem Seiteninhalt — der Textausschnitt ist dann nicht redaktionell kontrolliert.",
+          "empfehlung": "Für /leistungen eine eindeutige, seitenspezifische Meta-Beschreibung mit konkretem Nutzenversprechen schreiben, sodass sie den Seiteninhalt beschreibt und zum Klick anregt. Google legt keine feste Länge fest; die 70–160-Zeichen-Spanne ist lediglich eine SERP-Kürzungs-Heuristik.",
+          "ice": { "i": 1, "c": 1, "e": 2, "score": 2 },
+          "ruleIds": ["onpage:meta-missing"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/title-link", "heading": "Meta Description", "date": "2025-12-10" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec-geo",
+      "num": 2,
+      "title": "GEO & KI-Sichtbarkeit",
+      "findings": [
+        {
+          "id": "f-geo-1",
+          "title": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces)",
+          "category": "geo",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Auf keiner gecrawlten Seite ist FAQPage- oder HowTo-Schema ausgezeichnet.",
+          "beleg": "analysis.json ruleId=geo:no-faq-howto; site-weit (count=1, affectedUrls leer — Site-Level-Sentinel, severity \"info\" → niedrig gemappt)",
+          "evidence": "0 Seiten mit FAQPage-/HowTo-Markup über alle 3 gecrawlten Seiten (count=1 = site-weiter Sentinel, affectedUrls leer). pctOfPages ist null (site-weit) und wird NICHT als Einzelseiten-Anteil gelesen.",
+          "auswirkung": "FAQPage- und HowTo-Schema erzeugen keine Google-Rich-Results mehr (auf Government/Health beschränkt seit 08/2023, vollständig eingestellt 05/2026). Ihr verbleibender Wert liegt in AI-Antwort-Surfaces: strukturierte Q&A-Paare helfen KI-Such-Engines (ChatGPT Search, Perplexity, AI Overviews), Inhalte zuverlässig zu extrahieren und zu zitieren — eine ungenutzte, nachgelagerte GEO-Chance, KEIN Ranking-Hebel.",
+          "empfehlung": "Auf Seiten mit echten Frage-Antwort- oder Schritt-für-Schritt-Inhalten valides FAQPage- bzw. HowTo-JSON-LD ergänzen (je Frage ein Question-Entity mit acceptedAnswer). Ausschließlich auf tatsächlich sichtbaren Seiteninhalt anwenden, nicht auf erfundene Fragen. Optionaler GEO-Ausbau, keine Pflicht.",
+          "ice": { "i": 1, "c": 1, "e": 2, "score": 2 },
+          "ruleIds": ["geo:no-faq-howto"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/article", "heading": "FAQPage Schema", "date": "2025-12-10" }
+          ]
+        }
+      ]
+    }
+  ],
+  "positives": [
+    "Jede gecrawlte Seite hat einen <title> (onpage:title-missing sauber).",
+    "Jede Seite trägt eine H1-Überschrift (onpage:h1-missing sauber).",
+    "Vorhandenes JSON-LD ist syntaktisch valide — kein Parse-Fehler (schema:invalid sauber).",
+    "Seiten werden über HTTPS ohne Mixed-Content ausgeliefert (tech:https sauber).",
+    "Keine noindex-Seite fälschlich in der Sitemap gelistet (tech:noindex-conflict sauber).",
+    "Bilder tragen Alt-Text (onpage:alt-missing sauber).",
+    "Kein KI-Suchbot per robots.txt blockiert — GEO-Crawlbarkeit intakt (geo:ai-bot-blocked sauber).",
+    "Organization-Schema ist site-weit vorhanden (schema:no-organization sauber).",
+    "Canonical-Tags sind gesetzt (tech:canonical-missing sauber).",
+    "Keine internen Links auf tote 4xx/5xx-URLs (links:internal-broken sauber).",
+    "robots.txt ist vorhanden und eine llms.txt ist vorhanden und spec-valide, ohne Strukturprobleme (signals.robots.exists=true, signals.llms.valid=true)."
+  ],
+  "strategy": {
+    "levers": [
+      "Stärken sichern: die saubere technische und On-Page-Basis (Titel, H1, HTTPS, Canonical, valides JSON-LD, KI-Bot-Freigabe) bei künftigen Änderungen beibehalten.",
+      "On-Page-Feinschliff: seitenspezifische Meta-Beschreibungen als CTR-Hebel vervollständigen.",
+      "GEO-Chance ausbauen: strukturierte Q&A (FAQPage/HowTo) auf Seiten mit echtem Q&A-Inhalt für AI-Answer-Surfaces."
+    ],
+    "todos": [
+      "Kurzfristig: Meta-Beschreibung für /leistungen ergänzen.",
+      "Optional/GEO: FAQPage- bzw. HowTo-Schema auf Seiten mit echten Q&A-/Schritt-Inhalten hinzufügen.",
+      "Vor jeder Verallgemeinerung: einen größeren Crawl (≥ 5 Seiten) fahren, um die aktuell auf c ≤ 1 gedeckelte Konfidenz zu erhöhen."
+    ]
+  },
+  "confidence": {
+    "sampleSize": 3,
+    "minNMet": false,
+    "caveats": [
+      "Sehr kleine Stichprobe: nur 3 Seiten gecrawlt (sampleSize=3 < 5, minNMet=false). Häufigkeits-/Prozent-Angaben (z. B. pctOfPages=33,3 bei onpage:meta-missing) sind NICHT site-repräsentativ — es zählen nur absolute Anzahlen. Die Konfidenz jedes Befunds ist deshalb per Anti-Overclaim auf c ≤ 1 gedeckelt.",
+      "Abdeckung vollständig für die bekannten Seiten (coveragePct=100, fetched=3, discovered=3, sitemapTotal=3, capped=false) — die Aussagekraft ist durch die geringe Gesamt-Seitenzahl begrenzt, nicht durch einen abgebrochenen oder gekappten Crawl.",
+      "Das KB-Retrieval nutzt den deterministischen lexikalischen Fallback-Embedder (kb/embed.mjs); die Scores spiegeln Token-Überlappung, nicht Semantik. Die zwei zitierten Quellen (Meta Description, FAQPage) lagen mit brauchbarem Score vor; wo keine relevanten Treffer erscheinen, bleiben kbSources bewusst leer.",
+      "meta.crawledAt ist null (im Fixture-Lauf kein Zeitstempel gesetzt) — es wurde bewusst kein Datum erfunden."
+    ]
+  }
+}
