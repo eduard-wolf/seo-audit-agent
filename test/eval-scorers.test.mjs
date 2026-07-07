@@ -8,6 +8,7 @@ import { scoreRecall } from '../eval/scorers/recall.mjs';
 import { scoreCitations } from '../eval/scorers/citation.mjs';
 import { buildCitationAllowlist } from '../eval/lib/kb-citations.mjs';
 import { scoreSchema } from '../eval/scorers/schema.mjs';
+import { scoreFabrication } from '../eval/scorers/fabrication.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../examples/example-run/findings.json', import.meta.url), 'utf8'));
 
@@ -51,5 +52,25 @@ describe('eval/scorers/schema', () => {
   it('an empty object is schema-invalid with errors', () => {
     const r = scoreSchema({});
     assert.equal(r.valid, false, 'empty object invalid'); assert.ok(r.errors.length > 0, 'has errors');
+  });
+});
+
+describe('eval/scorers/fabrication', () => {
+  const analysis = { findings: [{ ruleId: 'a:real' }], positives: [{ ruleId: 'p:passed' }] };
+  const expected = { fixture: 'x', mustContain: [], mustNotContain: [{ ruleId: 'trap:x' }] };
+  it('zero fabrications when findings reference only real analysis rule ids', () => {
+    const f = { sections: [{ findings: [{ id: 'f1', beleg: 'analysis.json ruleId=a:real' }] }] };
+    assert.equal(scoreFabrication(f, expected, analysis).fabrications, 0, 'a:real is in analysis');
+  });
+  it('flags invented ruleId, positive-claim, and must-not-contain trap', () => {
+    const f = { sections: [{ findings: [
+      { id: 'f2', beleg: 'x ruleId=ghost:invented' },
+      { id: 'f3', beleg: 'x ruleId=p:passed' },
+      { id: 'f4', beleg: 'x ruleId=trap:x' }] }] };
+    const r = scoreFabrication(f, expected, analysis);
+    assert.equal(r.fabrications, 3, 'three distinct fabrication/precision violations');
+    assert.ok(r.items.some(i => i.kind === 'not-in-analysis' && i.ruleId === 'ghost:invented'), 'invented flagged');
+    assert.ok(r.items.some(i => i.kind === 'on-positive' && i.ruleId === 'p:passed'), 'positive-claim flagged');
+    assert.ok(r.items.some(i => i.kind === 'must-not-contain' && i.ruleId === 'trap:x'), 'trap flagged');
   });
 });
