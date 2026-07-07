@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import { scoreRecall } from '../eval/scorers/recall.mjs';
 import { scoreCitations } from '../eval/scorers/citation.mjs';
 import { buildCitationAllowlist } from '../eval/lib/kb-citations.mjs';
+import { scoreSchema } from '../eval/scorers/schema.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../examples/example-run/findings.json', import.meta.url), 'utf8'));
 
@@ -40,5 +41,15 @@ describe('eval/scorers/citation', () => {
     const r = scoreCitations(bad, allow);
     assert.equal(r.validity, 0, 'fabricated citation is invalid');
     assert.deepEqual(r.invalid, [{ findingId: 'f-x', source: 'https://example.com/nope' }], 'reports offender');
+  });
+});
+
+describe('eval/scorers/schema', () => {
+  it('golden findings are schema-valid', () => {
+    assert.equal(scoreSchema(golden).valid, true, 'golden must validate');
+  });
+  it('an empty object is schema-invalid with errors', () => {
+    const r = scoreSchema({});
+    assert.equal(r.valid, false, 'empty object invalid'); assert.ok(r.errors.length > 0, 'has errors');
   });
 });
