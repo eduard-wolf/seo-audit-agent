@@ -24,13 +24,27 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { listFixtures, loadFixture } from '../eval/lib/fixtures.mjs';
+import { listFixtures, loadFixture, loadRuns, loadVerdicts } from '../eval/lib/fixtures.mjs';
 import { validateExpected } from '../eval/schema/expected-schema.mjs';
+import { validateFindings } from '../lib/findings-schema.mjs';
+import { validateVerdicts } from '../eval/schema/verdict-schema.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, '..');
 const FIXTURES_DIR = path.join(REPO, 'eval', 'fixtures');
+const RUNS_DIR = path.join(REPO, 'eval', 'runs');
 const RULES_DIR = path.join(REPO, 'config', 'rules');
+
+// Fixture name → expected committed-run count. The 5 synthetic fixtures each
+// have k=3 independent interpret runs; example-run (a real crawl) has k=1.
+const EXPECTED_RUN_COUNTS = {
+  ecommerce: 3,
+  editorial: 3,
+  broken: 3,
+  geo: 3,
+  clean: 3,
+  'example-run': 1,
+};
 
 // The six fixtures this suite is expected to guard — a guard against a silent
 // zero-fixture (vacuously passing) run.
@@ -130,6 +144,77 @@ describe('eval/fixtures integrity', () => {
         assert.deepEqual(overlap, [],
           `${name}: ruleId(s) ${overlap.join(', ')} appear in BOTH findings and positives`);
       });
+    });
+  }
+});
+
+// A green `npm test` today would stay green even if `eval/runs/` were emptied
+// entirely — the soft metrics that depend on it (recall, stability,
+// faithfulness) simply come back null and get skipped by the gate. That makes
+// a "green build" claim untrustworthy: it wouldn't distinguish "evidence
+// checked out clean" from "no evidence was checked at all". This suite
+// asserts the committed run/verdict snapshot is actually present and valid,
+// so deleting or emptying eval/runs/ turns the suite red.
+describe('eval/runs snapshot presence (a deleted snapshot must fail loudly)', () => {
+  for (const [name, expectedRuns] of Object.entries(EXPECTED_RUN_COUNTS)) {
+    describe(`fixture: ${name}`, () => {
+      it(`has exactly ${expectedRuns} committed run(s), each with findings.json + judge.json`, () => {
+        for (let k = 1; k <= expectedRuns; k++) {
+          const runDir = path.join(RUNS_DIR, name, `run-${k}`);
+          assert.ok(fs.existsSync(path.join(runDir, 'findings.json')),
+            `${name}/run-${k}: missing findings.json — committed eval snapshot must not be emptied`);
+          assert.ok(fs.existsSync(path.join(runDir, 'judge.json')),
+            `${name}/run-${k}: missing judge.json — committed eval snapshot must not be emptied`);
+        }
+        const extraRunDir = path.join(RUNS_DIR, name, `run-${expectedRuns + 1}`);
+        assert.ok(!fs.existsSync(extraRunDir),
+          `${name}: expected exactly ${expectedRuns} run(s), found an unexpected run-${expectedRuns + 1}`);
+      });
+
+      const runs = loadRuns(RUNS_DIR, name);
+      const verdictRuns = loadVerdicts(RUNS_DIR, name);
+
+      it(`loadRuns/loadVerdicts also report exactly ${expectedRuns} run(s)`, () => {
+        assert.equal(runs.length, expectedRuns,
+          `${name}: loadRuns returned ${runs.length} run(s), expected ${expectedRuns}`);
+        assert.equal(verdictRuns.length, expectedRuns,
+          `${name}: loadVerdicts returned ${verdictRuns.length} run(s), expected ${expectedRuns}`);
+      });
+
+      for (const { run, findings } of runs) {
+        it(`run-${run}: findings.json is schema-valid`, () => {
+          const { valid, errors } = validateFindings(findings);
+          assert.ok(valid, `${name}/run-${run}: findings.json is schema-invalid: ${errors.join('; ')}`);
+        });
+      }
+
+      for (const { run, verdicts } of verdictRuns) {
+        it(`run-${run}: judge.json is verdict-valid`, () => {
+          const { valid, errors } = validateVerdicts(verdicts);
+          assert.ok(valid, `${name}/run-${run}: judge.json is verdict-invalid: ${errors.join('; ')}`);
+        });
+
+        it(`run-${run}: exactly one verdict per finding`, () => {
+          const matchingRun = runs.find(r => r.run === run);
+          assert.ok(matchingRun, `${name}/run-${run}: judge.json has no matching findings.json for the same run number`);
+
+          const findingIds = [];
+          for (const section of matchingRun.findings.sections || []) {
+            for (const f of section.findings || []) findingIds.push(f.id);
+          }
+          const findingIdSet = new Set(findingIds);
+          assert.equal(findingIds.length, findingIdSet.size,
+            `${name}/run-${run}: findings.json has duplicate finding ids`);
+
+          const verdictIds = verdicts.verdicts.map(v => v.findingId);
+          const verdictIdSet = new Set(verdictIds);
+          assert.equal(verdictIds.length, verdictIdSet.size,
+            `${name}/run-${run}: judge.json has duplicate findingId verdicts`);
+
+          assert.deepEqual([...verdictIdSet].sort(), [...findingIdSet].sort(),
+            `${name}/run-${run}: judge.json verdicts must cover exactly the finding ids in findings.json (one each)`);
+        });
+      }
     });
   }
 });

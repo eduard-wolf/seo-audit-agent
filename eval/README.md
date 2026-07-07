@@ -59,6 +59,12 @@ Modell ändern (siehe „Baseline erneuern").
 **Arbeitsteilung:** deterministisch = strukturell/Enum/Coverage/Citation-Existenz; **Judge** =
 semantische Faithfulness (was ein struktureller Check nicht sehen kann).
 
+**Aggregation (ehrlich benannt):** Recall und Stabilität werden **pro Fixture gemittelt, dann
+über Fixtures gemittelt** (macro-average) — Stabilität dabei nur über Fixtures mit **≥2**
+committeten Läufen (ein einzelner Lauf ergibt kein sinnvolles pass^k). Citation-Validität und
+Faithfulness werden dagegen **über alle Verdikte bzw. alle Zitate hinweg gepoolt** (micro-average),
+nicht pro Fixture gemittelt.
+
 ## Aktuelle Baseline (echt, reproduzierbar)
 
 Gemessen an **6 Fixtures**, **k=3** unabhängigen interpret-Läufen je synthetischer Fixture

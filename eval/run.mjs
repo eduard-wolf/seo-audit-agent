@@ -58,7 +58,7 @@ function mean(values) {
  * @param {string} runsDir
  * @param {string} name — fixture name
  * @param {{ urls: Set<string>, basenames: Set<string> }} allowlist
- * @returns {{ fixtureReport: object, totals: { schemaValids: boolean[], citationTotal: number, citationValid: number, fabrications: number, verdictTotal: number, verdictSupported: number, hasRuns: boolean, recallMean: number|null, passK: number|null } }}
+ * @returns {{ fixtureReport: object, totals: { schemaValids: boolean[], citationTotal: number, citationValid: number, fabrications: number, verdictTotal: number, verdictSupported: number, hasRuns: boolean, runCount: number, recallMean: number|null, passK: number|null } }}
  */
 function scoreFixture(fixturesDir, runsDir, name, allowlist) {
   const fixture = loadFixture(fixturesDir, name);
@@ -118,6 +118,7 @@ function scoreFixture(fixturesDir, runsDir, name, allowlist) {
     verdictTotal: faithfulness.total,
     verdictSupported: faithfulness.supported,
     hasRuns: runs.length > 0,
+    runCount: runs.length,
     recallMean,
     passK: stability.passK,
   };
@@ -214,7 +215,11 @@ export function runEval({ fixturesDir, runsDir, gate, baseline }) {
     verdictSupported += totals.verdictSupported;
     if (totals.hasRuns) {
       perFixtureRecallMeans.push(totals.recallMean);
-      perFixturePassK.push(totals.passK);
+      // Stability needs >=2 independent runs to be meaningful (a "pass^1" is
+      // vacuous). Fixtures with only one committed run (e.g. example-run)
+      // are excluded from the stabilityPassK aggregate below, though their
+      // per-fixture stability.passK is still reported unchanged.
+      if (totals.runCount >= 2) perFixturePassK.push(totals.passK);
     }
   }
 
@@ -223,7 +228,7 @@ export function runEval({ fixturesDir, runsDir, gate, baseline }) {
     citationValidity: citationTotal === 0 ? 1 : citationValid / citationTotal,
     fabrications,
     faithfulness: verdictTotal === 0 ? null : verdictSupported / verdictTotal,
-    stabilityPassK: mean(perFixturePassK),
+    stabilityPassK: mean(perFixturePassK), // macro-average over fixtures with runCount >= 2 only; null if none qualify
     schemaValid: allSchemaValids.every(Boolean), // vacuously true with zero runs anywhere
   };
 
