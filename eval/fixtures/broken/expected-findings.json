@@ -1,0 +1,36 @@
+{
+  "fixture": "broken",
+  "mustContain": [
+    {
+      "ruleId": "tech:noindex-conflict",
+      "urlAnchor": "https://example-corp.test/leistungen/altbestand",
+      "note": "high-severity indexing conflict — noindex pages in the sitemap"
+    },
+    {
+      "ruleId": "tech:canonical-nonself",
+      "note": "non-self canonicals risk consolidation loss"
+    },
+    {
+      "ruleId": "tech:redirect-chain",
+      "note": "multi-hop redirect chains"
+    },
+    {
+      "ruleId": "tech:sitemap-quality",
+      "note": "sitemap lists non-2xx URLs"
+    }
+  ],
+  "mustNotContain": [
+    {
+      "ruleId": "tech:https",
+      "reason": "site is fully HTTPS (in positives)"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "reason": "JSON-LD valid (in positives)"
+    },
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "reason": "absent from analysis — no AI bot is blocked"
+    }
+  ]
+}

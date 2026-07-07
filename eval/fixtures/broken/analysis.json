@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "origin": "https://example-corp.test",
+    "host": "example-corp.test",
+    "crawledAt": null,
+    "pageCount": 10,
+    "sampleSize": 10,
+    "siteType": "server-rendered",
+    "coveragePct": 83,
+    "capped": false,
+    "fetched": 10,
+    "discovered": 12,
+    "sitemapTotal": 12,
+    "minNMet": true
+  },
+  "rulesetVersion": "1.7.0",
+  "findings": [
+    {
+      "ruleId": "tech:noindex-conflict",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "Noindex-Seite in Sitemap (Konflikt)",
+      "count": 3,
+      "pctOfPages": 30,
+      "affectedUrls": [
+        "https://example-corp.test/leistungen/altbestand",
+        "https://example-corp.test/leistungen/entwurf",
+        "https://example-corp.test/leistungen/intern"
+      ],
+      "clusters": [],
+      "detail": "noindex-Seiten sind zugleich in der Sitemap gelistet (widersprüchliches Indexierungssignal).",
+      "quelle": "Google Search Central – Sitemaps & Robots",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:canonical-nonself",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Canonical zeigt nicht auf sich selbst",
+      "count": 4,
+      "pctOfPages": 40,
+      "affectedUrls": [
+        "https://example-corp.test/produkte/a",
+        "https://example-corp.test/produkte/b",
+        "https://example-corp.test/produkte/c",
+        "https://example-corp.test/produkte/d"
+      ],
+      "clusters": [],
+      "detail": "Canonical zeigt auf eine andere URL als die Seite selbst.",
+      "quelle": "Google Search Central – Canonical URLs",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:redirect-chain",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Redirect-Ketten (≥2 Hops)",
+      "count": 2,
+      "pctOfPages": 20,
+      "affectedUrls": [
+        "https://example-corp.test/alt/kontakt",
+        "https://example-corp.test/alt/impressum"
+      ],
+      "clusters": [],
+      "detail": "Interne Ziele über eine Redirect-Kette mit ≥2 Hops erreichbar.",
+      "quelle": "Google Search Central – Redirects",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:sitemap-quality",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Sitemap enthält fehlerhafte URLs",
+      "count": 3,
+      "pctOfPages": 30,
+      "affectedUrls": [
+        "https://example-corp.test/fehler/404-eintrag",
+        "https://example-corp.test/fehler/500-eintrag",
+        "https://example-corp.test/fehler/leerer-eintrag"
+      ],
+      "clusters": [],
+      "detail": "Sitemap listet URLs, die nicht mit 2xx antworten.",
+      "quelle": "Google Search Central – Sitemaps",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "tech:robots-sitemap-conflict",
+      "kategorie": "tech-index",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Sitemap listet per robots.txt gesperrte URL",
+      "count": 2,
+      "pctOfPages": 20,
+      "affectedUrls": [
+        "https://example-corp.test/gesperrt/report",
+        "https://example-corp.test/gesperrt/export"
+      ],
+      "clusters": [],
+      "detail": "Sitemap listet per robots.txt gesperrte URLs.",
+      "quelle": "Google Search Central – Sitemap erstellen & einreichen (keine robots-gesperrten URLs listen)",
+      "datum": "2025-12"
+    },
+    {
+      "ruleId": "crawl:orphan-page",
+      "kategorie": "links",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Verwaiste Seiten (keine internen Eingangslinks)",
+      "count": 1,
+      "pctOfPages": 10,
+      "affectedUrls": [
+        "https://example-corp.test/verwaist/altseite"
+      ],
+      "clusters": [],
+      "detail": "Seite ohne interne Eingangslinks.",
+      "quelle": "Google Search Central – Internal Linking",
+      "datum": "2024-01"
+    }
+  ],
+  "positives": [
+    {
+      "ruleId": "tech:https",
+      "title": "Seiten ohne HTTPS oder mit Mixed-Content"
+    },
+    {
+      "ruleId": "onpage:title-missing",
+      "title": "Fehlender Seitentitel"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "title": "Ungültiges JSON-LD (Parse-Fehler)"
+    },
+    {
+      "ruleId": "onpage:h1-missing",
+      "title": "Fehlende oder leere H1-Überschrift"
+    },
+    {
+      "ruleId": "links:internal-broken",
+      "title": "Interner Link auf tote URL (4xx/5xx)"
+    }
+  ],
+  "signals": {
+    "robots": {
+      "exists": true,
+      "disallow": [
+        "/gesperrt/"
+      ]
+    },
+    "llms": {
+      "exists": false
+    },
+    "aiBots": []
+  }
+}

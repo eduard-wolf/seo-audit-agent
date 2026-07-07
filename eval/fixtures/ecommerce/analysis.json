@@ -1,0 +1,174 @@
+{
+  "meta": {
+    "origin": "https://example-shop.test",
+    "host": "example-shop.test",
+    "crawledAt": null,
+    "pageCount": 15,
+    "sampleSize": 15,
+    "siteType": "server-rendered",
+    "coveragePct": 94,
+    "capped": false,
+    "fetched": 15,
+    "discovered": 16,
+    "sitemapTotal": 16,
+    "minNMet": true
+  },
+  "rulesetVersion": "1.7.0",
+  "findings": [
+    {
+      "ruleId": "schema:product-no-aggregate",
+      "kategorie": "structured-data",
+      "scope": "ecommerce",
+      "severity": "mittel",
+      "title": "Produkt ohne AggregateRating (nur mit echten Bewertungen ergänzen)",
+      "count": 9,
+      "pctOfPages": 60,
+      "affectedUrls": [
+        "https://example-shop.test/produkt/espresso-crema",
+        "https://example-shop.test/produkt/hausmischung",
+        "https://example-shop.test/produkt/entkoffeiniert",
+        "https://example-shop.test/produkt/geschenkbox",
+        "https://example-shop.test/produkt/filterkaffee",
+        "https://example-shop.test/produkt/cold-brew",
+        "https://example-shop.test/produkt/kapseln",
+        "https://example-shop.test/produkt/probierset",
+        "https://example-shop.test/produkt/abo-box"
+      ],
+      "clusters": [],
+      "detail": "Produktseiten ohne AggregateRating-Markup (nur mit echten Bewertungen ergänzen).",
+      "quelle": "Google Rich Results – Product / Review-Snippet-Policy (keine fabrizierten Ratings)",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "schema:offer-no-price",
+      "kategorie": "structured-data",
+      "scope": "ecommerce",
+      "severity": "mittel",
+      "title": "Produkt ohne Preis im Offer (price ist für Rich-Results erforderlich)",
+      "count": 4,
+      "pctOfPages": 26.7,
+      "affectedUrls": [
+        "https://example-shop.test/produkt/geschenkbox",
+        "https://example-shop.test/produkt/abo-box",
+        "https://example-shop.test/produkt/probierset",
+        "https://example-shop.test/produkt/kapseln"
+      ],
+      "clusters": [],
+      "detail": "Offer-Objekt ohne price — nicht für Merchant-Rich-Results qualifiziert.",
+      "quelle": "Google Search Central – Product snippet / Merchant listing (structured data): price erforderlich",
+      "datum": "2025-12"
+    },
+    {
+      "ruleId": "onpage:title-dup",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Doppelter Seitentitel",
+      "count": 6,
+      "pctOfPages": 40,
+      "affectedUrls": [
+        "https://example-shop.test/produkt/espresso-crema",
+        "https://example-shop.test/produkt/hausmischung",
+        "https://example-shop.test/produkt/entkoffeiniert",
+        "https://example-shop.test/produkt/filterkaffee",
+        "https://example-shop.test/produkt/cold-brew",
+        "https://example-shop.test/produkt/kapseln"
+      ],
+      "clusters": [],
+      "detail": "Sechs Produktseiten teilen denselben generischen Seitentitel.",
+      "quelle": "Google Search Central – Title Tags",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "onpage:alt-missing",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Bilder ohne Alt-Text",
+      "count": 8,
+      "pctOfPages": 53.3,
+      "affectedUrls": [
+        "https://example-shop.test/produkt/espresso-crema",
+        "https://example-shop.test/produkt/hausmischung",
+        "https://example-shop.test/produkt/entkoffeiniert",
+        "https://example-shop.test/produkt/geschenkbox",
+        "https://example-shop.test/produkt/filterkaffee",
+        "https://example-shop.test/produkt/cold-brew",
+        "https://example-shop.test/produkt/kapseln",
+        "https://example-shop.test/produkt/probierset"
+      ],
+      "clusters": [],
+      "detail": "Produktbilder ohne alt-Attribut.",
+      "quelle": "WCAG 2.1 – Non-text Content / Google Image SEO",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "schema:organization-logo",
+      "kategorie": "structured-data",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Organization ohne logo",
+      "count": 1,
+      "pctOfPages": 6.7,
+      "affectedUrls": [
+        "https://example-shop.test/"
+      ],
+      "clusters": [],
+      "detail": "Organization-Schema auf der Startseite ohne logo-Eigenschaft.",
+      "quelle": "Google Search Central – Organization Structured Data (logo empfohlen für Logo in Suche/Knowledge Panel; kein Ranking)",
+      "datum": "2026-04"
+    },
+    {
+      "ruleId": "hygiene:oos-noindexed",
+      "kategorie": "hygiene",
+      "scope": "ecommerce",
+      "severity": "mittel",
+      "title": "Temporär ausverkaufte Produkte fälschlich deindexiert (noindex → Ranking-/Backlink-Verlust)",
+      "count": 2,
+      "pctOfPages": 13.3,
+      "affectedUrls": [
+        "https://example-shop.test/produkt/saisonale-edition",
+        "https://example-shop.test/produkt/limited-drop"
+      ],
+      "clusters": [],
+      "detail": "Temporär ausverkaufte Produkte fälschlich auf noindex gesetzt.",
+      "quelle": "Google Search Central / John Mueller – temporäre Out-of-Stock-Produkte indexiert lassen",
+      "datum": "2024-01"
+    }
+  ],
+  "positives": [
+    {
+      "ruleId": "schema:no-organization",
+      "title": "Kein Organization-Schema auf der gesamten Site"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "title": "Ungültiges JSON-LD (Parse-Fehler)"
+    },
+    {
+      "ruleId": "tech:https",
+      "title": "Seiten ohne HTTPS oder mit Mixed-Content"
+    },
+    {
+      "ruleId": "onpage:h1-missing",
+      "title": "Fehlende oder leere H1-Überschrift"
+    },
+    {
+      "ruleId": "tech:canonical-missing",
+      "title": "Fehlendes Canonical-Tag"
+    },
+    {
+      "ruleId": "links:internal-broken",
+      "title": "Interner Link auf tote URL (4xx/5xx)"
+    }
+  ],
+  "signals": {
+    "robots": {
+      "exists": true
+    },
+    "llms": {
+      "exists": false
+    },
+    "aiBots": []
+  }
+}

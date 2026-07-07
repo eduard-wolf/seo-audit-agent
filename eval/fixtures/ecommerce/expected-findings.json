@@ -1,0 +1,36 @@
+{
+  "fixture": "ecommerce",
+  "mustContain": [
+    {
+      "ruleId": "schema:product-no-aggregate",
+      "urlAnchor": "https://example-shop.test/produkt/espresso-crema",
+      "note": "dominant structured-data gap across the product catalogue"
+    },
+    {
+      "ruleId": "schema:offer-no-price",
+      "note": "missing price blocks merchant listing rich results"
+    },
+    {
+      "ruleId": "onpage:alt-missing",
+      "note": "image accessibility + image SEO on product pages"
+    },
+    {
+      "ruleId": "onpage:title-dup",
+      "note": "duplicate titles across product pages"
+    }
+  ],
+  "mustNotContain": [
+    {
+      "ruleId": "schema:invalid",
+      "reason": "JSON-LD parses cleanly (in positives) — must not claim a parse error"
+    },
+    {
+      "ruleId": "onpage:title-missing",
+      "reason": "titles exist (duplicated, not missing)"
+    },
+    {
+      "ruleId": "tech:noindex-conflict",
+      "reason": "absent from analysis — no noindex-in-sitemap conflict"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "fixture": "editorial",
+  "mustContain": [
+    {
+      "ruleId": "geo:missing-citations",
+      "urlAnchor": "https://example-journal.test/artikel/roestprofile",
+      "note": "strongest GEO lever — content without external citations"
+    },
+    {
+      "ruleId": "schema:article-no-author",
+      "note": "E-E-A-T author signal missing across the article set"
+    },
+    {
+      "ruleId": "geo:content-stale",
+      "note": "articles lack dateModified recency signal"
+    },
+    {
+      "ruleId": "onpage:thin",
+      "note": "several near-empty content pages"
+    }
+  ],
+  "mustNotContain": [
+    {
+      "ruleId": "schema:invalid",
+      "reason": "JSON-LD valid (in positives) — no parse error"
+    },
+    {
+      "ruleId": "onpage:title-missing",
+      "reason": "every page has a title (in positives)"
+    },
+    {
+      "ruleId": "tech:noindex-conflict",
+      "reason": "absent from analysis — no sitemap/noindex conflict"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "fixture": "example-run",
+  "mustContain": [
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "note": "OAI-SearchBot blocked — core GEO finding of the run"
+    },
+    {
+      "ruleId": "geo:missing-citations",
+      "note": "core GEO lever surfaced in the run"
+    },
+    {
+      "ruleId": "onpage:title-missing",
+      "note": "high-severity missing title"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "note": "high-severity JSON-LD parse error"
+    },
+    {
+      "ruleId": "tech:https",
+      "note": "high-severity HTTPS/mixed-content defect"
+    }
+  ],
+  "mustNotContain": [
+    {
+      "ruleId": "schema:no-organization",
+      "reason": "in positives — Organization schema is present site-wide"
+    },
+    {
+      "ruleId": "geo:content-stale",
+      "reason": "in positives — articles carry dateModified"
+    },
+    {
+      "ruleId": "tech:charset-missing",
+      "reason": "in positives — UTF-8 charset declared"
+    }
+  ]
+}
