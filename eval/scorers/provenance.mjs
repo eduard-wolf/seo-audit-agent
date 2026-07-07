@@ -8,24 +8,10 @@
  * No npm dependencies — pure Node.js.
  */
 
+import { allFindings } from '../lib/ruleids.mjs';
+
 const PROV_VALUES = new Set(['gemessen', 'beobachtet', 'geschätzt']);
 const SEVERITY_VALUES = new Set(['hoch', 'mittel', 'niedrig']);
-
-/**
- * Flatten every `sections[].findings[]` entry into a single list.
- *
- * @param {object} findings — parsed findings.json
- * @returns {object[]}
- */
-function allFindings(findings) {
-  const sections = (findings && Array.isArray(findings.sections)) ? findings.sections : [];
-  const out = [];
-  for (const section of sections) {
-    const sectionFindings = (section && Array.isArray(section.findings)) ? section.findings : [];
-    for (const finding of sectionFindings) out.push(finding);
-  }
-  return out;
-}
 
 /**
  * Score a findings.json object against the provenance / anti-overclaim

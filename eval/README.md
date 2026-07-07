@@ -54,7 +54,7 @@ Modell ändern (siehe „Baseline erneuern").
 | **Fabrications (strukturell)** | Referenziert ein Finding einen `ruleId`, der nicht in der Analyse steht / der bestanden hat? | ✅ |
 | **Provenienz / Anti-Overclaim** | Enum-/ICE-Invarianten, `minNMet`-c≤1-Kappung u. a. | ✅ |
 | **Stabilität (pass^k)** | Über k unabhängige Läufe: Anteil mit vollem Recall | ✅ (aus k committeten Läufen) |
-| **Faithfulness** | Ist jedes Finding durch die Analyse gedeckt, Provenienz korrekt, keine erfundenen Zahlen? | LLM-as-Judge (committete Verdikte, deterministisch aggregiert) |
+| **Faithfulness** | Anteil der Findings mit Judge-Verdikt `pass` = **alle drei Achsen**: durch die Analyse gedeckt **und** Provenienz korrekt **und** keine erfundenen Zahlen (`warn`/`fail` zählen nicht). `supported`/Provenienz/erfundene-Zahlen bleiben als separate Diagnose-Kennzahlen. | LLM-as-Judge (committete Verdikte, deterministisch aggregiert) |
 
 **Arbeitsteilung:** deterministisch = strukturell/Enum/Coverage/Citation-Existenz; **Judge** =
 semantische Faithfulness (was ein struktureller Check nicht sehen kann).
@@ -63,7 +63,7 @@ semantische Faithfulness (was ein struktureller Check nicht sehen kann).
 über Fixtures gemittelt** (macro-average) — Stabilität dabei nur über Fixtures mit **≥2**
 committeten Läufen (ein einzelner Lauf ergibt kein sinnvolles pass^k). Citation-Validität und
 Faithfulness werden dagegen **über alle Verdikte bzw. alle Zitate hinweg gepoolt** (micro-average),
-nicht pro Fixture gemittelt.
+nicht pro Fixture gemittelt — Faithfulness als Anteil der `pass`-Verdikte über alle 103 Verdikte.
 
 ## Aktuelle Baseline (echt, reproduzierbar)
 
@@ -75,14 +75,16 @@ Gemessen an **6 Fixtures**, **k=3** unabhängigen interpret-Läufen je synthetis
 | Recall | 1.00 |
 | Citation-Validität | 1.00 |
 | Fabrications (strukturell) | 0 |
-| Faithfulness (Judge) | **0.9806** |
+| Faithfulness (Judge, strikt) | **0.9223** |
 | Stabilität pass^3 | 1.00 |
 | Schema valide | ja |
 
-Die Faithfulness liegt **bewusst nicht bei 1.00**: der Cross-Model-Judge fand im **realen,
-committeten `example-run`** zwei echte Faithfulness-Bugs (ein Verweis auf eine bestandene
-Regel; eine erfundene Redirect-Hop-Angabe). Genau dafür ist der Judge da — die Zahl ist echt,
-nicht geschönt.
+Die Faithfulness ist die **strikte** Pass-Rate (Verdikt `pass` = alle drei Achsen) und liegt
+**bewusst nicht bei 1.00**: über 103 Verdikte sind 95 `pass`, 6 `warn` (gedeckt, aber weiche
+Provenienz-Ungenauigkeit) und 2 `fail`. Die 2 Fehler sind genuine Bugs, die der Cross-Model-Judge
+im **realen, committeten `example-run`** fand (ein Verweis auf eine bestandene Regel; eine
+erfundene Redirect-Hop-Angabe). Zum Vergleich: die reine `supported`-Rate (nur Achse 1) läge bei
+0.9806 — die strengere, ehrlichere Zahl ist die hier gegatete. Genau dafür ist der Judge da.
 
 **Modelle (aus offizieller Anthropic-Doku gepinnt):** interpret = `claude-opus-4-8`,
 Judge = `claude-sonnet-5` (Cross-Model, reduziert Self-Preference-Bias). Beide über die

@@ -253,17 +253,21 @@ npm run eval    # deterministisch, KEY-FREI: scored den committeten Golden-Snaps
 ```
 
 Gemessen über **6 Fixtures** (5 synthetische Archetypen + der reale `example-run`), **k=3**
-unabhängige Läufe je Fixture, **16 Läufe / 103 LLM-as-Judge-Verdikte**:
+unabhängige Läufe je synthetischer Fixture (`example-run`: 1 realer Lauf), **16 Läufe /
+103 LLM-as-Judge-Verdikte**:
 
 | Recall | Citation-Validität | Fabrications | Faithfulness (Judge) | Stabilität pass³ |
 |---|---|---|---|---|
-| 1.00 | 1.00 | 0 | **0.9806** | 1.00 |
+| 1.00 | 1.00 | 0 | **0.9223** | 1.00 |
 
 - **Deterministische Scorer** (key-frei): Recall/Coverage (ruleId-Matching), Citation-Existenz
   gegen die KB, Schema, strukturelle No-Fabrication, Provenienz/Anti-Overclaim, `pass^k`.
 - **LLM-as-Judge** (Cross-Model, `claude-sonnet-5` bewertet `claude-opus-4-8`-Output): semantische
-  Faithfulness je Finding gegen `analysis.json`. Die 98,06 % sind **echt, nicht 100 %** — der
-  Judge fand im realen `example-run` zwei genuine Faithfulness-Bugs. Genau dafür ist er da.
+  Faithfulness je Finding gegen `analysis.json`. Die Zahl ist die **strikte** Pass-Rate (Judge-
+  Verdikt `pass` = alle drei Achsen: gedeckt **und** Provenienz korrekt **und** keine erfundenen
+  Zahlen). Die 92,23 % sind **echt, nicht 100 %** — über 103 Verdikte: 2 echte Fehler (u. a. zwei
+  genuine Bugs im realen `example-run`) + 6 weiche Provenienz-Ungenauigkeiten (`warn`). Genau
+  dafür ist der Judge da.
 - **CI-gegated:** harte Invarianten (Schema, Fabrications = 0, Citations = 100 %) + No-Regression
   gegen committete Baseline + konservativer Floor. **Kein API-Key, keine Modell-Calls in CI** —
   die modell-berührenden Schritte werden manuell erzeugt und als versionierter Snapshot committet.
