@@ -1,0 +1,8 @@
+{
+  "floors": {
+    "recall": 0.5,
+    "faithfulness": 0.6,
+    "stability": 0.4
+  },
+  "note": "Conservative absolute safety-net floors, deliberately well below baseline; primary signal is no-regression vs baseline.json."
+}
