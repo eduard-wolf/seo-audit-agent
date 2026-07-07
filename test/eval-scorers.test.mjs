@@ -11,6 +11,7 @@ import { scoreSchema } from '../eval/scorers/schema.mjs';
 import { scoreFabrication } from '../eval/scorers/fabrication.mjs';
 import { scoreProvenance } from '../eval/scorers/provenance.mjs';
 import { scoreStability, anchorStability } from '../eval/scorers/stability.mjs';
+import { scoreFaithfulness } from '../eval/scorers/faithfulness.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../examples/example-run/findings.json', import.meta.url), 'utf8'));
 
@@ -101,5 +102,20 @@ describe('eval/scorers/stability', () => {
     const r = anchorStability([['a:1', 'b:2'], ['a:1']], ['a:1', 'b:2']);
     assert.deepEqual(r, [{ ruleId: 'a:1', coveredFraction: 1 }, { ruleId: 'b:2', coveredFraction: 0.5 }],
       'a:1 in both runs, b:2 in one');
+  });
+});
+
+describe('eval/scorers/faithfulness', () => {
+  it('aggregates committed judge verdicts across runs', () => {
+    const runs = [
+      { verdicts: [{ findingId: 'a', supported: true, provenanceCorrect: true, fabricatedNumbers: false, verdict: 'pass', rationale: '' },
+                   { findingId: 'b', supported: false, provenanceCorrect: true, fabricatedNumbers: true, verdict: 'fail', rationale: '' }] },
+      { verdicts: [{ findingId: 'a', supported: true, provenanceCorrect: false, fabricatedNumbers: false, verdict: 'warn', rationale: '' }] },
+    ];
+    const r = scoreFaithfulness(runs);
+    assert.equal(r.total, 3, 'three verdicts total');
+    assert.equal(r.supported, 2, 'two supported');
+    assert.equal(r.fabricatedNumbers, 1, 'one invented-number');
+    assert.equal(r.provenanceIssues, 1, 'one provenance issue');
   });
 });
