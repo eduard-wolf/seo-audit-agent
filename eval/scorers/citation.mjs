@@ -6,6 +6,7 @@
  */
 
 import { isValidCitation } from '../lib/kb-citations.mjs';
+import { allFindings } from '../lib/ruleids.mjs';
 
 /**
  * Score citation validity across every `sections[].findings[].kbSources[]`
@@ -20,24 +21,25 @@ export function scoreCitations(findings, allowlist) {
   let valid = 0;
   const invalid = [];
 
-  const sections = (findings && Array.isArray(findings.sections)) ? findings.sections : [];
-  for (const section of sections) {
-    const sectionFindings = (section && Array.isArray(section.findings)) ? section.findings : [];
-    for (const finding of sectionFindings) {
-      const kbSources = (finding && Array.isArray(finding.kbSources)) ? finding.kbSources : [];
-      for (const kbSource of kbSources) {
-        total++;
-        const source = kbSource && kbSource.source;
-        if (isValidCitation(source, allowlist)) {
-          valid++;
-        } else {
-          invalid.push({ findingId: finding.id, source });
-        }
+  for (const finding of allFindings(findings)) {
+    const kbSources = (finding && Array.isArray(finding.kbSources)) ? finding.kbSources : [];
+    for (const kbSource of kbSources) {
+      total++;
+      const source = kbSource && kbSource.source;
+      if (isValidCitation(source, allowlist)) {
+        valid++;
+      } else {
+        invalid.push({ findingId: finding.id, source });
       }
     }
   }
 
-  invalid.sort((a, b) => (a.findingId === b.findingId ? (a.source < b.source ? -1 : a.source > b.source ? 1 : 0) : (a.findingId < b.findingId ? -1 : 1)));
+  // Sort by findingId, then source (same explicit two-step form as fabrication.mjs).
+  invalid.sort((a, b) => {
+    if (a.findingId !== b.findingId) return a.findingId < b.findingId ? -1 : 1;
+    if (a.source !== b.source) return a.source < b.source ? -1 : 1;
+    return 0;
+  });
 
   const validity = total === 0 ? 1 : valid / total;
   return { total, valid, validity, invalid };

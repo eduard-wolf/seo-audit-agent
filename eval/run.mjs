@@ -58,7 +58,7 @@ function mean(values) {
  * @param {string} runsDir
  * @param {string} name — fixture name
  * @param {{ urls: Set<string>, basenames: Set<string> }} allowlist
- * @returns {{ fixtureReport: object, totals: { schemaValids: boolean[], citationTotal: number, citationValid: number, fabrications: number, verdictTotal: number, verdictSupported: number, hasRuns: boolean, runCount: number, recallMean: number|null, passK: number|null } }}
+ * @returns {{ fixtureReport: object, totals: { schemaValids: boolean[], citationTotal: number, citationValid: number, fabrications: number, verdictTotal: number, verdictPassed: number, hasRuns: boolean, runCount: number, recallMean: number|null, passK: number|null } }}
  */
 function scoreFixture(fixturesDir, runsDir, name, allowlist) {
   const fixture = loadFixture(fixturesDir, name);
@@ -116,7 +116,7 @@ function scoreFixture(fixturesDir, runsDir, name, allowlist) {
     citationValid,
     fabrications,
     verdictTotal: faithfulness.total,
-    verdictSupported: faithfulness.supported,
+    verdictPassed: faithfulness.passed,
     hasRuns: runs.length > 0,
     runCount: runs.length,
     recallMean,
@@ -199,7 +199,7 @@ export function runEval({ fixturesDir, runsDir, gate, baseline }) {
   let citationValid = 0;
   let fabrications = 0;
   let verdictTotal = 0;
-  let verdictSupported = 0;
+  let verdictPassed = 0;
   const perFixtureRecallMeans = [];
   const perFixturePassK = [];
 
@@ -212,7 +212,7 @@ export function runEval({ fixturesDir, runsDir, gate, baseline }) {
     citationValid += totals.citationValid;
     fabrications += totals.fabrications;
     verdictTotal += totals.verdictTotal;
-    verdictSupported += totals.verdictSupported;
+    verdictPassed += totals.verdictPassed;
     if (totals.hasRuns) {
       perFixtureRecallMeans.push(totals.recallMean);
       // Stability needs >=2 independent runs to be meaningful (a "pass^1" is
@@ -227,7 +227,7 @@ export function runEval({ fixturesDir, runsDir, gate, baseline }) {
     recall: mean(perFixtureRecallMeans),
     citationValidity: citationTotal === 0 ? 1 : citationValid / citationTotal,
     fabrications,
-    faithfulness: verdictTotal === 0 ? null : verdictSupported / verdictTotal,
+    faithfulness: verdictTotal === 0 ? null : verdictPassed / verdictTotal,
     stabilityPassK: mean(perFixturePassK), // macro-average over fixtures with runCount >= 2 only; null if none qualify
     schemaValid: allSchemaValids.every(Boolean), // vacuously true with zero runs anywhere
   };

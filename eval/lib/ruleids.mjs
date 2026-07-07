@@ -39,6 +39,24 @@ export function findingRuleIds(finding) {
 }
 
 /**
+ * Flatten every `sections[].findings[]` entry of a findings.json object into a
+ * single list, tolerating malformed shapes (returns [] rather than throwing).
+ * Shared by the eval scorers so the findings.json traversal lives in one place.
+ *
+ * @param {object} findings — parsed findings.json
+ * @returns {object[]}
+ */
+export function allFindings(findings) {
+  const sections = (findings && Array.isArray(findings.sections)) ? findings.sections : [];
+  const out = [];
+  for (const section of sections) {
+    const sectionFindings = (section && Array.isArray(section.findings)) ? section.findings : [];
+    for (const finding of sectionFindings) out.push(finding);
+  }
+  return out;
+}
+
+/**
  * Union of findingRuleIds() over every finding in every section of a
  * findings.json object. Returns [] if the shape is invalid.
  *
@@ -47,12 +65,8 @@ export function findingRuleIds(finding) {
  */
 export function producedRuleIds(findings) {
   const ids = new Set();
-  if (!findings || !Array.isArray(findings.sections)) return [];
-  for (const section of findings.sections) {
-    if (!section || !Array.isArray(section.findings)) continue;
-    for (const f of section.findings) {
-      for (const id of findingRuleIds(f)) ids.add(id);
-    }
+  for (const f of allFindings(findings)) {
+    for (const id of findingRuleIds(f)) ids.add(id);
   }
   return [...ids].sort();
 }

@@ -13,7 +13,7 @@
  * No npm dependencies — pure Node.js.
  */
 
-import { findingRuleIds, analysisRuleIds, positiveRuleIds } from '../lib/ruleids.mjs';
+import { findingRuleIds, analysisRuleIds, positiveRuleIds, allFindings } from '../lib/ruleids.mjs';
 
 /**
  * Score structural fabrication/precision violations across every finding's
@@ -34,24 +34,20 @@ export function scoreFabrication(findings, expected, analysis) {
   );
 
   const items = [];
-  const sections = (findings && Array.isArray(findings.sections)) ? findings.sections : [];
-  for (const section of sections) {
-    const sectionFindings = (section && Array.isArray(section.findings)) ? section.findings : [];
-    for (const finding of sectionFindings) {
-      const findingId = finding && finding.id;
-      for (const ruleId of findingRuleIds(finding)) {
-        let explained = false;
-        if (trapIds.has(ruleId)) {
-          items.push({ findingId, ruleId, kind: 'must-not-contain' });
-          explained = true;
-        }
-        if (positiveIds.has(ruleId)) {
-          items.push({ findingId, ruleId, kind: 'on-positive' });
-          explained = true;
-        }
-        if (!explained && !analysisIds.has(ruleId)) {
-          items.push({ findingId, ruleId, kind: 'not-in-analysis' });
-        }
+  for (const finding of allFindings(findings)) {
+    const findingId = finding && finding.id;
+    for (const ruleId of findingRuleIds(finding)) {
+      let explained = false;
+      if (trapIds.has(ruleId)) {
+        items.push({ findingId, ruleId, kind: 'must-not-contain' });
+        explained = true;
+      }
+      if (positiveIds.has(ruleId)) {
+        items.push({ findingId, ruleId, kind: 'on-positive' });
+        explained = true;
+      }
+      if (!explained && !analysisIds.has(ruleId)) {
+        items.push({ findingId, ruleId, kind: 'not-in-analysis' });
       }
     }
   }

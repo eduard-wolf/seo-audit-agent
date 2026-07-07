@@ -114,8 +114,15 @@ describe('eval/scorers/faithfulness', () => {
     ];
     const r = scoreFaithfulness(runs);
     assert.equal(r.total, 3, 'three verdicts total');
-    assert.equal(r.supported, 2, 'two supported');
-    assert.equal(r.fabricatedNumbers, 1, 'one invented-number');
-    assert.equal(r.provenanceIssues, 1, 'one provenance issue');
+    // passRate is the STRICT rate: fraction with verdict === 'pass' (all three
+    // judge axes satisfied), not merely supported. Here only 1 of 3 is a pass.
+    assert.equal(r.passed, 1, 'one strict pass (verdict === "pass")');
+    assert.equal(r.warned, 1, 'one warn');
+    assert.equal(r.failed, 1, 'one fail');
+    assert.equal(r.passRate, 1 / 3, 'passRate is passed/total (strict, all three axes)');
+    // supported/provenance/fabricatedNumbers remain as diagnostics.
+    assert.equal(r.supported, 2, 'two supported (diagnostic)');
+    assert.equal(r.fabricatedNumbers, 1, 'one invented-number (diagnostic)');
+    assert.equal(r.provenanceIssues, 1, 'one provenance issue (diagnostic)');
   });
 });
