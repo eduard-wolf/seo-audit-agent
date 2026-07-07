@@ -7,6 +7,9 @@ import fs from 'node:fs';
 import { findingRuleIds, producedRuleIds, analysisRuleIds, positiveRuleIds } from '../eval/lib/ruleids.mjs';
 import { extractInterpretedRuleIds } from '../bin/handoff.mjs';
 import { buildCitationAllowlist, isValidCitation } from '../eval/lib/kb-citations.mjs';
+import path from 'node:path';
+import os from 'node:os';
+import { listFixtures, loadFixture, loadRuns, parseAffectedUrls } from '../eval/lib/fixtures.mjs';
 
 describe('eval/lib/ruleids', () => {
   it('findingRuleIds prefers first-class ruleIds[]', () => {
@@ -41,5 +44,30 @@ describe('eval/lib/kb-citations', () => {
     assert.equal(isValidCitation('https://web.dev/articles/vitals', allow), true, 'real URL is valid');
     assert.equal(isValidCitation('05-meta-tags.md', allow), true, 'basename form is valid');
     assert.equal(isValidCitation('https://example.com/made-up', allow), false, 'fabricated URL is invalid');
+  });
+});
+
+describe('eval/lib/fixtures', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'seo-eval-'));
+  const fixDir = path.join(tmp, 'fixtures');
+  const runDir = path.join(tmp, 'runs');
+  fs.mkdirSync(path.join(fixDir, 'demo'), { recursive: true });
+  fs.writeFileSync(path.join(fixDir, 'demo', 'analysis.json'), JSON.stringify({ meta: {}, findings: [], positives: [] }));
+  fs.writeFileSync(path.join(fixDir, 'demo', 'expected-findings.json'), JSON.stringify({ fixture: 'demo', mustContain: [], mustNotContain: [] }));
+  fs.writeFileSync(path.join(fixDir, 'demo', 'affected-urls.csv'), 'ruleId,url\na:1,http://h/x\n');
+  fs.mkdirSync(path.join(runDir, 'demo', 'run-1'), { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'demo', 'run-1', 'findings.json'), JSON.stringify({ sections: [] }));
+  it('lists fixtures and loads one with parsed affected-urls', () => {
+    assert.deepEqual(listFixtures(fixDir), ['demo'], 'lists the demo fixture');
+    const fx = loadFixture(fixDir, 'demo');
+    assert.equal(fx.expected.fixture, 'demo', 'loads expected-findings');
+    assert.deepEqual(fx.affectedUrls, [{ ruleId: 'a:1', url: 'http://h/x' }], 'parses affected-urls.csv');
+  });
+  it('loads runs sorted by run number', () => {
+    const runs = loadRuns(runDir, 'demo');
+    assert.equal(runs.length, 1, 'one run present'); assert.equal(runs[0].run, 1, 'run number parsed');
+  });
+  it('parseAffectedUrls drops header and blanks', () => {
+    assert.deepEqual(parseAffectedUrls('ruleId,url\n\nb:2,http://h/y\n'), [{ ruleId: 'b:2', url: 'http://h/y' }], 'header+blank dropped');
   });
 });
