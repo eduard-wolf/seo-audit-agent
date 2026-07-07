@@ -10,6 +10,7 @@ import { buildCitationAllowlist } from '../eval/lib/kb-citations.mjs';
 import { scoreSchema } from '../eval/scorers/schema.mjs';
 import { scoreFabrication } from '../eval/scorers/fabrication.mjs';
 import { scoreProvenance } from '../eval/scorers/provenance.mjs';
+import { scoreStability, anchorStability } from '../eval/scorers/stability.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../examples/example-run/findings.json', import.meta.url), 'utf8'));
 
@@ -86,5 +87,19 @@ describe('eval/scorers/provenance', () => {
       sections: [{ findings: [{ prov: 'gemessen', severity: 'hoch', ice: { i: 3, c: 2, e: 1, score: 6 } }] }] };
     const r = scoreProvenance(bad);
     assert.equal(r.checks.cCapOk, false, 'c=2 with minNMet=false violates the cap');
+  });
+});
+
+describe('eval/scorers/stability', () => {
+  it('pass^k = fraction of runs with recall 1', () => {
+    const r = scoreStability([1, 1, 0.5, 1]);
+    assert.equal(r.k, 4, 'k = number of runs');
+    assert.equal(r.passK, 0.75, 'three of four runs fully recalled');
+    assert.equal(r.recallMin, 0.5, 'min recall');
+  });
+  it('anchorStability reports per-anchor coverage fraction', () => {
+    const r = anchorStability([['a:1', 'b:2'], ['a:1']], ['a:1', 'b:2']);
+    assert.deepEqual(r, [{ ruleId: 'a:1', coveredFraction: 1 }, { ruleId: 'b:2', coveredFraction: 0.5 }],
+      'a:1 in both runs, b:2 in one');
   });
 });
