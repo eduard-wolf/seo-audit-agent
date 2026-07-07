@@ -1,0 +1,56 @@
+{
+  "fixture": "editorial",
+  "run": 1,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-geo-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=6/pctOfPages=50 and the /artikel/* cluster/affectedUrls sample match analysis.findings[geo:missing-citations] exactly; gemessen is correct for the measured count and the qualitative GEO impact is appropriately hedged as non-ranking."
+    },
+    {
+      "findingId": "f-geo-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=5/pctOfPages=41.7 and affectedUrls sample match analysis.findings[geo:content-stale]; gemessen fits the measured count, and the QDF query-dependency caveat mirrors the analysis's own quelle text rather than overclaiming a ranking effect."
+    },
+    {
+      "findingId": "f-sd-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=7/pctOfPages=58.3 and affectedUrls sample match analysis.findings[schema:article-no-author] verbatim; gemessen is justified, and the finding correctly frames author as a recommended E-E-A-T signal, not a hard requirement, per the rule's own quelle."
+    },
+    {
+      "findingId": "f-op-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=4/pctOfPages=33.3 and affectedUrls match analysis.findings[onpage:thin]; gemessen applies to the measured count, and the finding correctly avoids inventing a word-count threshold, citing the rule's own 'no Google word-count signal' caveat and its own missing kbSources/reduced confidence."
+    },
+    {
+      "findingId": "f-link-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=3/pctOfPages=25 and the three archive URLs match analysis.findings[links:deep]; gemessen is correct for the measured count, and the '~3 clicks' figure in the recommendation is a cited KB best-practice guideline, not a site metric asserted as fact."
+    },
+    {
+      "findingId": "f-link-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=2/pctOfPages=16.7 and both URLs (/artikel/verwaist, /artikel/alte-aktion) match analysis.findings[crawl:orphan-page] exactly; gemessen is correct for the measured count and no unsupported numeric claim is added."
+    }
+  ]
+}

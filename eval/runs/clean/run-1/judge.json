@@ -1,0 +1,24 @@
+{
+  "fixture": "clean",
+  "run": 1,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-op-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings[0] ruleId=onpage:meta-missing exactly (count=1, affectedUrls=[\"https://example-clean.test/leistungen\"]); the finding correctly reports the raw count of 1 and explicitly declines to state the 33.3% pctOfPages as a site-wide quota given minNMet=false, so gemessen is justified and no number is invented."
+    },
+    {
+      "findingId": "f-geo-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings[1] ruleId=geo:no-faq-howto (count=1, affectedUrls=[], pctOfPages=null, severity=\"info\"); the finding correctly treats this as a site-wide sentinel with no per-page share, discloses the info→niedrig severity mapping in beleg, and states no numeric claim beyond count=1, so gemessen and pass are justified."
+    }
+  ]
+}

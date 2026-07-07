@@ -1,0 +1,56 @@
+{
+  "fixture": "geo",
+  "run": 1,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-geo-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:ai-bot-blocked (count=1, affectedUrls=[], pctOfPages=null) and signals.robots.aiBots (OAI-SearchBot, disallowAll=true, disallowPaths=[\"/\"], operator=OpenAI, kategorie=ai-search) exactly; gemessen is justified by the measured presence flag."
+    },
+    {
+      "findingId": "f-geo-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:ai-snippet-suppressed (count=2, pctOfPages=25, affectedUrls=[definition, vergleich]) exactly, including the cross-reference to the same /wissen/* pages in f-geo-4; gemessen is correct for the measured count/pct."
+    },
+    {
+      "findingId": "f-geo-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:llms-txt-malformed (count=1, severity mittel) and signals.llms (exists=true, valid=false, problems=[missing-h1...]) verbatim; gemessen is justified by the measured validity flag."
+    },
+    {
+      "findingId": "f-geo-4",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:missing-citations (count=5, pctOfPages=62.5, clusters /wissen/* count=5) and lists exactly the 5 affectedUrls; gemessen is correct for the measured count/pct, and the GEO-citability claim is caveated (\"kein zugesagter Ranking-Zuwachs\")."
+    },
+    {
+      "findingId": "f-geo-5",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:no-faq-howto (count=1 site-wide sentinel, affectedUrls=[], pctOfPages=null); the severity info→niedrig relabel is the documented mapping (skills/interpret.md), not a fabrication, and the rich-results-deprecated claim mirrors the analysis's own quelle text."
+    },
+    {
+      "findingId": "f-geo-6",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:poor-chunkability (count=3, pctOfPages=37.5, affectedUrls=[grosser-ratgeber, glossar, faq-langform]) exactly, and the \"word count is not a ranking signal\" caveat mirrors the analysis's own quelle text almost verbatim."
+    }
+  ]
+}

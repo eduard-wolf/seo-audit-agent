@@ -1,0 +1,56 @@
+{
+  "fixture": "geo",
+  "run": 3,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-geo-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:ai-bot-blocked (count=1, affectedUrls=[], pctOfPages=null) and signals.aiBots[0]/signals.robots.aiBots[0] exactly (agent OAI-SearchBot, disallowAll=true, disallowPaths=['/'], operator OpenAI, kategorie ai-search); gemessen is justified for the measured block and the effect language is hedged as mechanism-based, not a guaranteed traffic claim."
+    },
+    {
+      "findingId": "f-geo-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:ai-snippet-suppressed exactly (count=2, pctOfPages=25, affectedUrls = /wissen/definition and /wissen/vergleich, cluster /wissen/* count=2); gemessen is correct for the measured count/URLs, and the finding honestly discloses empty kbSources rather than fabricating a citation."
+    },
+    {
+      "findingId": "f-geo-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:llms-txt-malformed (count=1, pctOfPages=null) and signals.llms exactly (exists=true, valid=false, problems=['missing-h1: ...']); gemessen is justified since the malformation is a directly observed presence/validity flag, no invented numbers."
+    },
+    {
+      "findingId": "f-geo-4",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:missing-citations exactly (count=5, pctOfPages=62.5, all 5 affectedUrls and the /wissen/* cluster reproduced verbatim); gemessen fits the measured count/pct, and the auswirkung is appropriately hedged as non-causal (no fabricated numbers)."
+    },
+    {
+      "findingId": "f-geo-5",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:no-faq-howto (count=1, pctOfPages=null, site-level absence of FAQPage/HowTo schema); severity is transparently remapped from raw 'info' to 'niedrig' with the mapping stated in beleg, and gemessen is correct for the measured absence flag with no invented numbers."
+    },
+    {
+      "findingId": "f-geo-6",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.findings geo:poor-chunkability exactly (count=3, pctOfPages=37.5, all 3 affectedUrls and the /wissen/* cluster reproduced verbatim); gemessen is justified for the measured count/pct while the practitioner-based impact claim is separately and correctly flagged as geschätzt in the auswirkung text, with no fabricated numbers."
+    }
+  ]
+}

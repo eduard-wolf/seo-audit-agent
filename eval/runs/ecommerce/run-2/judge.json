@@ -1,0 +1,56 @@
+{
+  "fixture": "ecommerce",
+  "run": 2,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-idx-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=2, pctOfPages=13.3, and both affectedUrls (saisonale-edition, limited-drop) match ruleId hygiene:oos-noindexed exactly; the noindex-on-OOS framing mirrors the analysis title itself, and the backlink/ranking-loss reasoning is qualitative interpretation, not an invented metric."
+    },
+    {
+      "findingId": "f-sd-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=9, pctOfPages=60, cluster count=9 on /produkt/*, and the cited example URLs all match ruleId schema:product-no-aggregate in the analysis; the rich-result-not-ranking distinction and the anti-fabrication caveat are faithful, non-numeric interpretation."
+    },
+    {
+      "findingId": "f-sd-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=4, pctOfPages=26.7, and all four affectedUrls (geschenkbox, abo-box, probierset, kapseln) match ruleId schema:offer-no-price exactly, with no invented figures in the recommendation."
+    },
+    {
+      "findingId": "f-sd-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=1 and the single affected URL (homepage) match ruleId schema:organization-logo; the finding correctly flags pctOfPages=6.7 as a single-page artifact rather than a site-wide share, showing careful (not over-claimed) provenance."
+    },
+    {
+      "findingId": "f-op-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=6, pctOfPages=40, cluster count=6, and all six listed affectedUrls match ruleId onpage:title-dup exactly, with the duplicate-title diagnosis grounded directly in the analysis title/detail."
+    },
+    {
+      "findingId": "f-op-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=8, pctOfPages=53.3, cluster count=8 on /produkt/*, and the cited example URLs (espresso-crema, hausmischung, geschenkbox) are all members of the ruleId onpage:alt-missing affectedUrls set."
+    }
+  ]
+}

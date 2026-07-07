@@ -1,0 +1,56 @@
+{
+  "fixture": "ecommerce",
+  "run": 3,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-idx-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.json ruleId=hygiene:oos-noindexed exactly: count=2, pctOfPages=13.3, both cited URLs (saisonale-edition, limited-drop) and the /produkt/* cluster count=2 are present in the analysis; the ranking/backlink-equity impact is a reasonable, non-numeric inference from the noindex fact, and gemessen correctly tags the measured count."
+    },
+    {
+      "findingId": "f-sd-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.json ruleId=schema:offer-no-price exactly: count=4, pctOfPages=26.7, and all four cited URLs (geschenkbox, abo-box, probierset, kapseln) are the analysis's affectedUrls; the finding correctly frames this as Rich-Result eligibility (not ranking) and honestly notes the empty kbSources, so gemessen is justified for the measured count."
+    },
+    {
+      "findingId": "f-sd-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "warn",
+      "rationale": "count=9, pctOfPages=60 and the five example URLs all match analysis.json ruleId=schema:product-no-aggregate (which lists all 9 affectedUrls), and the conditional 'only if real reviews exist' caveat is faithful; but the evidence text's '10-URL-Stichprobe' is a minor over-statement since analysis.json's affectedUrls array here is the complete set of 9, not a capped sample of 10."
+    },
+    {
+      "findingId": "f-sd-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.json ruleId=schema:organization-logo exactly: count=1, single affected URL 'https://example-shop.test/', and the finding correctly and carefully caveats that the pctOfPages=6.7 (1/15) is an artefact rather than '6.7% of pages affected', which is a faithful, non-overclaiming read of the data."
+    },
+    {
+      "findingId": "f-op-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.json ruleId=onpage:title-dup exactly: count=6, pctOfPages=40, and all six cited URLs are exactly the analysis's affectedUrls for this rule; gemessen is justified for the measured duplicate-title count."
+    },
+    {
+      "findingId": "f-op-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "warn",
+      "rationale": "count=8, pctOfPages=53.3 and the five example URLs all match analysis.json ruleId=onpage:alt-missing (which lists all 8 affectedUrls), but as with f-sd-2 the '10-URL-Stichprobe' phrasing overstates truncation that did not occur here since the analysis already provides the complete 8-URL list."
+    }
+  ]
+}

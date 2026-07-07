@@ -1,0 +1,56 @@
+{
+  "fixture": "editorial",
+  "run": 2,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-cite-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis geo:missing-citations exactly (count=6, pctOfPages=50 of 12 pages) and the three cited example URLs (roestprofile, herkunftslaender, koffein-mythen) are all in that rule's affectedUrls; gemessen is correct for the count."
+    },
+    {
+      "findingId": "f-author-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis schema:article-no-author exactly (count=7, pctOfPages=58.3) with example URLs (roestprofile, mahlgrad, wasserqualitaet) all present in affectedUrls; gemessen is correct and the recommended-not-required framing tracks the analysis's quelle line."
+    },
+    {
+      "findingId": "f-recency-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis geo:content-stale exactly (count=5, pctOfPages=41.7) with example URLs (roestprofile, lagerung, koffein-mythen) all present in affectedUrls; gemessen correctly applies to the measured count."
+    },
+    {
+      "findingId": "f-thin-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis onpage:thin exactly (count=4, pctOfPages=33.3) and lists all four affectedUrls verbatim; the added remark that some pages are 'naturgemäß kurz' is explicitly hedged ('legt nahe') as inference from the URLs themselves rather than asserted as measured fact, so gemessen still fits the core count claim."
+    },
+    {
+      "findingId": "f-depth-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis links:deep exactly (count=3, pctOfPages=25) and lists all three affectedUrls verbatim; gemessen is correct for the measured count."
+    },
+    {
+      "findingId": "f-orphan-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis crawl:orphan-page exactly (count=2, pctOfPages=16.7) and lists both affectedUrls verbatim; the 'mutmaßlich abgelaufene Aktion' aside is hedged inference from the URL slug, not stated as measured fact, so gemessen remains appropriate for the core count."
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "fixture": "example-run",
+  "run": 1,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-geo-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches geo:ai-bot-blocked exactly: signals.robots.aiBots lists OAI-SearchBot with disallowAll:true and operator OpenAI, count=1 site-wide."
+    },
+    {
+      "findingId": "f-geo-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches geo:missing-citations (count=1, affectedUrls=[no-citations.html]); the caveat about unlisted authoritative sources is an honest limitation note, not an invented fact."
+    },
+    {
+      "findingId": "f-geo-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches geo:llms-txt-malformed count=1; the two cited problems (missing-h1, missing-blockquote) are quoted verbatim from analysis.json."
+    },
+    {
+      "findingId": "f-geo-4",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches geo:no-faq-howto (site-wide sentinel count=1, severity info); '21 gecrawlte Seiten' is derivable from meta.sampleSize=21, and the info→niedrig mapping is disclosed."
+    },
+    {
+      "findingId": "f-geo-5",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches trust:contact-pages-missing (site-level sentinel, affectedUrls empty); 'beobachtet' correctly reflects the rule's own heuristic/manual-verification framing."
+    },
+    {
+      "findingId": "f-idx-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Correctly merges tech:sitemap-quality (count=3: noindex.html, redirect-1, gone-page.html), tech:noindex-conflict, tech:non-2xx and tech:robots-sitemap-conflict; the '21/22' coverage claim matches meta.fetched=21/discovered=22."
+    },
+    {
+      "findingId": "f-idx-2",
+      "supported": false,
+      "provenanceCorrect": false,
+      "fabricatedNumbers": false,
+      "verdict": "fail",
+      "rationale": "The noindex+canonical conflict itself matches tech:noindex-canonical-conflict, but the finding also asserts noindex.html is 'Gegenstand von Befund 2.3 (fehlerhaftes Canonical-Ziel)' — tech:canonical-target-broken is listed in analysis.positives (passed cleanly site-wide), so this claims a problem for a rule the analysis marks as passing, and no such finding exists at that position in this run."
+    },
+    {
+      "findingId": "f-idx-4",
+      "supported": false,
+      "provenanceCorrect": false,
+      "fabricatedNumbers": true,
+      "verdict": "fail",
+      "rationale": "tech:redirect-chain only establishes count=1 with affectedUrls=[redirect-1] and a '≥2 Hops' rule threshold; the specific claim of exactly '2 Hops' via an intermediate '/redirect-2' is not present anywhere in analysis.json (no crawl.csv is available to this judge) and is therefore an invented detail."
+    },
+    {
+      "findingId": "f-idx-6",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches crawl:client-rendered count=1 (client-rendered.html); the 'site remains server-rendered' claim matches meta.siteType=server-rendered."
+    },
+    {
+      "findingId": "f-idx-7",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "warn",
+      "rationale": "Matches crawl:orphan-page count=1 (orphan.html) and the 'Befund 2.1' cross-reference correctly points to the sitemap-cleanup finding, but the claim that the orphan filter 'bewusst' excludes redirect-1/gone-page.html is tool-internal reasoning not stated in analysis.json — a soft, unverifiable over-statement rather than an invented fact."
+    },
+    {
+      "findingId": "f-sd-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches schema:invalid count=1, affectedUrls=[invalid-schema.html]."
+    },
+    {
+      "findingId": "f-sd-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches schema:product-no-aggregate count=1, affectedUrls=[invalid-schema.html]."
+    },
+    {
+      "findingId": "f-sd-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches schema:org-missing-same-as count=1, affectedUrls=[index.html]."
+    },
+    {
+      "findingId": "f-sd-4",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches schema:merchant-shipping-returns count=1, affectedUrls=[invalid-schema.html]; correctly frames the properties as recommended, not required, per analysis detail text."
+    },
+    {
+      "findingId": "f-sd-5",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Correctly merges schema:organization-logo and schema:organization-contact, both count=1 on index.html."
+    },
+    {
+      "findingId": "f-op-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches onpage:title-missing count=1, affectedUrls=[missing-title.html]."
+    },
+    {
+      "findingId": "f-op-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Correctly merges onpage:title-dup (count=2: dup-title-a/b), onpage:title-long (long-title.html) and onpage:title-short (count=3: thin, invalid-schema, xss) with matching URLs."
+    },
+    {
+      "findingId": "f-op-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Correctly merges onpage:meta-missing, onpage:meta-dup (count=2) and onpage:meta-desc-length (count=10, pctOfPages=47.6); all five cited example URLs appear in that rule's affectedUrls."
+    },
+    {
+      "findingId": "f-op-4",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Correctly merges onpage:h1-multi and onpage:heading-skip, both count=1 on multi-h1.html."
+    },
+    {
+      "findingId": "f-op-5",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches onpage:alt-missing count=1, affectedUrls=[no-alt.html]."
+    },
+    {
+      "findingId": "f-op-6",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches onpage:thin count=17/pctOfPages=81 exactly, cites five real example URLs from affectedUrls, and correctly flags the figure as fixture-driven rather than site-representative (anti-overclaim)."
+    },
+    {
+      "findingId": "f-perf-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches onpage:non-modern-image-format count=1, affectedUrls=[no-alt.html]."
+    },
+    {
+      "findingId": "f-perf-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches perf:text-compression-missing count=18/pctOfPages=85.7 exactly, with example URLs drawn from its affectedUrls."
+    },
+    {
+      "findingId": "f-perf-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches tech:viewport-missing count=17/pctOfPages=81 exactly, with example URLs drawn from its affectedUrls."
+    },
+    {
+      "findingId": "f-perf-4",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Correctly merges five header rules (csp/nosniff/frame-protection/referrer-policy/permissions-policy-missing), each count=18/pctOfPages=85.7, and correctly restates their individual severities (mittel/mittel/niedrig/niedrig/niedrig)."
+    },
+    {
+      "findingId": "f-art-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches tech:https count=21/pctOfPages=100 and directly reflects analysis.confidence.caveats' own statement that tech:https is a localhost crawl-environment artifact."
+    },
+    {
+      "findingId": "f-art-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches tech:canonical-nonself count=18/pctOfPages=85.7; the demo.example vs. 127.0.0.1 host-mismatch story is grounded in signals.robots.sitemapRefs/raw and explicitly echoed in analysis.confidence.caveats."
+    }
+  ]
+}
