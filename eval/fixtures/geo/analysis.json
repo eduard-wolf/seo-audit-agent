@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "origin": "https://example-answers.test",
+    "host": "example-answers.test",
+    "crawledAt": null,
+    "pageCount": 8,
+    "sampleSize": 8,
+    "siteType": "server-rendered",
+    "coveragePct": 89,
+    "capped": false,
+    "fetched": 8,
+    "discovered": 9,
+    "sitemapTotal": 9,
+    "minNMet": true
+  },
+  "rulesetVersion": "1.7.0",
+  "findings": [
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "KI-Suchbot blockiert (GEO-Sichtbarkeit gefährdet)",
+      "count": 1,
+      "pctOfPages": null,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "OAI-SearchBot per robots.txt vollständig gesperrt (ai-search-blocked).",
+      "quelle": "Offizielle AI-Operator-Dokumentation (u.a. OpenAI OAI-SearchBot, Google-Crawler-Übersicht) — Provenienz + lastVerified je Bot in config/ai-bots.SOURCES.md",
+      "datum": "2026-07"
+    },
+    {
+      "ruleId": "geo:llms-txt-malformed",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "llms.txt fehlt oder ist strukturell fehlerhaft",
+      "count": 1,
+      "pctOfPages": null,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "llms.txt vorhanden, aber ohne H1-Titelzeile (\"# \").",
+      "quelle": "https://llmstxt.org – llms.txt Specification",
+      "datum": "2024-11"
+    },
+    {
+      "ruleId": "geo:no-faq-howto",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "info",
+      "title": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces)",
+      "count": 1,
+      "pctOfPages": null,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "Kein FAQPage-/HowTo-Schema auf der gesamten Site gefunden.",
+      "quelle": "GEO-Praxis — strukturierte Q&A erhöht AI-Answer-Surface; Google-FAQ/HowTo-Rich-Results sind entfallen (2023/2026)",
+      "datum": "2026-06"
+    },
+    {
+      "ruleId": "geo:missing-citations",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Keine externen Quellenangaben (GEO: Cite Sources)",
+      "count": 5,
+      "pctOfPages": 62.5,
+      "affectedUrls": [
+        "https://example-answers.test/wissen/definition",
+        "https://example-answers.test/wissen/vergleich",
+        "https://example-answers.test/wissen/anleitung",
+        "https://example-answers.test/wissen/kosten",
+        "https://example-answers.test/wissen/haltbarkeit"
+      ],
+      "clusters": [
+        {
+          "pattern": "/wissen/*",
+          "count": 5
+        }
+      ],
+      "detail": "Substanzielle Antwort-Seiten ohne externe Quellenangabe (schwächt die KI-Zitierbarkeit).",
+      "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
+      "datum": "2023-11"
+    },
+    {
+      "ruleId": "geo:poor-chunkability",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Lange Seite ohne Zwischenüberschriften (KI-Chunkability — struktureller Hinweis)",
+      "count": 3,
+      "pctOfPages": 37.5,
+      "affectedUrls": [
+        "https://example-answers.test/wissen/grosser-ratgeber",
+        "https://example-answers.test/wissen/glossar",
+        "https://example-answers.test/wissen/faq-langform"
+      ],
+      "clusters": [
+        {
+          "pattern": "/wissen/*",
+          "count": 3
+        }
+      ],
+      "detail": "Lange Seite ohne Zwischenüberschriften — erschwert heading-basiertes Chunking.",
+      "quelle": "RAG-Chunking-Praxis (Unstructured.io / Firecrawl 2026: heading-basiertes Chunking schlägt Fixed-Size-Splitting) + GEO-Praxis (Backlinko 2025-26); Google bestätigt: Wortzahl ist KEIN Qualitäts-/Ranking-Signal (Mueller/Sullivan) — struktureller Hinweis für KI-Extrahierbarkeit, kein Ranking-Claim, Praktiker-Evidenz (keine Google-Primärquelle)",
+      "datum": "2026-01"
+    },
+    {
+      "ruleId": "geo:ai-snippet-suppressed",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "hoch",
+      "title": "AI-Snippet unterdrückt (nosnippet / max-snippet:0 — keine AI-Overview-/AI-Mode-Zitierung)",
+      "count": 2,
+      "pctOfPages": 25,
+      "affectedUrls": [
+        "https://example-answers.test/wissen/definition",
+        "https://example-answers.test/wissen/vergleich"
+      ],
+      "clusters": [
+        {
+          "pattern": "/wissen/*",
+          "count": 2
+        }
+      ],
+      "detail": "nosnippet / max-snippet:0 verhindert Zitierung in AI-Overviews.",
+      "quelle": "Google Search Central – Robots-Meta/X-Robots-Spezifikation: nosnippet & max-snippet:0",
+      "datum": "2026-03"
+    }
+  ],
+  "positives": [
+    {
+      "ruleId": "geo:content-stale",
+      "title": "Artikel ohne dateModified (Recency-Signal fehlt)"
+    },
+    {
+      "ruleId": "geo:noimageindex",
+      "title": "Bilder von der Indexierung ausgeschlossen (noimageindex)"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "title": "Ungültiges JSON-LD (Parse-Fehler)"
+    },
+    {
+      "ruleId": "tech:https",
+      "title": "Seiten ohne HTTPS oder mit Mixed-Content"
+    },
+    {
+      "ruleId": "onpage:title-missing",
+      "title": "Fehlender Seitentitel"
+    }
+  ],
+  "signals": {
+    "robots": {
+      "exists": true,
+      "aiBots": [
+        {
+          "agent": "OAI-SearchBot",
+          "disallowAll": true,
+          "disallowPaths": [
+            "/"
+          ],
+          "kategorie": "ai-search",
+          "operator": "OpenAI"
+        }
+      ]
+    },
+    "llms": {
+      "exists": true,
+      "valid": false,
+      "problems": [
+        "missing-h1: first non-empty line must start with \"# \" (H1 heading)"
+      ]
+    },
+    "aiBots": [
+      {
+        "agent": "OAI-SearchBot",
+        "disallowAll": true,
+        "disallowPaths": [
+          "/"
+        ],
+        "kategorie": "ai-search",
+        "operator": "OpenAI"
+      }
+    ]
+  }
+}

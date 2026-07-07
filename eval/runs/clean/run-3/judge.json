@@ -1,0 +1,24 @@
+{
+  "fixture": "clean",
+  "run": 3,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-op-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis.json exactly (ruleId=onpage:meta-missing, count=1, affectedUrls=[\"https://example-clean.test/leistungen\"], pctOfPages=33.3), and correctly caveats the raw percentage as non-representative given sampleSize=3/minNMet=false, using only the absolute count; prov=gemessen is justified for the measured count/URL, and the sole extra number (70–160-char heuristic) is explicitly hedged as a non-mandatory heuristic, not a site metric."
+    },
+    {
+      "findingId": "f-geo-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "warn",
+      "rationale": "Rule hit geo:no-faq-howto matches analysis.json (count=1 site-level sentinel, affectedUrls=[], pctOfPages=null correctly treated as site-wide rather than per-page), and the auswirkung correctly propagates the quelle's \"kein Ranking-Hebel\"/entfallen-Rich-Results calibration; prov=gemessen is justified for the measured presence/absence flag; however it states specific months (08/2023, 05/2026) beyond the analysis's year-only quelle \"(2023/2026)\", a minor over-precision not literally derivable from analysis.json, so this is a soft over-statement rather than a clean pass."
+    }
+  ]
+}

@@ -1,0 +1,535 @@
+{
+  "meta": {
+    "url": "http://127.0.0.1:59896",
+    "crawledAt": "2026-06-29T00:00:00.000Z",
+    "modelId": "claude-opus-4-8[1m]",
+    "rulesetVersion": "1.7.0",
+    "sampleSize": 21,
+    "coveragePct": 95,
+    "siteType": "server-rendered"
+  },
+  "execSummary": {
+    "metrics": [
+      "21 von 22 bekannten Seiten gecrawlt (Abdeckung 95 %; eine per robots.txt gesperrte URL blieb ungecrawlt).",
+      "40 Roh-Regel-Treffer, davon 2 als reine Crawl-Umgebungs-Artefakte eingeordnet (Abschnitt 6).",
+      "53 sauber bestandene Regel-Checks (Positiv-Befunde) — die Mehrzahl der 96 geprüften Signale (Regelwerk 1.7.0) ist intakt.",
+      "Höchste Priorität: KI-Suchbot OAI-SearchBot per robots.txt global blockiert (GEO-Sichtbarkeit gefährdet)."
+    ],
+    "patterns": [
+      "GEO-Sichtbarkeit aktiv beschädigt: OAI-SearchBot global ausgesperrt plus strukturell fehlerhafte llms.txt.",
+      "Sitemap-Hygiene defekt: eine noindex-Seite, eine tote 410-URL, ein Redirect sowie eine robots-gesperrte URL liegen gemeinsam in der Sitemap; noindex.html bündelt zusätzlich einen noindex-/canonical-Widerspruch.",
+      "Strukturierte Daten lückenhaft: ein JSON-LD-Parse-Fehler, Produkt ohne aggregateRating, Organization ohne sameAs/logo/contactPoint.",
+      "Serverseitige Auslieferung ohne Härtung: keine Text-Kompression, fehlende Viewport-Meta und ein komplett fehlendes HTTP-Security-Header-Set (CSP, X-Content-Type-Options, X-Frame-Options/frame-ancestors, Referrer-/Permissions-Policy) auf der Mehrzahl der Seiten — Performance/Mobile/Security, KEIN Ranking-Signal.",
+      "Der Interpretations-Layer trennt echte Defekte von Crawl-Artefakten: tech:https (100 %) und tech:canonical-nonself (85,7 %) entstehen nur durch den localhost-HTTP-Lauf, nicht durch reale Site-Fehler."
+    ],
+    "quickWins": [
+      "robots.txt: Disallow:/ für OAI-SearchBot entfernen, damit ChatGPT Search die Site wieder zitieren darf.",
+      "Sitemap bereinigen: noindex.html, gone-page.html (410), redirect-1 und die robots-gesperrte /private/secret.html aus der sitemap.xml entfernen.",
+      "Fehlenden <title> auf missing-title.html ergänzen.",
+      "JSON-LD-Syntaxfehler auf invalid-schema.html beheben und im Rich Results Test validieren.",
+      "Security-Header-Set (CSP, nosniff, X-Frame-Options/frame-ancestors, Referrer-/Permissions-Policy) zentral am Server/CDN setzen — eine Konfigurationsänderung deckt alle Seiten ab."
+    ]
+  },
+  "sections": [
+    {
+      "id": "sec-geo",
+      "num": 1,
+      "title": "GEO & KI-Sichtbarkeit",
+      "findings": [
+        {
+          "id": "f-geo-1",
+          "title": "KI-Suchbot per robots.txt global blockiert (OAI-SearchBot)",
+          "category": "geo",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Die robots.txt sperrt OAI-SearchBot — den offiziellen Crawler für ChatGPT-Search-Quellenangaben — mit \"Disallow: /\" vollständig aus.",
+          "beleg": "analysis.json signals.robots.aiBots: [{agent:\"OAI-SearchBot\", disallowAll:true, operator:\"OpenAI\"}]; ruleId=geo:ai-bot-blocked",
+          "evidence": "1 AI-Bot betroffen (count=1, site-weit). robots.txt-Block: \"User-agent: OAI-SearchBot\\nDisallow: /\". Wirkt site-weit, nicht pfadgebunden.",
+          "auswirkung": "Solange der Bot global ausgesperrt ist, kann ChatGPT Search die Domain nicht crawlen und damit auch nicht als Quelle zitieren — die GEO-Sichtbarkeit fällt für diesen Kanal auf null. Ein Crawl-Verbot ist kein Indexierungs-Verbot, aber ohne Crawl gibt es keine Zitierung.",
+          "empfehlung": "Den \"Disallow: /\"-Block für OAI-SearchBot entfernen oder auf gezielte, wirklich schützenswerte Pfade beschränken. Direktiven für KI-Such-Bots bewusst und pfadgenau setzen, statt pauschal alles zu sperren — analog zur Trennung von robots-Disallow (Crawl) und noindex (Index).",
+          "ice": { "i": 3, "c": 3, "e": 3, "score": 27 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "noindex vs. Disallow", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "robots.txt", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-geo-2",
+          "title": "Content ohne autoritative Quellenangaben (GEO: Cite Sources)",
+          "category": "geo",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Eine Seite mit faktischen Aussagen verlinkt auf keine einzige kuratierte Autoritäts-Domain (.gov/.edu/Wikipedia + Liste).",
+          "beleg": "ruleId=geo:missing-citations; analysis.json affectedUrls",
+          "evidence": "1 Seite betroffen (count=1): http://127.0.0.1:59896/no-citations.html — keine Outlinks zu gelisteten Autoritäts-Quellen. Hinweis aus der Regel: nicht-gelistete seriöse Quellen werden derzeit (noch) nicht erkannt.",
+          "auswirkung": "Generative Engines bevorzugen belegte Aussagen; fehlende autoritative Quellen senken die Chance, in KI-Antworten zitiert zu werden, und schwächen das E-E-A-T-Signal für klassische Rankings.",
+          "empfehlung": "Faktische und statistische Aussagen mit Outbound-Links auf autoritative Primärquellen belegen und die Quelle sichtbar nahe der Behauptung im Fließtext platzieren. Nur tatsächlich einschlägige, vertrauenswürdige Quellen verlinken.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "kbSources": [
+            { "source": "https://arxiv.org/abs/2311.09735", "heading": "How to Cite Sources in Your Own Content", "date": "2024-06" },
+            { "source": "https://arxiv.org/abs/2311.09735", "heading": "Why Citations Matter", "date": "2024-06" }
+          ]
+        },
+        {
+          "id": "f-geo-3",
+          "title": "llms.txt strukturell fehlerhaft (fehlender Titel + Summary)",
+          "category": "geo",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Die vorhandene llms.txt verletzt die Spezifikation: weder eine H1-Titelzeile (\"# …\") noch eine Summary als Blockquote (\"> …\") sind vorhanden.",
+          "beleg": "ruleId=geo:llms-txt-malformed; analysis.json signals.llms.problems",
+          "evidence": "1 Datei betroffen (count=1) mit 2 Strukturproblemen: \"missing-h1: first non-empty line must start with '# '\" und \"missing-blockquote: no '> ' summary line found\".",
+          "auswirkung": "Eine ungültige llms.txt kann von LLM-Tooling nicht zuverlässig als kuratierte Einstiegskarte genutzt werden; der gewünschte Steuerungseffekt für KI-Crawler entfällt. Der Effekt ist GEO-spezifisch und (Stand heute) sekundär gegenüber robots.txt.",
+          "empfehlung": "Die Datei spec-konform aufbauen: erste Zeile als H1 (\"# Markenname\"), gefolgt von einer Blockquote-Summary (\"> Kurzbeschreibung\"), darunter thematische Linklisten. An der offiziellen llms.txt-Spezifikation (llmstxt.org) ausrichten.",
+          "ice": { "i": 2, "c": 1, "e": 3, "score": 6 },
+          "kbSources": []
+        },
+        {
+          "id": "f-geo-4",
+          "title": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces)",
+          "category": "geo",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Auf keiner gecrawlten Seite ist FAQPage- oder HowTo-Schema ausgezeichnet.",
+          "beleg": "ruleId=geo:no-faq-howto; site-weit (count=1 = Site-Level-Befund, severity \"info\" → niedrig gemappt)",
+          "evidence": "0 Seiten mit FAQPage/HowTo-Markup über alle 21 gecrawlten Seiten (count=1, site-weiter Sentinel).",
+          "auswirkung": "FAQPage- und HowTo-Schema erzeugen seit 2023/2026 keine Google-Rich-Results mehr. Ihr verbleibender Wert liegt in AI-Antwort-Surfaces: strukturierte Q&A-Paare und Schritt-für-Schritt-Strukturen helfen KI-Such-Engines (ChatGPT Search, Perplexity, AI Overviews), Inhalte zuverlässig zu extrahieren und zu zitieren — eine ungenutzte, nachgelagerte GEO-Chance, kein Ranking-Hebel.",
+          "empfehlung": "Auf Seiten mit echten Q&A- oder Schritt-für-Schritt-Inhalten valides FAQPage- bzw. HowTo-JSON-LD ergänzen. Nur auf tatsächlich sichtbaren Seiteninhalt anwenden, nicht auf erfundene Fragen.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/article", "heading": "FAQPage Schema", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-geo-5",
+          "title": "Keine erkennbare Kontakt-/Impressums-/Datenschutz-Seite (Trust & Recht)",
+          "category": "trust",
+          "severity": "mittel",
+          "prov": "beobachtet",
+          "befund": "Unter den gecrawlten/entdeckten URLs ist kein Kontakt-, Über-uns-, Impressums- oder Datenschutz-Bereich erkennbar.",
+          "beleg": "ruleId=trust:contact-pages-missing; analysis.json detail (Heuristik, Site-Level)",
+          "evidence": "Site-Level-Befund (count=1, affectedUrls leer — site-weiter Sentinel, kein Einzelseiten-Anteil). Heuristik: solche Seiten können unter untypischen URLs liegen oder ungecrawlt sein — manuell verifizieren.",
+          "auswirkung": "Trust-Seiten sind ein E-E-A-T-Vertrauenssignal gemäß Google Quality Rater Guidelines (2025-09: \"Trust is the most important member of the E-E-A-T family\"), aber KEIN direkter Ranking-Faktor. Für gewerbliche deutsche Websites zudem Rechtspflicht: Impressum (DDG §5, seit Mai 2024) und Datenschutzerklärung (DSGVO Art. 13).",
+          "empfehlung": "Sofern noch nicht vorhanden: klar verlinkte Kontakt-, Über-uns-, Impressums- und Datenschutz-Seiten bereitstellen und aus Footer/Hauptnavigation erreichbar machen. Da es sich um eine Heuristik handelt, zuerst prüfen, ob die Seiten nur unter untypischen URLs liegen.",
+          "ice": { "i": 2, "c": 1, "e": 2, "score": 4 },
+          "kbSources": []
+        }
+      ]
+    },
+    {
+      "id": "sec-index",
+      "num": 2,
+      "title": "Indexierung, Crawling & Sitemap-Hygiene",
+      "findings": [
+        {
+          "id": "f-idx-1",
+          "title": "Sitemap enthält noindex-, 410-, Redirect- und robots-gesperrte URLs (Indexierungs-Konflikte)",
+          "category": "tech-index",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Die sitemap.xml listet URLs, die dort nicht hingehören: eine auf noindex gesetzte Seite, eine tote URL (HTTP 410), einen Redirect sowie eine per robots.txt gesperrte URL.",
+          "beleg": "ruleId=tech:sitemap-quality (count=3) + tech:noindex-conflict + tech:non-2xx + tech:robots-sitemap-conflict; analysis.json affectedUrls",
+          "evidence": "Fehlerhafte Sitemap-Einträge: /noindex.html (Meta-robots=noindex bei gleichzeitiger Sitemap-Listung → Konflikt), /gone-page.html (Server liefert 410, tech:non-2xx), /redirect-1 (Redirect statt finaler URL) sowie http://demo.example/private/secret.html (per robots.txt \"Disallow: /private/\" gesperrt → tech:robots-sitemap-conflict). Letztere ist genau die nicht gecrawlte URL (Abdeckung 21/22).",
+          "auswirkung": "Widersprüchliche Signale (Sitemap = \"indexiere mich\" vs. noindex/Disallow/410 = nicht indexierbar) verwirren Crawler und verschwenden Crawl-Budget auf tote, umgeleitete und gesperrte URLs. Die Sitemap soll ausschließlich crawlbare, indexierbare 200-Endziel-URLs enthalten.",
+          "empfehlung": "Sitemap auf kanonische, indexierbare 200-Endziel-URLs reduzieren: noindex-Seite entfernen (oder noindex aufheben, falls sie indexiert werden soll), 410-URL streichen, Redirect-Einträge durch ihr finales Ziel ersetzen und die robots-gesperrte URL entfernen. noindex/Disallow nie mit Sitemap-Listung kombinieren.",
+          "ice": { "i": 3, "c": 3, "e": 3, "score": 27 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "sitemap.xml essentials", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "noindex vs. Disallow", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-idx-2",
+          "title": "Widersprüchliche Indexierungssignale: noindex und canonical gleichzeitig",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Eine Seite trägt zugleich ein noindex und ein rel=canonical — widersprüchliche Indexierungssignale.",
+          "beleg": "ruleId=tech:noindex-canonical-conflict; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/noindex.html — noindex (blockiert die Seite aus der Suche) UND rel=canonical (signalisiert eine bevorzugte Index-Version) gleichzeitig. Dieselbe Seite ist auch Gegenstand von Befund 2.3 (fehlerhaftes Canonical-Ziel).",
+          "auswirkung": "Google empfiehlt, noindex nicht mit rel=canonical zu kombinieren: noindex blockiert die Seite komplett, während canonical eine Konsolidierung andeutet — die gemischten Signale können dazu führen, dass das canonical-Ziel uneindeutig interpretiert wird.",
+          "empfehlung": "Sich für eine Absicht entscheiden: Soll die Seite aus dem Index, das rel=canonical entfernen und beim noindex bleiben; soll sie indexiert/konsolidiert werden, das noindex entfernen und ein eindeutiges self- oder ziel-canonical setzen.",
+          "ice": { "i": 1, "c": 3, "e": 3, "score": 9 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/canonicalization", "heading": "The Canonical Tag", "date": "2025-12-10" }
+          ]
+        },
+        
+        {
+          "id": "f-idx-4",
+          "title": "Redirect-Kette mit mindestens zwei Hops",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Eine URL leitet über eine mehrstufige Redirect-Kette (≥2 Hops) auf das Endziel um.",
+          "beleg": "ruleId=tech:redirect-chain; analysis.json affectedUrls + crawl.csv (finalUrl/redirectChain)",
+          "evidence": "1 Kette (count=1): http://127.0.0.1:59896/redirect-1 → /redirect-2 → /redirect-final.html (2 Hops; crawl.csv: redirectChain=/redirect-1|/redirect-2, finalUrl=/redirect-final.html).",
+          "auswirkung": "Jeder zusätzliche Hop kostet Crawl-Budget und verwässert die weitergegebenen Link-Signale geringfügig; bei einer einzelnen URL ist der Effekt klein, als Template-Muster wäre er größer.",
+          "empfehlung": "Interne Links und Sitemap-Einträge direkt auf das finale Ziel (/redirect-final.html) setzen, sodass höchstens ein einziger Redirect-Hop verbleibt.",
+          "ice": { "i": 1, "c": 3, "e": 3, "score": 9 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/canonicalization", "heading": "301 Redirects vs. Canonical", "date": "2025-12-10" }
+          ]
+        },
+        
+        {
+          "id": "f-idx-6",
+          "title": "Client-gerenderte Seite ohne SSR-Fallback",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "beobachtet",
+          "befund": "Eine Seite liefert nur eine JS-Shell ohne server-gerenderten Inhalt aus (JS-Guard).",
+          "beleg": "ruleId=crawl:client-rendered; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/client-rendered.html — client-seitig gerendert ohne SSR-Fallback.",
+          "auswirkung": "Crawler ohne JS-Ausführung sehen leeren Inhalt; Indexierung und Snippet-Qualität dieser Seite sind gefährdet. Für genau diese Seite sind Head-Signal-Befunde (Titel, Meta, Schema) unzuverlässig, weil der Inhalt clientseitig entsteht. Die Gesamt-Site bleibt server-rendered (siteType=server-rendered) — dies ist ein Einzelfall.",
+          "empfehlung": "SSR oder Prerendering für die Route aktivieren, sodass der Crawler vollständiges HTML erhält. Nach Umstellung erneut crawlen und die Head-Signale verifizieren, bevor man ihnen vertraut.",
+          "ice": { "i": 2, "c": 2, "e": 1, "score": 4 },
+          "kbSources": []
+        },
+        {
+          "id": "f-idx-7",
+          "title": "Verwaiste Seite ohne interne Eingangslinks",
+          "category": "crawl",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Eine inhaltstragende URL hat keine internen Eingangslinks. Der Orphan-Filter blendet Nicht-Inhalts-URLs (Redirect-Quellen, 4xx/410) inzwischen aus, sodass nur die echte Waise verbleibt.",
+          "beleg": "ruleId=crawl:orphan-page; analysis.json affectedUrls",
+          "evidence": "count=1: http://127.0.0.1:59896/orphan.html — einzige echte Waise. (Die Redirect-Quelle /redirect-1 und die 410-URL /gone-page.html werden vom Filter bewusst nicht mehr als Waisen geführt; sie sind Gegenstand der Sitemap-Bereinigung, Befund 2.1.)",
+          "auswirkung": "Eine Waise erhält keine interne Link-Equity und wird seltener gecrawlt. Bei einer einzelnen Content-Seite ist der Effekt überschaubar, als Template-Muster (z. B. ganze /blog/-Segmente) wäre er größer.",
+          "empfehlung": "/orphan.html aus thematisch passenden Hub-Seiten kontextuell verlinken (Hub-and-Spoke), damit die Seite Eingangs-Equity erhält und zuverlässig gecrawlt wird.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable", "heading": "Orphan Pages", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable", "heading": "Why Internal Links Matter", "date": "2025-12-10" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec-schema",
+      "num": 3,
+      "title": "Strukturierte Daten",
+      "findings": [
+        {
+          "id": "f-sd-1",
+          "title": "Ungültiges JSON-LD (Parse-Fehler)",
+          "category": "structured-data",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Eine Seite enthält JSON-LD mit einem Syntaxfehler, der den gesamten Block ungültig macht.",
+          "beleg": "ruleId=schema:invalid; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/invalid-schema.html — JSON-LD-Block mit Parse-Fehler.",
+          "auswirkung": "Fehlerhaftes JSON-LD wird von Google ignoriert; jede darauf gestützte Rich-Result-Eignung dieser Seite entfällt vollständig.",
+          "empfehlung": "Den Syntaxfehler beheben, das Markup gegen den Rich Results Test und den Schema Markup Validator prüfen und erst nach grünem Ergebnis ausliefern.",
+          "ice": { "i": 2, "c": 3, "e": 3, "score": 18 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/review-snippet", "heading": "Testing", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-sd-2",
+          "title": "Produkt-Schema ohne aggregateRating",
+          "category": "structured-data",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Eine Produktauszeichnung enthält kein aggregateRating und ist damit nicht für Bewertungs-Rich-Results geeignet.",
+          "beleg": "ruleId=schema:product-no-aggregate; analysis.json affectedUrls",
+          "evidence": "1 Produktseite (count=1): http://127.0.0.1:59896/invalid-schema.html — Product-JSON-LD ohne aggregateRating-Property.",
+          "auswirkung": "Ohne aggregateRating zeigt die SERP keine Sterne/Bewertungen für das Produkt — ein sichtbarer CTR-Hebel bleibt ungenutzt. Wirkt nur, wenn echte Bewertungen existieren.",
+          "empfehlung": "aggregateRating mit den Pflichtfeldern (ratingValue, reviewCount/ratingCount) ergänzen — ausschließlich auf Basis echter, on-page sichtbarer Bewertungen. Erfundene oder self-serving Ratings verstoßen gegen die Richtlinien und riskieren eine Manual Action.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/review-snippet", "heading": "Required Properties", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/review-snippet", "heading": "Common Mistakes", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-sd-3",
+          "title": "Organization-Schema ohne sameAs",
+          "category": "structured-data",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Das Organization-Schema der Startseite hat keine sameAs-Property zur Verknüpfung mit offiziellen Marken-Profilen.",
+          "beleg": "ruleId=schema:org-missing-same-as; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/index.html — Organization vorhanden, sameAs fehlt.",
+          "auswirkung": "sameAs verbindet die Marke mit ihren autoritativen Profilen (Wikipedia, Wikidata, Social) und stützt die Entity-Erkennung im Knowledge Graph und in KI-Suchen — ohne sie bleibt die Entitäts-Zuordnung schwächer.",
+          "empfehlung": "sameAs als Array offizieller, verifizierbarer Marken-URLs ins Organization-Schema aufnehmen. Nur tatsächlich der Marke gehörende Profile listen.",
+          "ice": { "i": 2, "c": 2, "e": 3, "score": 12 },
+          "kbSources": []
+        },
+        {
+          "id": "f-sd-4",
+          "title": "Product/Offer ohne shippingDetails/Rückgabepolicy (empfohlen)",
+          "category": "structured-data",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Das Product/Offer-Markup enthält weder shippingDetails noch hasMerchantReturnPolicy.",
+          "beleg": "ruleId=schema:merchant-shipping-returns; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/invalid-schema.html — Offer ohne shippingDetails und/oder hasMerchantReturnPolicy.",
+          "auswirkung": "Diese Properties sind für Merchant-Listing-Erlebnisse EMPFOHLEN, nicht erforderlich — ihr Fehlen unterbindet nur die Versand-/Rückgabe-Annotationen im Rich Result, das Produktergebnis bleibt gültig. KEIN Ranking-Signal. Hinweis: Versand-/Rückgabe-Angaben können alternativ im Google Merchant Center hinterlegt sein.",
+          "empfehlung": "Sofern echte Versand- und Rückgabebedingungen existieren, shippingDetails und hasMerchantReturnPolicy ins Offer-Markup aufnehmen oder die Angaben im Merchant Center pflegen. Nur reale Konditionen abbilden.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": []
+        },
+        {
+          "id": "f-sd-5",
+          "title": "Organization ohne logo und contactPoint",
+          "category": "structured-data",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Das Organization-Markup der Startseite hat weder die logo- noch die contactPoint-Property.",
+          "beleg": "ruleId=schema:organization-logo + schema:organization-contact; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1 je Regel): http://127.0.0.1:59896/index.html — Organization ohne logo und ohne contactPoint.",
+          "auswirkung": "logo und contactPoint sind empfohlene Organization-Properties: logo speist das Logo in Suchergebnissen/Knowledge Panel, contactPoint reichert Entity-Verständnis und Knowledge-Panel-Profil an. Beides betrifft Rich-Result-/Knowledge-Panel-Eligibility, ist aber KEIN Ranking-Signal.",
+          "empfehlung": "logo (auf eine erreichbare, ausreichend große Bilddatei) und — falls vorhanden — contactPoint mit echten Kontaktdaten ins Organization-Schema aufnehmen.",
+          "ice": { "i": 1, "c": 2, "e": 3, "score": 6 },
+          "kbSources": []
+        }
+      ]
+    },
+    {
+      "id": "sec-onpage",
+      "num": 4,
+      "title": "On-Page: Titel, Meta, Struktur & Content",
+      "findings": [
+        {
+          "id": "f-op-1",
+          "title": "Fehlender Seitentitel",
+          "category": "on-page",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Eine Seite hat kein <title>-Element.",
+          "beleg": "ruleId=onpage:title-missing; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/missing-title.html — kein <title>.",
+          "auswirkung": "Der Titel ist eines der stärksten On-Page- und CTR-Signale; fehlt er, generiert Google einen Ersatztitel aus dem Seiteninhalt, den man nicht kontrolliert.",
+          "empfehlung": "Einen einzigartigen, ~50–60 Zeichen langen Titel mit Primär-Keyword vorn und Markennamen hinten ergänzen.",
+          "ice": { "i": 2, "c": 3, "e": 3, "score": 18 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/title-link", "heading": "Best practices", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-op-2",
+          "title": "Doppelte, zu lange und sehr kurze Seitentitel",
+          "category": "on-page",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Zwei Seiten teilen denselben Titel, eine ist zu lang, drei sind sehr kurz (Längen-Heuristiken).",
+          "beleg": "ruleId=onpage:title-dup (count=2) + onpage:title-long + onpage:title-short (count=3); analysis.json affectedUrls",
+          "evidence": "Duplikat-Paar: /dup-title-a.html ↔ /dup-title-b.html (identischer <title>). Zu lang: /long-title.html (>60 Zeichen, SERP-Pixel-Faustregel). Sehr kurz (<30 Zeichen, Heuristik — Google nennt keine Mindestlänge): /thin.html, /invalid-schema.html, /xss.html.",
+          "auswirkung": "Identische Titel erschweren die Unterscheidung der Seiten und verwässern die Keyword-Zuordnung; zu lange Titel werden in der SERP abgeschnitten; sehr kurze beschreiben den Inhalt oft unzureichend. Die 30/60-Zeichen-Grenzen sind Heuristiken, kein fixer Google-Wert.",
+          "empfehlung": "Jeder Seite einen eindeutigen, beschreibenden Titel geben; überlange auf ~50–60 Zeichen kürzen, sehr kurze inhaltlich anreichern, sodass die Kernaussage nicht abgeschnitten wird und das Thema klar ist.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/title-link", "heading": "Duplicate Titles and Descriptions", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/appearance/title-link", "heading": "Best practices", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-op-3",
+          "title": "Fehlende, doppelte und längen-auffällige Meta-Beschreibungen",
+          "category": "on-page",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Eine Seite hat keine Meta-Beschreibung, zwei teilen dieselbe, zehn liegen außerhalb der Snippet-Längen-Heuristik (70–160 Zeichen).",
+          "beleg": "ruleId=onpage:meta-missing + onpage:meta-dup (count=2) + onpage:meta-desc-length (count=10); analysis.json affectedUrls",
+          "evidence": "Fehlt: /missing-meta.html. Duplikat-Paar: /dup-meta-a.html ↔ /dup-meta-b.html. Länge auffällig (count=10, pctOfPages=47,6; Beispiele, u. a.): /missing-title.html, /long-title.html, /dup-title-a.html, /noindex.html, /thin.html. Google legt keine feste Länge fest — die 70–160-Zeichen-Grenze ist eine SERP-Kürzungs-Heuristik.",
+          "auswirkung": "Fehlende oder doppelte Descriptions liefern keinen seitenspezifischen Snippet-Anreiz; Google überschreibt sie häufiger mit eigenem Text. Sehr kurze/lange Snippets werden gekürzt oder beschreiben die Seite unzureichend. Es ist ein CTR-Hebel, kein direktes Ranking-Signal.",
+          "empfehlung": "Für jede wichtige Seite eine eindeutige Meta-Beschreibung (~120–155 Zeichen) mit konkretem Nutzenversprechen schreiben; Duplikate auflösen, fehlende ergänzen.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/title-link", "heading": "Meta Description", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/appearance/title-link", "heading": "Duplicate Titles and Descriptions", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-op-4",
+          "title": "Mehrere H1 und übersprungene Überschriften-Ebene",
+          "category": "on-page",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Eine Seite hat mehrere H1-Elemente und überspringt eine Ebene in der Überschriften-Hierarchie.",
+          "beleg": "ruleId=onpage:h1-multi + onpage:heading-skip; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1 je Regel): http://127.0.0.1:59896/multi-h1.html — mehrere H1 und ein Heading-Sprung in der Ebenen-Hierarchie.",
+          "auswirkung": "Mehrere H1 sind laut Google kein Ranking-Problem; eine unklare Überschriften-Struktur erschwert jedoch Maschinen und assistiven Technologien das Erfassen der Seitenhierarchie. Der Effekt liegt auf Zugänglichkeit/Dokumentstruktur, nicht auf dem Ranking.",
+          "empfehlung": "Genau eine H1 als Hauptthema setzen und die Ebenen lückenlos schachteln (H1 → H2 → H3), ohne Ebenen zu überspringen.",
+          "ice": { "i": 1, "c": 2, "e": 3, "score": 6 },
+          "kbSources": []
+        },
+        {
+          "id": "f-op-5",
+          "title": "Bilder ohne Alt-Text",
+          "category": "on-page",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Eine Seite enthält Bilder ohne alt-Attribut.",
+          "beleg": "ruleId=onpage:alt-missing; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/no-alt.html — <img> ohne alt-Attribut.",
+          "auswirkung": "Fehlender Alt-Text nimmt Screenreadern den Bildkontext (Barrierefreiheit, WCAG 2.1 Non-text Content) und Google das Bildverständnis — die Seite verschenkt Image-Search-Sichtbarkeit.",
+          "empfehlung": "Jedem inhaltstragenden Bild einen kurzen, beschreibenden Alt-Text geben; rein dekorative Bilder mit leerem alt=\"\" auszeichnen.",
+          "ice": { "i": 2, "c": 2, "e": 3, "score": 12 },
+          "kbSources": []
+        },
+        {
+          "id": "f-op-6",
+          "title": "Wenig Textinhalt auf vielen Seiten (Fixture-bedingt überzeichnet)",
+          "category": "on-page",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "17 von 21 Seiten haben unter 100 Wörter Fließtext — die hohe Quote ist hier ein Artefakt der absichtlich minimalen Testfixture.",
+          "beleg": "ruleId=onpage:thin; analysis.json count + pctOfPages",
+          "evidence": "count=17, pctOfPages=81. Gemessene Wortzahl <100 (Beispiele, u. a.): /thin.html, /dup-meta-a.html, /no-alt.html, /long-title.html, /perfect.html. Diese Fixture besteht überwiegend aus bewusst kurzen Einzel-Defekt-Seiten.",
+          "auswirkung": "Auf einer Produktiv-Site wäre flächiger Thin-Content ein Helpful-Content-Risiko. Google nutzt jedoch KEINE Wortzahl-Schwelle — die Regel ist ein manueller Review-Hinweis. Die 81-%-Quote ist fixture-bedingt und nicht site-repräsentativ; ihre Verallgemeinerung wäre Overclaiming.",
+          "empfehlung": "Auf einer realen Site dünne, aber wichtige Seiten zu eigenständig nützlichem Inhalt ausbauen oder konsolidieren. Für diese Fixture kein Handlungsbedarf — als Methodik-Beispiel für Stichproben-Vorsicht aufgeführt.",
+          "ice": { "i": 2, "c": 1, "e": 1, "score": 2 },
+          "kbSources": []
+        }
+      ]
+    },
+    {
+      "id": "sec-perf",
+      "num": 5,
+      "title": "Performance, Mobile & Sicherheits-Header",
+      "findings": [
+        {
+          "id": "f-perf-1",
+          "title": "Bilder nur im Legacy-Format (JPG ohne WebP/AVIF)",
+          "category": "performance",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Eine Seite liefert Bilder ausschließlich als JPG ohne moderne WebP/AVIF-Alternative aus.",
+          "beleg": "ruleId=onpage:non-modern-image-format; analysis.json affectedUrls",
+          "evidence": "1 Seite (count=1): http://127.0.0.1:59896/no-alt.html — Bilder als Legacy-Format (JPG), kein WebP/AVIF.",
+          "auswirkung": "Moderne Formate sind bei gleicher Qualität deutlich kleiner; JPG-only erhöht das Übertragungsgewicht und kann den LCP verschlechtern — auf einer Bild-lastigen Site ein spürbarer Core-Web-Vitals-Hebel.",
+          "empfehlung": "Bilder in WebP/AVIF ausliefern (z. B. via <picture> mit JPG-Fallback) und korrekt dimensionieren, um den LCP zu entlasten.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://web.dev/articles/vitals", "heading": "Improving LCP", "date": "2024-10-31" }
+          ]
+        },
+        {
+          "id": "f-perf-2",
+          "title": "HTML ohne Text-Kompression (gzip/Brotli)",
+          "category": "performance",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Die HTML-Antworten werden ohne Text-Kompression (kein Content-Encoding gzip/br/deflate/zstd) ausgeliefert.",
+          "beleg": "ruleId=perf:text-compression-missing; analysis.json count + pctOfPages",
+          "evidence": "count=18, pctOfPages=85,7 (Beispiele, u. a.): /index.html, /missing-title.html, /thin.html, /invalid-schema.html, /orphan.html. Erkannt wird der Content-Encoding-Header der gecrawlten Antwort. Die hohe Quote ist fixture-bedingt (der Testserver komprimiert generell nicht).",
+          "auswirkung": "Unkomprimiertes HTML erhöht die Transfergröße und verlangsamt das Laden — eine Performance-Heuristik (Lighthouse uses-text-compression), KEIN Google-Ranking-Signal. Der Effekt ist Ladezeit, nicht Ranking.",
+          "empfehlung": "gzip oder Brotli serverseitig aktivieren (Webserver-/CDN-Konfiguration). Eine einmalige Konfigurationsänderung wirkt auf alle Antworten.",
+          "ice": { "i": 1, "c": 2, "e": 3, "score": 6 },
+          "kbSources": []
+        },
+        {
+          "id": "f-perf-3",
+          "title": "Fehlendes Viewport-Meta-Tag (Mobile Usability)",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Auf vielen Seiten fehlt das <meta name=\"viewport\">-Tag, sodass mobile Browser die Seite nicht korrekt skalieren.",
+          "beleg": "ruleId=tech:viewport-missing; analysis.json count + pctOfPages",
+          "evidence": "count=17, pctOfPages=81 (Beispiele, u. a.): /index.html, /long-title.html, /missing-meta.html, /noindex.html, /orphan.html. Die hohe Quote ist fixture-bedingt (die Stub-Seiten lassen die Viewport-Meta weg); gewertet wird as-served HTML.",
+          "auswirkung": "Ohne Viewport-Meta können mobile Browser die Seite nicht responsiv skalieren — eine Mobile-Usability-Voraussetzung im Rahmen des Mobile-First-Indexing, aber KEIN direkter Ranking-Score. Auf einer echten Site beeinträchtigt es die mobile Darstellung spürbar.",
+          "empfehlung": "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"> ins <head>-Template aufnehmen — eine zentrale Template-Änderung deckt alle Seiten ab. Zoom/Skalierung dabei nicht unterbinden.",
+          "ice": { "i": 2, "c": 2, "e": 3, "score": 12 },
+          "kbSources": []
+        },
+        {
+          "id": "f-perf-4",
+          "title": "HTTP-Security-Header-Set fehlt vollständig (CSP, nosniff, Clickjacking-Schutz, Referrer-/Permissions-Policy)",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Den Antworten fehlt das gesamte gängige HTTP-Security-Header-Set: keine Content-Security-Policy, kein X-Content-Type-Options: nosniff, kein Clickjacking-Schutz (X-Frame-Options bzw. CSP frame-ancestors), keine Referrer-Policy und keine Permissions-Policy.",
+          "beleg": "ruleId=tech:csp-missing + tech:nosniff-missing + tech:frame-protection-missing + tech:referrer-policy-missing + tech:permissions-policy-missing; analysis.json count + pctOfPages",
+          "evidence": "Alle fünf Header-Regeln feuern auf jeweils 18 Seiten (pctOfPages=85,7; Beispiele, u. a.): /index.html, /missing-title.html, /thin.html, /invalid-schema.html, /orphan.html. Die hohe Quote ist fixture-bedingt (der Testserver setzt generell keine Security-Header). CSP (XSS-/Injection-Abwehr) und nosniff (MIME-Sniffing) sind als mittel eingestuft, frame-ancestors/Referrer-/Permissions-Policy als niedrig.",
+          "auswirkung": "Fehlende Security-Header erhöhen die Angriffsfläche: ohne CSP fehlt die wichtigste XSS-/Injection-Abwehrschicht, ohne nosniff drohen MIME-Confusion-Risiken, ohne X-Frame-Options/frame-ancestors ist Clickjacking möglich, ohne Referrer-Policy können interne URLs an Dritte leaken, ohne Permissions-Policy gelten die Default-Feature-Berechtigungen. Sämtlich Trust/Security-Härtung — KEIN Ranking-Signal und keine Rich-Result-Eignung.",
+          "empfehlung": "Das Header-Set zentral am Webserver/CDN setzen — eine Konfigurationsänderung deckt alle Antworten ab: Content-Security-Policy (inkl. frame-ancestors 'self' als moderner Clickjacking-Schutz, alternativ X-Frame-Options: SAMEORIGIN), X-Content-Type-Options: nosniff, Referrer-Policy (z. B. strict-origin-when-cross-origin) und eine restriktive Permissions-Policy. CSP zunächst im Report-Only-Modus testen.",
+          "ice": { "i": 1, "c": 2, "e": 3, "score": 6 },
+          "kbSources": []
+        }
+      ]
+    },
+    {
+      "id": "sec-artifacts",
+      "num": 6,
+      "title": "Crawl-Umgebungs-Artefakte (vom Interpret-Layer eingeordnet)",
+      "findings": [
+        {
+          "id": "f-art-1",
+          "title": "tech:https feuert auf 100 % — Artefakt des localhost-HTTP-Laufs",
+          "category": "tech-index",
+          "severity": "niedrig",
+          "prov": "beobachtet",
+          "befund": "Die Roh-Regel meldet alle 21 Seiten als \"ohne HTTPS\" (Roh-Schweregrad hoch). Ursache ist, dass die synthetische Fixture über plain HTTP auf localhost ausgeliefert wird — kein realer Site-Defekt.",
+          "beleg": "ruleId=tech:https (count=21, pctOfPages=100); Crawl-Origin http://127.0.0.1:59896",
+          "evidence": "count=21, pctOfPages=100. Alle URLs sind http://127.0.0.1:59896/… — der Testserver bietet kein TLS. Eine reale Produktiv-Domain unter HTTPS würde diese Regel nicht auslösen.",
+          "auswirkung": "Als echter Site-Befund wäre fehlendes HTTPS kritisch — hier ist die Messung korrekt, die Schlussfolgerung aber kontextabhängig: es ist ein reines Crawl-Umgebungs-Artefakt. Deshalb von \"hoch\" auf \"niedrig\" herabgestuft.",
+          "empfehlung": "Kein Handlungsbedarf für diesen Beleg-Lauf. Bei einem echten Audit gilt: Site durchgängig über HTTPS ausliefern und HSTS setzen — dann verschwindet der Befund.",
+          "ice": { "i": 1, "c": 1, "e": 3, "score": 3 },
+          "kbSources": []
+        },
+        {
+          "id": "f-art-2",
+          "title": "tech:canonical-nonself feuert auf 85,7 % — Host-Mismatch-Artefakt",
+          "category": "tech-index",
+          "severity": "niedrig",
+          "prov": "beobachtet",
+          "befund": "Die Roh-Regel meldet 18 Seiten mit \"Canonical zeigt nicht auf sich selbst\". Ursache: Die Fixture-Canonicals verweisen auf http://demo.example/…, gecrawlt wurde aber auf http://127.0.0.1:59896/… — ein reiner Host-Mismatch.",
+          "beleg": "ruleId=tech:canonical-nonself (count=18, pctOfPages=85,7); Canonicals zeigen auf demo.example, Crawl-Host 127.0.0.1",
+          "evidence": "count=18, pctOfPages=85,7 (Beispiele, u. a.): /index.html, /missing-title.html, /thin.html, /invalid-schema.html, /orphan.html. Auf demselben Host ausgeliefert wären die Canonicals korrekt self-referenziell.",
+          "auswirkung": "Echte fremd-zeigende Canonicals würden Ranking-Signale auf andere URLs umleiten und wären ernst. Hier sind sie nur durch die Test-Host-Differenz \"non-self\" — also ein Artefakt, kein Defekt. Von \"mittel\" auf \"niedrig\" herabgestuft.",
+          "empfehlung": "Kein Handlungsbedarf für diesen Beleg-Lauf. In einem echten Audit gilt: Canonicals müssen auf die tatsächlich ausgelieferte, kanonische Host-Variante zeigen — dann ist die Regel still.",
+          "ice": { "i": 1, "c": 1, "e": 3, "score": 3 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/canonicalization", "heading": "What Duplicate Content Means", "date": "2025-12-10" }
+          ]
+        }
+      ]
+    }
+  ],
+  "positives": [
+    "Organization-Schema ist site-weit vorhanden (Marken-Entität wird ausgezeichnet; schema:no-organization sauber).",
+    "Schema-Basis intakt: datePublished gesetzt, Datumsangaben konsistent, Artikel mit author, Produkt mit Preis, Breadcrumb auf tiefen Seiten, AggregateRating-Vollständigkeit, keine Microdata-only-Insellösung — kein Schema-Folgefehler (schema:missing-dates, schema:date-inconsistent, schema:article-no-author, schema:offer-no-price, schema:breadcrumb-missing, schema:aggregaterating-incomplete, schema:microdata-only sauber).",
+    "Jede Seite trägt genau die erwartete H1 — keine fehlt (onpage:h1-missing sauber).",
+    "<html lang> ist gesetzt und das Viewport-Zoom ist nicht unterdrückt (Barrierefreiheit; onpage:html-lang-missing, onpage:viewport-zoom-disabled sauber).",
+    "UTF-8-Charset ist deklariert (tech:charset-missing sauber).",
+    "Kein X-Robots-Tag noindex im HTTP-Header — keine unsichtbare Deindexierung (tech:x-robots-noindex sauber).",
+    "hreflang-Setup vollständig sauber: gültige Codes, x-default vorhanden, reziprok, kein Konflikt mit Canonical/noindex, keine toten hreflang-Ziele (i18n:hreflang-* inkl. i18n:hreflang-target-broken alle sauber).",
+    "Flache, gut erreichbare Struktur: keine Seiten jenseits der maximalen Klicktiefe, keine Sackgassen, keine generischen Ankertexte, keine internen Links auf tote URLs oder Weiterleitungen (links:deep, links:dead-end, links:generic-anchor, links:internal-broken, links:internal-redirect sauber).",
+    "Temporär ausverkaufte Produkte sind nicht fälschlich deindexiert, keine strukturelle Voll-Dublette, URL-/Host-Kanonisierung konsistent (hygiene:oos-noindexed, hygiene:duplicate-content, hygiene:url-inconsistency sauber).",
+    "AI-Snippets sind nicht unterdrückt (kein nosnippet/max-snippet:0 — KI-Overviews dürfen zitieren; geo:ai-snippet-suppressed sauber).",
+    "Sitemap innerhalb des 50.000-URL-Limits; keine mehrfachen/widersprüchlichen Canonical-Tags (tech:sitemap-scale-limit, tech:canonical-multiple sauber).",
+    "robots.txt-Hygiene intakt: keine site-weite Voll-Sperre, keine unwirksame noindex-Direktive, eine Sitemap referenziert, keine gesperrten Render-Ressourcen (tech:robots-site-blocked, tech:robots-noindex-directive, tech:robots-no-sitemap, tech:robots-blocked-resources sauber).",
+    "Cookie- und Server-Header-Hygiene ok: keine unsicheren Set-Cookie-Flags, keine Software-Versions-Offenlegung (tech:cookie-insecure, tech:version-disclosure sauber).",
+    "Performance-Grundlagen ok: Bilder mit width/height, LCP-Bild nicht lazy, keine übermäßige DOM-Größe, keine render-blockierenden Head-Ressourcen, Favicon und Open-Graph vorhanden (onpage:img-missing-dimensions, onpage:lcp-image-lazy, onpage:excessive-dom, onpage:render-blocking-head, onpage:favicon-missing, onpage:og-missing sauber)."
+  ],
+  "strategy": {
+    "levers": [
+      "GEO/KI-Sichtbarkeit: Crawl-Freigabe für KI-Such-Bots, autoritative Quellenangaben, spec-konforme llms.txt.",
+      "Index-Hygiene: Sitemap, Canonical und Indexierungs-Direktiven zu einem widerspruchsfreien Signal konsolidieren (inkl. fehlerhafter Canonical-Ziele).",
+      "Strukturierte Daten als Fundament für Rich Results und Entity-Erkennung (sameAs/logo/contactPoint, valides JSON-LD).",
+      "On-Page-Grundhygiene: Titel/Meta/Headings/Alt eindeutig, vollständig und je Seite spezifisch.",
+      "Serverseitige Härtung: Text-Kompression, Viewport-Meta und ein vollständiges HTTP-Security-Header-Set als zentrale Template-/Server-/CDN-Änderungen."
+    ],
+    "todos": [
+      "Sofort (e=3, hoher Impact): robots.txt für OAI-SearchBot freigeben und Sitemap von noindex-/410-/Redirect-/robots-gesperrten URLs bereinigen.",
+      "Kurzfristig: JSON-LD-Syntaxfehler beheben, sameAs/logo/contactPoint ergänzen, fehlende/doppelte/lange/kurze Titel und Meta-Beschreibungen korrigieren, fehlenden Alt-Text nachtragen, das Security-Header-Set zentral setzen.",
+      "Mittelfristig: llms.txt spec-konform aufbauen, faktischen Content mit autoritativen Quellen belegen, FAQ/HowTo-Schema auf echten Q&A-Seiten ergänzen, noindex/canonical-Widerspruch auf noindex.html auflösen (canonical entfernen).",
+      "Strukturell: SSR/Prerender für die client-gerenderte Route, Bild-Pipeline auf WebP/AVIF umstellen, serverseitig gzip/Brotli und Viewport-Meta aktivieren, /orphan.html aus Hub-Seiten verlinken."
+    ]
+  },
+  "confidence": {
+    "sampleSize": 21,
+    "minNMet": true,
+    "caveats": [
+      "Teilabdeckung: 21 von 22 bekannten/entdeckten URLs gecrawlt (coveragePct=95, fetched=21, sitemapTotal=22, discovered=22). Die nicht gecrawlte URL ist die per robots.txt gesperrte Sitemap-Entry http://demo.example/private/secret.html (Disallow: /private/, siehe tech:robots-sitemap-conflict) — Häufigkeits-Angaben sind daher Schätzungen der gecrawlten Teilmenge, keine site-weite Vollerhebung.",
+      "Synthetische Fixture (\"Demo Kaffeerösterei\") mit absichtlich eingebauten Defekten — eingefrorener, repräsentativer Beleg-Lauf, keine echte Kundensite.",
+      "Über plain HTTP auf localhost gecrawlt: tech:https (100 %) und tech:canonical-nonself (85,7 %) sind Crawl-Umgebungs-Artefakte (Abschnitt 6), keine realen Defekte.",
+      "Mehrere Befunde betreffen jeweils nur eine Stub-Seite (Einzel-Defekt-Fixtures); die hohen pctOfPages-Werte bei thin/viewport/text-compression sowie dem gesamten Security-Header-Set (CSP/nosniff/frame-protection/referrer-policy/permissions-policy, je 85,7 %) sind fixture-bedingt und nicht als Site-Muster zu lesen.",
+      "Das KB-Retrieval nutzt den deterministischen lokalen Fallback-Embedder; für mehrere neuere Regeln (llms.txt, Viewport, Text-Kompression, das HTTP-Security-Header-Set, Merchant/Return, Org logo/contactPoint, Trust-Seiten, sameAs, Alt-Text, Heading-Struktur, SSR) liegen keine starken KB-Treffer vor — diese Empfehlungen tragen bewusst weniger oder keine kbSources und eine reduzierte Konfidenz (c). Die OWASP/MDN-Grundlagen der Security-Header sind im Korpus nicht abgebildet.",
+      "Die drei Laufzeit-Checks (Core Web Vitals/CrUX, TLS-Zertifikat, Safe-Browsing) wurden im Offline-Lauf NICHT gemessen und sind daher weder als Defekt noch als bestanden ausgewiesen — ihre Abwesenheit ist by design, kein Positivbefund."
+    ]
+  }
+}

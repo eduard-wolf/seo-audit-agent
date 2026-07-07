@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "url": "https://example-shop.test",
+    "crawledAt": null,
+    "modelId": "claude-opus-4-8",
+    "rulesetVersion": "1.7.0",
+    "sampleSize": 15,
+    "coveragePct": 94,
+    "siteType": "server-rendered"
+  },
+  "execSummary": {
+    "metrics": [
+      "15 von 16 bekannten Seiten gecrawlt (Abdeckung 94 %, server-rendered, Regelwerk 1.7.0) — 1 bekannte URL blieb ungecrawlt.",
+      "6 Roh-Regel-Treffer, konzentriert auf die Produkt-Vorlage (/produkt/*) — strukturierte Daten und On-Page-Hygiene.",
+      "6 sauber bestandene Regel-Checks (HTTPS, H1, Canonical, gültiges JSON-LD, Organization-Schema vorhanden, keine internen Broken Links).",
+      "Höchste Priorität: 2 temporär ausverkaufte Produkte fälschlich auf noindex — sie fallen aktiv aus dem Index (Ranking-/Backlink-Verlust)."
+    ],
+    "patterns": [
+      "Die Produkt-Vorlage /produkt/* bündelt praktisch alle Defekte: fehlendes AggregateRating (9), fehlender Offer-Preis (4), doppelte Titel (6) und fehlende Alt-Texte (8) clustern alle auf diesem Pfad — ein Template-Muster, keine Einzelfälle.",
+      "Strukturierte Produktdaten sind lückenhaft: ohne Offer-price entfällt die Merchant-Rich-Result-Eignung, ohne AggregateRating die Bewertungssterne — beides Rich-Result-Eligibility (CTR), KEIN Ranking-Signal.",
+      "Indexierungs-Hygiene ist der einzige direkt ranking-wirksame Defekt: zwei temporär ausverkaufte Produkte werden fälschlich deindexiert und verlieren so Ranking-Historie und aufgebaute Backlink-Equity."
+    ],
+    "quickWins": [
+      "noindex von den zwei temporär ausverkauften Produkten (/produkt/saisonale-edition, /produkt/limited-drop) entfernen — eine Änderung der OOS-Logik, hoher Impact.",
+      "logo-Property ins bestehende Organization-JSON-LD der Startseite aufnehmen — einmalige, sehr günstige Ergänzung (Rich-Result-/Knowledge-Panel-Eignung)."
+    ]
+  },
+  "sections": [
+    {
+      "id": "sec-index",
+      "num": 1,
+      "title": "Indexierung & Crawling",
+      "findings": [
+        {
+          "id": "f-idx-1",
+          "title": "Temporär ausverkaufte Produkte fälschlich deindexiert (noindex)",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Zwei temporär ausverkaufte Produktseiten tragen ein meta-robots noindex und werden dadurch aus dem Google-Index entfernt, obwohl das Produkt nur vorübergehend nicht lieferbar ist.",
+          "beleg": "analysis.json ruleId=hygiene:oos-noindexed; affectedUrls",
+          "evidence": "2 Seiten betroffen (count=2, pctOfPages=13,3): https://example-shop.test/produkt/saisonale-edition und https://example-shop.test/produkt/limited-drop. Beide clustern auf /produkt/* — Hinweis auf eine systematische OOS-Behandlung, nicht auf zwei Einzelfälle.",
+          "auswirkung": "noindex entfernt eine bereits indexierte Seite aktiv aus der Suche (Ranking-Signal). Für temporär ausverkaufte Produkte ist das schädlich: die Seite verliert ihre Ranking-Historie und die auf sie zeigende Backlink-Equity, die nach Wieder-Verfügbarkeit teuer neu aufgebaut werden muss. Google empfiehlt, temporär vergriffene Produkte indexiert zu lassen und die Nicht-Verfügbarkeit stattdessen über schema.org-availability (OutOfStock) und einen On-Page-Hinweis zu kommunizieren.",
+          "empfehlung": "Das noindex auf temporär ausverkauften Produktseiten entfernen und die Seiten indexiert lassen; die Nicht-Verfügbarkeit über Offer.availability = https://schema.org/OutOfStock und einen sichtbaren On-Page-Hinweis (inkl. Benachrichtigungs-/Alternativoptionen) abbilden. noindex nur für dauerhaft eingestellte Produkte verwenden — und dann bevorzugt mit 301 auf ein passendes Ziel oder 410 statt Dauer-noindex.",
+          "ice": { "i": 2, "c": 3, "e": 3, "score": 18 },
+          "ruleIds": ["hygiene:oos-noindexed"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "noindex vs. Disallow", "date": "2025-12-10" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec-schema",
+      "num": 2,
+      "title": "Strukturierte Daten (Produkt)",
+      "findings": [
+        {
+          "id": "f-sd-1",
+          "title": "Produktseiten ohne AggregateRating (nur mit echten Bewertungen ergänzen)",
+          "category": "structured-data",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Neun Produktseiten enthalten kein aggregateRating-Markup und sind damit nicht für die Bewertungssterne im Suchergebnis (Review-Rich-Result) qualifiziert.",
+          "beleg": "analysis.json ruleId=schema:product-no-aggregate; affectedUrls",
+          "evidence": "9 Seiten betroffen (count=9, pctOfPages=60), alle unter /produkt/* (Cluster count=9). Beispiele: https://example-shop.test/produkt/espresso-crema, https://example-shop.test/produkt/hausmischung, https://example-shop.test/produkt/entkoffeiniert.",
+          "auswirkung": "aggregateRating macht ein Produkt für Sterne-/Bewertungs-Rich-Results eligibel — ein sichtbarer CTR-Hebel im SERP, aber KEIN Ranking-Signal. Der Effekt tritt nur ein, wenn echte, on-page sichtbare Bewertungen existieren; fabrizierte oder self-serving Ratings verstoßen gegen Googles Richtlinien und riskieren eine Manual Action.",
+          "empfehlung": "aggregateRating mit den Pflicht-Properties ratingValue und reviewCount/ratingCount (bestRating/worstRating empfohlen) ergänzen — ausschließlich auf Basis echter, on-page sichtbarer Kundenbewertungen. Wo noch keine Bewertungen existieren, zuerst ein Review-Sammelsystem aufbauen, statt Ratings zu erfinden. Das Markup vor dem Ausrollen im Rich Results Test validieren.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "ruleIds": ["schema:product-no-aggregate"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/review-snippet", "heading": "Required Properties", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/review-snippet", "heading": "Common Mistakes", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-sd-2",
+          "title": "Offer ohne price (für Merchant-Rich-Result erforderlich)",
+          "category": "structured-data",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Vier Produktseiten enthalten ein Offer-Objekt ohne price-Property und qualifizieren sich damit nicht für Produkt-/Merchant-Listing-Rich-Results.",
+          "beleg": "analysis.json ruleId=schema:offer-no-price; affectedUrls",
+          "evidence": "4 Seiten betroffen (count=4, pctOfPages=26,7), alle unter /produkt/* (Cluster count=4): https://example-shop.test/produkt/geschenkbox, https://example-shop.test/produkt/abo-box, https://example-shop.test/produkt/probierset, https://example-shop.test/produkt/kapseln.",
+          "auswirkung": "price ist für das Produkt-/Merchant-Listing-Rich-Result eine erforderliche Angabe; ohne sie ist das Offer nicht für diese SERP-Anreicherung eligibel. Das betrifft die Rich-Result-/Merchant-Eignung (Sichtbarkeit/CTR), KEIN Ranking-Signal.",
+          "empfehlung": "price (mit priceCurrency und availability) ins Offer-Markup dieser Produktseiten aufnehmen — den real ausgezeichneten Verkaufspreis, konsistent mit dem sichtbaren On-Page-Preis. Alternativ können die Angaben im Google Merchant Center gepflegt werden. Nach der Ergänzung im Rich Results Test verifizieren.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "ruleIds": ["schema:offer-no-price"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/review-snippet", "heading": "Testing", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-sd-3",
+          "title": "Organization-Schema der Startseite ohne logo",
+          "category": "structured-data",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Das Organization-Schema auf der Startseite — der einzigen Seite mit Organization-Markup — besitzt keine logo-Property.",
+          "beleg": "analysis.json ruleId=schema:organization-logo; affectedUrls",
+          "evidence": "1 Seite betroffen (count=1): https://example-shop.test/ (Startseite). Kein site-weiter Anteil ableitbar — Organization-Markup existiert nur auf der Startseite; die pctOfPages=6,7 ist hier ein Artefakt der Einzelseite.",
+          "auswirkung": "logo ist eine empfohlene (nicht erforderliche) Organization-Property: sie speist das Marken-Logo in Suchergebnissen und im Knowledge Panel. Das betrifft Rich-Result-/Knowledge-Panel-Eignung, ist aber KEIN Ranking-Signal.",
+          "empfehlung": "logo mit der URL einer erreichbaren, ausreichend großen Bilddatei ins bestehende Organization-JSON-LD der Startseite aufnehmen. Nur das echte Marken-Logo referenzieren.",
+          "ice": { "i": 1, "c": 2, "e": 3, "score": 6 },
+          "ruleIds": ["schema:organization-logo"],
+          "kbSources": []
+        }
+      ]
+    },
+    {
+      "id": "sec-onpage",
+      "num": 3,
+      "title": "On-Page: Titel & Bilder",
+      "findings": [
+        {
+          "id": "f-op-1",
+          "title": "Doppelter, generischer Seitentitel auf sechs Produktseiten",
+          "category": "on-page",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Sechs Produktseiten teilen denselben generischen <title> — die Seiten sind über den Titel nicht voneinander unterscheidbar.",
+          "beleg": "analysis.json ruleId=onpage:title-dup; affectedUrls",
+          "evidence": "6 Seiten betroffen (count=6, pctOfPages=40), alle unter /produkt/* (Cluster count=6): https://example-shop.test/produkt/espresso-crema, https://example-shop.test/produkt/hausmischung, https://example-shop.test/produkt/entkoffeiniert, https://example-shop.test/produkt/filterkaffee, https://example-shop.test/produkt/cold-brew, https://example-shop.test/produkt/kapseln.",
+          "auswirkung": "Der Titel ist eines der stärksten On-Page-Signale und die klickbare SERP-Überschrift. Identische Titel verwässern die Keyword-Zuordnung zwischen den Produktseiten und erschweren Crawlern die Auswahl der passenden Seite pro Query; zugleich sinkt die Klick-Differenzierung im SERP. Das deutet auf eine Template-Vorlage, die den Produktnamen nicht in den Titel interpoliert.",
+          "empfehlung": "Jeder Produktseite einen eindeutigen, ~50–60 Zeichen langen Titel mit dem Produktnamen (Primär-Keyword) vorn und dem Markennamen hinten geben, z. B. \"{Produktname} | {Marke}\". Da die Produktnamen bereits vorliegen, genügt eine Anpassung der Titel-Vorlage, sodass sie den Produktnamen einsetzt.",
+          "ice": { "i": 2, "c": 3, "e": 2, "score": 12 },
+          "ruleIds": ["onpage:title-dup"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/title-link", "heading": "Title Tags and Meta Descriptions", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/canonicalization", "heading": "Duplicate Content and Canonical Tags", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-op-2",
+          "title": "Produktbilder ohne Alt-Text",
+          "category": "on-page",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Acht Produktseiten enthalten Bilder ohne alt-Attribut.",
+          "beleg": "analysis.json ruleId=onpage:alt-missing; affectedUrls",
+          "evidence": "8 Seiten betroffen (count=8, pctOfPages=53,3), alle unter /produkt/* (Cluster count=8). Beispiele: https://example-shop.test/produkt/espresso-crema, https://example-shop.test/produkt/hausmischung, https://example-shop.test/produkt/geschenkbox.",
+          "auswirkung": "Fehlender Alt-Text nimmt Screenreadern den Bildkontext (Barrierefreiheit, WCAG 2.1 Non-text Content) und erschwert Google das Bildverständnis — die Produktseiten verschenken Image-Search-Sichtbarkeit. Der Effekt liegt auf Zugänglichkeit und Bildersuche, nicht auf dem Kern-Ranking.",
+          "empfehlung": "Jedem inhaltstragenden Produktbild einen kurzen, beschreibenden Alt-Text geben (Produktname plus relevante Eigenschaft), rein dekorative Bilder mit alt=\"\" auszeichnen. Da es sich um eine Produkt-Vorlage handelt, lässt sich der Alt-Text aus vorhandenen Produktdaten weitgehend generieren.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "ruleIds": ["onpage:alt-missing"],
+          "kbSources": []
+        }
+      ]
+    }
+  ],
+  "positives": [
+    "Organization-Schema ist vorhanden (schema:no-organization sauber) — die Marken-Entität wird grundsätzlich ausgezeichnet; es fehlt nur die logo-Property (Befund 2.3).",
+    "JSON-LD parst fehlerfrei — kein Syntaxfehler, der einen Markup-Block ungültig machen würde (schema:invalid sauber).",
+    "Alle Seiten werden über HTTPS ausgeliefert, kein Mixed-Content (tech:https sauber).",
+    "Jede Seite trägt eine nicht-leere H1-Überschrift (onpage:h1-missing sauber).",
+    "Canonical-Tags sind vorhanden (tech:canonical-missing sauber).",
+    "Keine internen Links auf tote URLs (4xx/5xx) — die interne Verlinkung ist intakt (links:internal-broken sauber)."
+  ],
+  "strategy": {
+    "levers": [
+      "Indexierungs-Hygiene: temporär ausverkaufte Produkte indexiert lassen (noindex nur für dauerhaft eingestellte), Nicht-Verfügbarkeit über schema.org-availability abbilden.",
+      "Produkt-Vorlage härten: strukturierte Daten (Offer.price, aggregateRating auf Basis echter Reviews) und On-Page-Eindeutigkeit (Titel, Alt-Text) zentral in der /produkt/*-Vorlage lösen.",
+      "Rich-Result-/Entity-Eignung vervollständigen: Organization-logo ergänzen, Offer/Product-Markup im Rich Results Test verifizieren."
+    ],
+    "todos": [
+      "Sofort (e=3, hoher Impact): noindex von den zwei temporär ausverkauften Produkten entfernen und availability=OutOfStock setzen.",
+      "Kurzfristig: Offer.price auf den vier Produktseiten ergänzen, eindeutige Produkt-Titel aus der Vorlage generieren, Alt-Texte für Produktbilder nachtragen, logo ins Organization-Schema aufnehmen.",
+      "Mittelfristig: Review-Sammlung aufbauen und erst dann aggregateRating (mit echten Bewertungen) ausrollen; strukturierte Daten site-weit im Rich Results Test validieren."
+    ]
+  },
+  "confidence": {
+    "sampleSize": 15,
+    "minNMet": true,
+    "caveats": [
+      "Teilabdeckung: 15 von 16 bekannten/entdeckten URLs gecrawlt (coveragePct=94, fetched=15, sitemapTotal=16, discovered=16) — eine bekannte URL blieb ungecrawlt. Häufigkeits-/pctOfPages-Angaben sind daher Schätzungen der gecrawlten Teilmenge, keine site-weite Vollerhebung; coveragePct ist bei BFS-Crawl ohne vollständige Sitemap-Deckung eine Obergrenze.",
+      "meta.crawledAt ist im Analyse-Artefakt null; das Crawl-Datum wird bewusst nicht erfunden.",
+      "aggregateRating ist nur mit echten, on-page sichtbaren Bewertungen zulässig — die Empfehlung ist konditional (erst Reviews sammeln, dann auszeichnen); fabrizierte Ratings sind richtlinienwidrig.",
+      "Das KB-Retrieval nutzt den deterministischen lokalen Fallback-Embedder (lexikalisch, nicht semantisch). Für Alt-Text und die Organization-logo-Empfehlung liegen keine relevanten KB-Treffer vor — diese Befunde tragen bewusst keine kbSources und eine reduzierte Konfidenz (c). Die Offer-price-Anforderung selbst ist im Korpus nicht direkt abgebildet (nur die Validierungs-/Testing-Guidance); der Kernbeleg stammt aus Googles Product-/Merchant-Dokumentation.",
+      "Der Origin example-shop.test ist eine Test-/Beispiel-Domain — ein eingefrorener Beleg-Lauf, keine reale Kundensite."
+    ]
+  }
+}

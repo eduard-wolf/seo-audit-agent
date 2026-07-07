@@ -1,0 +1,36 @@
+{
+  "fixture": "geo",
+  "mustContain": [
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "note": "high-severity — OAI-SearchBot fully blocked kills GEO visibility"
+    },
+    {
+      "ruleId": "geo:ai-snippet-suppressed",
+      "note": "nosnippet suppresses AI-Overview citation"
+    },
+    {
+      "ruleId": "geo:missing-citations",
+      "urlAnchor": "https://example-answers.test/wissen/definition",
+      "note": "answer pages without external citations"
+    },
+    {
+      "ruleId": "geo:llms-txt-malformed",
+      "note": "malformed llms.txt (missing H1)"
+    }
+  ],
+  "mustNotContain": [
+    {
+      "ruleId": "geo:content-stale",
+      "reason": "articles carry dateModified (in positives)"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "reason": "JSON-LD valid (in positives)"
+    },
+    {
+      "ruleId": "onpage:title-missing",
+      "reason": "every page has a title (in positives)"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "fixture": "editorial",
+  "run": 3,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-geo-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=6, pctOfPages=50 and all six affectedUrls (roestprofile, herkunftslaender, bruehmethoden, mahlgrad, wasserqualitaet, koffein-mythen) match analysis.json ruleId=geo:missing-citations exactly, gemessen is justified for the count, and the GEO impact claim is properly hedged as probabilistic and cited to the KB source."
+    },
+    {
+      "findingId": "f-geo-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=5, pctOfPages=41.7 and all five affectedUrls match analysis.json ruleId=geo:content-stale exactly, gemessen is justified for the measured count, and the QDF query-dependence hedge mirrors the analysis's own quelle text without overclaiming a ranking effect."
+    },
+    {
+      "findingId": "f-sd-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=7, pctOfPages=58.3 and all seven affectedUrls match analysis.json ruleId=schema:article-no-author exactly, gemessen is justified, and the auswirkung correctly frames author as Google-recommended rather than required, matching the analysis's quelle."
+    },
+    {
+      "findingId": "f-content-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=4, pctOfPages=33.3 and all four affectedUrls match analysis.json ruleId=onpage:thin exactly; the finding correctly reframes this as a manual-review heuristic (not a measured defect) per the rule's own quelle and the empty kbSources, avoiding word-count overclaim as confidence.caveats also notes."
+    },
+    {
+      "findingId": "f-links-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=3, pctOfPages=25 and all three affectedUrls (archiv/2019/notizen, archiv/2018/rueckblick, archiv/2017/anfaenge) match analysis.json ruleId=links:deep exactly; the '~3 Klicks' guidance is attributed to the cited KB source (Link Depth), not asserted as a measured site value, so it is not fabricated."
+    },
+    {
+      "findingId": "f-links-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "warn",
+      "rationale": "count=2, pctOfPages=16.7 and both affectedUrls (verwaist, alte-aktion) match analysis.json ruleId=crawl:orphan-page exactly, but the aside that /artikel/alte-aktion 'könnte eine bewusst ausgelaufene Kampagnenseite sein' is a soft, hedged speculation about page purpose that analysis.json contains no metadata to support."
+    }
+  ]
+}

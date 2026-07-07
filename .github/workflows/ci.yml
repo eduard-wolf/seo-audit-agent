@@ -29,6 +29,13 @@ jobs:
       - name: Run tests
         run: npm test
 
+      # Deterministic, key-free evals of the LLM interpret step against the
+      # committed golden snapshot (eval/runs + eval/baseline.json). No model
+      # call, no ANTHROPIC_API_KEY — scores the snapshot and gates on
+      # hard invariants + no-regression vs baseline + conservative floor.
+      - name: Evals (deterministic, key-free)
+        run: npm run eval
+
       - name: Run leak scan
         if: always()
         run: npm run leak-scan

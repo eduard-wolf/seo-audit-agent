@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "origin": "https://example-clean.test",
+    "host": "example-clean.test",
+    "crawledAt": null,
+    "pageCount": 3,
+    "sampleSize": 3,
+    "siteType": "server-rendered",
+    "coveragePct": 100,
+    "capped": false,
+    "fetched": 3,
+    "discovered": 3,
+    "sitemapTotal": 3,
+    "minNMet": false
+  },
+  "rulesetVersion": "1.7.0",
+  "findings": [
+    {
+      "ruleId": "onpage:meta-missing",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Fehlende Meta-Beschreibung",
+      "count": 1,
+      "pctOfPages": 33.3,
+      "affectedUrls": [
+        "https://example-clean.test/leistungen"
+      ],
+      "clusters": [
+        {
+          "pattern": "/leistungen/*",
+          "count": 1
+        }
+      ],
+      "detail": "Eine Unterseite ohne Meta-Beschreibung.",
+      "quelle": "Google Search Central – Meta Descriptions",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "geo:no-faq-howto",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "info",
+      "title": "Kein FAQPage-/HowTo-Schema (strukturierte Q&A für AI-Antwort-Surfaces)",
+      "count": 1,
+      "pctOfPages": null,
+      "affectedUrls": [],
+      "clusters": [],
+      "detail": "Kein FAQPage-/HowTo-Schema auf der Site (info-Hinweis).",
+      "quelle": "GEO-Praxis — strukturierte Q&A erhöht AI-Answer-Surface; Google-FAQ/HowTo-Rich-Results sind entfallen (2023/2026)",
+      "datum": "2026-06"
+    }
+  ],
+  "positives": [
+    {
+      "ruleId": "onpage:title-missing",
+      "title": "Fehlender Seitentitel"
+    },
+    {
+      "ruleId": "onpage:h1-missing",
+      "title": "Fehlende oder leere H1-Überschrift"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "title": "Ungültiges JSON-LD (Parse-Fehler)"
+    },
+    {
+      "ruleId": "tech:https",
+      "title": "Seiten ohne HTTPS oder mit Mixed-Content"
+    },
+    {
+      "ruleId": "tech:noindex-conflict",
+      "title": "Noindex-Seite in Sitemap (Konflikt)"
+    },
+    {
+      "ruleId": "onpage:alt-missing",
+      "title": "Bilder ohne Alt-Text"
+    },
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "title": "KI-Suchbot blockiert (GEO-Sichtbarkeit gefährdet)"
+    },
+    {
+      "ruleId": "schema:no-organization",
+      "title": "Kein Organization-Schema auf der gesamten Site"
+    },
+    {
+      "ruleId": "tech:canonical-missing",
+      "title": "Fehlendes Canonical-Tag"
+    },
+    {
+      "ruleId": "links:internal-broken",
+      "title": "Interner Link auf tote URL (4xx/5xx)"
+    }
+  ],
+  "signals": {
+    "robots": {
+      "exists": true
+    },
+    "llms": {
+      "exists": true,
+      "valid": true,
+      "problems": []
+    },
+    "aiBots": []
+  }
+}

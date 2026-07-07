@@ -1,0 +1,232 @@
+{
+  "aggregate": {
+    "recall": 1,
+    "citationValidity": 1,
+    "fabrications": 0,
+    "faithfulness": 0.9805825242718447,
+    "stabilityPassK": 1,
+    "schemaValid": true
+  },
+  "fixtures": [
+    {
+      "name": "broken",
+      "runs": 3,
+      "schemaAllValid": true,
+      "recall": {
+        "mean": 1,
+        "perRun": [
+          1,
+          1,
+          1
+        ]
+      },
+      "citation": {
+        "total": 25,
+        "valid": 25,
+        "validity": 1
+      },
+      "fabrications": 0,
+      "provenance": {
+        "issues": []
+      },
+      "stability": {
+        "k": 3,
+        "passK": 1,
+        "recallMin": 1,
+        "recallMean": 1,
+        "recallMax": 1
+      },
+      "faithfulness": {
+        "total": 16,
+        "supported": 16,
+        "passRate": 1,
+        "unsupported": 0,
+        "fabricatedNumbers": 0,
+        "provenanceIssues": 0
+      }
+    },
+    {
+      "name": "clean",
+      "runs": 3,
+      "schemaAllValid": true,
+      "recall": {
+        "mean": 1,
+        "perRun": [
+          1,
+          1,
+          1
+        ]
+      },
+      "citation": {
+        "total": 7,
+        "valid": 7,
+        "validity": 1
+      },
+      "fabrications": 0,
+      "provenance": {
+        "issues": []
+      },
+      "stability": {
+        "k": 3,
+        "passK": 1,
+        "recallMin": 1,
+        "recallMean": 1,
+        "recallMax": 1
+      },
+      "faithfulness": {
+        "total": 6,
+        "supported": 6,
+        "passRate": 1,
+        "unsupported": 0,
+        "fabricatedNumbers": 0,
+        "provenanceIssues": 0
+      }
+    },
+    {
+      "name": "ecommerce",
+      "runs": 3,
+      "schemaAllValid": true,
+      "recall": {
+        "mean": 1,
+        "perRun": [
+          1,
+          1,
+          1
+        ]
+      },
+      "citation": {
+        "total": 15,
+        "valid": 15,
+        "validity": 1
+      },
+      "fabrications": 0,
+      "provenance": {
+        "issues": []
+      },
+      "stability": {
+        "k": 3,
+        "passK": 1,
+        "recallMin": 1,
+        "recallMean": 1,
+        "recallMax": 1
+      },
+      "faithfulness": {
+        "total": 18,
+        "supported": 18,
+        "passRate": 1,
+        "unsupported": 0,
+        "fabricatedNumbers": 0,
+        "provenanceIssues": 0
+      }
+    },
+    {
+      "name": "editorial",
+      "runs": 3,
+      "schemaAllValid": true,
+      "recall": {
+        "mean": 1,
+        "perRun": [
+          1,
+          1,
+          1
+        ]
+      },
+      "citation": {
+        "total": 22,
+        "valid": 22,
+        "validity": 1
+      },
+      "fabrications": 0,
+      "provenance": {
+        "issues": []
+      },
+      "stability": {
+        "k": 3,
+        "passK": 1,
+        "recallMin": 1,
+        "recallMean": 1,
+        "recallMax": 1
+      },
+      "faithfulness": {
+        "total": 18,
+        "supported": 18,
+        "passRate": 1,
+        "unsupported": 0,
+        "fabricatedNumbers": 0,
+        "provenanceIssues": 0
+      }
+    },
+    {
+      "name": "example-run",
+      "runs": 1,
+      "schemaAllValid": true,
+      "recall": {
+        "mean": 1,
+        "perRun": [
+          1
+        ]
+      },
+      "citation": {
+        "total": 21,
+        "valid": 21,
+        "validity": 1
+      },
+      "fabrications": 0,
+      "provenance": {
+        "issues": []
+      },
+      "stability": {
+        "k": 1,
+        "passK": 1,
+        "recallMin": 1,
+        "recallMean": 1,
+        "recallMax": 1
+      },
+      "faithfulness": {
+        "total": 27,
+        "supported": 25,
+        "passRate": 0.9259259259259259,
+        "unsupported": 2,
+        "fabricatedNumbers": 1,
+        "provenanceIssues": 2
+      }
+    },
+    {
+      "name": "geo",
+      "runs": 3,
+      "schemaAllValid": true,
+      "recall": {
+        "mean": 1,
+        "perRun": [
+          1,
+          1,
+          1
+        ]
+      },
+      "citation": {
+        "total": 18,
+        "valid": 18,
+        "validity": 1
+      },
+      "fabrications": 0,
+      "provenance": {
+        "issues": []
+      },
+      "stability": {
+        "k": 3,
+        "passK": 1,
+        "recallMin": 1,
+        "recallMean": 1,
+        "recallMax": 1
+      },
+      "faithfulness": {
+        "total": 18,
+        "supported": 18,
+        "passRate": 1,
+        "unsupported": 0,
+        "fabricatedNumbers": 0,
+        "provenanceIssues": 0
+      }
+    }
+  ]
+}

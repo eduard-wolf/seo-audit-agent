@@ -1,0 +1,40 @@
+{
+  "fixture": "broken",
+  "run": 3,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-idx-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Combines three real rule hits (tech:noindex-conflict count=3, tech:sitemap-quality count=3, tech:robots-sitemap-conflict count=2) with exactly matching affectedUrls, clusters and signals.robots.disallow=[\"/gesperrt/\"]; the derived '8 fehlerhafte Sitemap-Einträge bei 10 gecrawlten Seiten' correctly sums three disjoint URL clusters against sampleSize/fetched=10, so the gemessen tag is justified and no number is invented."
+    },
+    {
+      "findingId": "f-idx-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=4, pctOfPages=40 and all four /produkte/* affectedUrls match tech:canonical-nonself exactly, and the finding explicitly and correctly notes the canonical target itself is not captured in analysis.json rather than inventing one, so gemessen is justified on the measured count only."
+    },
+    {
+      "findingId": "f-crawl-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "warn",
+      "rationale": "count=2, pctOfPages=20 and both /alt/* affectedUrls match tech:redirect-chain exactly, and the finding is honest that chain hops live in crawl.csv not analysis.json, but it asserts as fact that the two pages are 'zentrale Navigations-/Rechtsseiten' — a centrality claim analysis.json has no signal for (no traffic/link-importance data) — a soft over-statement beyond the measured data rather than an invented number."
+    },
+    {
+      "findingId": "f-crawl-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "count=1, pctOfPages=10 and the single /verwaist/altseite affectedUrl match crawl:orphan-page exactly, and the speculative 'Migrations-Altbestand' reading of the URL path is properly hedged with 'legt nahe... könnte' rather than stated as fact."
+    }
+  ]
+}

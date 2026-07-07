@@ -1,0 +1,39 @@
+{
+  "fixture": "clean",
+  "mustContain": [
+    {
+      "ruleId": "onpage:meta-missing",
+      "note": "the single genuine low-severity gap — surface WITH a small-sample caveat (minNMet === false)"
+    }
+  ],
+  "mustNotContain": [
+    {
+      "ruleId": "onpage:title-missing",
+      "reason": "in positives — titles present; must not fabricate"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "reason": "in positives — JSON-LD valid; must not fabricate"
+    },
+    {
+      "ruleId": "onpage:h1-missing",
+      "reason": "in positives — H1 present"
+    },
+    {
+      "ruleId": "onpage:alt-missing",
+      "reason": "in positives — images have alt text"
+    },
+    {
+      "ruleId": "tech:https",
+      "reason": "in positives — fully HTTPS"
+    },
+    {
+      "ruleId": "tech:noindex-conflict",
+      "reason": "in positives — no noindex/sitemap conflict"
+    },
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "reason": "in positives — AI bots are allowed"
+    }
+  ]
+}

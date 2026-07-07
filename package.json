@@ -11,6 +11,7 @@
     "leak-scan": "node scripts/leak-scan.mjs",
     "audit": "node bin/crawl-and-analyze.mjs",
     "render": "node report/build-report.mjs",
+    "eval": "node eval/run.mjs",
     "coverage": "node --test --test-concurrency=1 --experimental-test-coverage",
     "clean": "node -e \"require('node:fs').rmSync('data',{recursive:true,force:true})\""
   }

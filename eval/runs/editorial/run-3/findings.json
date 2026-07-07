@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "url": "https://example-journal.test",
+    "crawledAt": null,
+    "modelId": "claude-opus-4-8",
+    "rulesetVersion": "1.7.0",
+    "sampleSize": 12,
+    "coveragePct": 92,
+    "siteType": "server-rendered"
+  },
+  "execSummary": {
+    "metrics": [
+      "12 von 13 bekannten/entdeckten URLs gecrawlt (Abdeckung 92 %); eine bekannte URL blieb ungecrawlt.",
+      "6 Roh-Regel-Treffer über 4 Themenbereiche: GEO/KI-Sichtbarkeit, strukturierte Daten/E-E-A-T, Content-Qualität und interne Verlinkung.",
+      "6 sauber bestandene Kern-Checks als Positiv-Befunde: Titel, H1, HTTPS, valides JSON-LD, site-weites Organization-Schema und kein per robots.txt geblockter KI-Suchbot.",
+      "Höchste Priorität (Severity mittel): substanzielle Artikel ohne externe Quellenangaben (GEO: Cite Sources) — schwächt die Zitierbarkeit in KI-Antworten."
+    ],
+    "patterns": [
+      "Der redaktionelle /artikel/*-Bereich ist der gemeinsame Nenner aller sechs Befunde: E-E-A-T- und GEO-Signale (author, dateModified, externe Quellen) sind dort systematisch unterausgezeichnet — ein Template-/Workflow-Muster, kein Einzelseiten-Zufall.",
+      "Keine kritischen (hoch) Defekte: technische Basis (HTTPS, <title>, H1, valides Schema, Organization-Entität, KI-Bot-Freigabe) ist intakt; die Findings sind Optimierungen, keine Indexierungs-Blocker.",
+      "Interne-Verlinkungs-Hygiene mit kleinen Lücken: einzelne verwaiste Seiten und zu tiefe Archiv-Jahrgänge, aber kein flächiges Strukturproblem."
+    ],
+    "quickWins": [
+      "Article-Schema-Template der /artikel/*-Seiten um author und dateModified erweitern — eine Template-Änderung adressiert zwei Befunde (schema:article-no-author, geo:content-stale) über den gesamten redaktionellen Bereich (setzt voraus, dass Autor- und Änderungsdaten im CMS vorliegen).",
+      "Verwaiste /artikel/-Seiten kontextuell aus thematisch passenden Hub-Seiten verlinken bzw. tatsächlich ausgelaufene Aktionsseiten bewusst weiterleiten/entfernen (crawl:orphan-page)."
+    ]
+  },
+  "sections": [
+    {
+      "id": "sec-geo",
+      "num": 1,
+      "title": "GEO & KI-Sichtbarkeit",
+      "findings": [
+        {
+          "id": "f-geo-1",
+          "title": "Substanzielle Artikel ohne externe Quellenangaben (GEO: Cite Sources)",
+          "category": "geo",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Sechs substanzielle Artikel enthalten keine einzige externe Quellenangabe — keinen Outlink auf eine andere Domain.",
+          "beleg": "analysis.json ruleId=geo:missing-citations; affectedUrls + clusters",
+          "evidence": "count=6 (pctOfPages=50 der gecrawlten Teilmenge; Cluster /artikel/* = 6). Beispiele: /artikel/roestprofile, /artikel/herkunftslaender, /artikel/bruehmethoden, /artikel/mahlgrad, /artikel/wasserqualitaet, /artikel/koffein-mythen — jeweils ohne Outlink zu einer externen Domain.",
+          "auswirkung": "Generative Engines bevorzugen Inhalte mit nachvollziehbaren Quellen; substanzielle Artikel ohne externe Belege werden seltener von KI-Such-Engines (ChatGPT Search, Perplexity, AI Overviews) zitiert und stützen zugleich das E-E-A-T-Vertrauenssignal schwächer. Der Effekt liegt auf GEO-Sichtbarkeit/Belegbarkeit, ist aber kein direkter klassischer Ranking-Score. Die GEO-Grundlage stammt aus einer Forschungsarbeit (arXiv 2311.09735), der Effekt ist damit probabilistisch, nicht garantiert.",
+          "empfehlung": "Faktische und statistische Aussagen mit Outbound-Links auf einschlägige, autoritative Primärquellen belegen und die Quelle sichtbar nahe der Behauptung im Fließtext platzieren. Nur tatsächlich relevante, vertrauenswürdige Quellen verlinken — keine dekorativen oder themenfremden Links.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "kbSources": [
+            { "source": "https://arxiv.org/abs/2311.09735", "heading": "GEO: Cite Sources for Generative Engine Optimisation", "date": "2024-06" },
+            { "source": "https://arxiv.org/abs/2311.09735", "heading": "What GEO Means", "date": "2024-06" }
+          ],
+          "ruleIds": ["geo:missing-citations"]
+        },
+        {
+          "id": "f-geo-2",
+          "title": "Artikel ohne dateModified (Recency-/Freshness-Signal fehlt)",
+          "category": "geo",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Fünf Artikel tragen kein dateModified — das Aktualitäts-/Freshness-Signal im Article-Schema fehlt.",
+          "beleg": "analysis.json ruleId=geo:content-stale; affectedUrls + clusters",
+          "evidence": "count=5 (pctOfPages=41,7 der gecrawlten Teilmenge; Cluster /artikel/* = 5). Beispiele: /artikel/roestprofile, /artikel/herkunftslaender, /artikel/lagerung, /artikel/entkoffeinierung, /artikel/koffein-mythen — jeweils ohne dateModified.",
+          "auswirkung": "dateModified (ISO 8601) hilft Google, Aktualitätsdaten in Such-Snippets anzuzeigen, und stützt recency-abhängige Bewertungen. Die Regel selbst hält fest, dass Query-Deserves-Freshness (QDF) query-abhängig ist — der Nutzen greift nur bei aktualitätssensiblen Suchanfragen und ist damit bedingt. Es ist ein Freshness-/Darstellungssignal, kein garantierter Ranking-Hebel.",
+          "empfehlung": "dateModified (und datePublished) im ISO-8601-Format ins Article-/NewsArticle-/BlogPosting-Schema aufnehmen und ausschließlich bei echten inhaltlichen Aktualisierungen pflegen — kein künstliches Datums-Refreshing ohne Inhaltsänderung, da die Markup-Angabe dem tatsächlichen Änderungsstand entsprechen muss.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/article", "heading": "Article Schema", "date": "2025-12-10" }
+          ],
+          "ruleIds": ["geo:content-stale"]
+        }
+      ]
+    },
+    {
+      "id": "sec-schema",
+      "num": 2,
+      "title": "Strukturierte Daten & E-E-A-T",
+      "findings": [
+        {
+          "id": "f-sd-1",
+          "title": "Artikel-Schema ohne author (E-E-A-T-Signal, empfohlen)",
+          "category": "structured-data",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Sieben Artikelseiten liefern Article-Schema ohne author-Property aus — das Autorschafts-/E-E-A-T-Signal fehlt im Markup.",
+          "beleg": "analysis.json ruleId=schema:article-no-author; affectedUrls + clusters",
+          "evidence": "count=7 (pctOfPages=58,3 der gecrawlten Teilmenge; Cluster /artikel/* = 7). Beispiele: /artikel/roestprofile, /artikel/herkunftslaender, /artikel/bruehmethoden, /artikel/mahlgrad, /artikel/lagerung, /artikel/entkoffeinierung, /artikel/wasserqualitaet — Article-Schema ohne author.",
+          "auswirkung": "author ist im Article-Structured-Data von Google EMPFOHLEN, nicht erforderlich: die Property stützt die maschinelle Zuordnung von Autorschaft und das E-E-A-T-Signal für redaktionelle Inhalte, ist aber KEIN direkter Ranking-Faktor. Ihr Fehlen unterbindet keine Indexierung, schwächt jedoch die Entity-/Autorschafts-Erkennung — die Wirkung liegt auf Verständnis/Eignung, nicht auf dem Ranking-Score.",
+          "empfehlung": "author als Person (oder Organization) mit name — idealerweise verknüpft mit einer erreichbaren Autorenprofil-URL — ins Article-/BlogPosting-Schema des /artikel/*-Templates aufnehmen. Nur echte, verifizierbare Autoren auszeichnen; die Markup-Angabe muss der on-page sichtbaren Autorenangabe entsprechen.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/appearance/structured-data/article", "heading": "Article Schema", "date": "2025-12-10" }
+          ],
+          "ruleIds": ["schema:article-no-author"]
+        }
+      ]
+    },
+    {
+      "id": "sec-content",
+      "num": 3,
+      "title": "Content-Qualität",
+      "findings": [
+        {
+          "id": "f-content-1",
+          "title": "Wenig Textinhalt auf vier Seiten (manueller Review-Hinweis, keine Wortzahl-Schwelle)",
+          "category": "on-page",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Vier Seiten haben sehr wenig Fließtext. Die betroffenen URLs wirken teils funktional legitim kurz (Kurznotiz, Pressemitteilung, Öffnungszeiten, Danksagung).",
+          "beleg": "analysis.json ruleId=onpage:thin; affectedUrls",
+          "evidence": "count=4 (pctOfPages=33,3 der gecrawlten Teilmenge). Betroffen: /artikel/kurznotiz, /artikel/pressemitteilung, /artikel/oeffnungszeiten, /artikel/danksagung — gemessen sehr geringe Textmenge.",
+          "auswirkung": "Google nutzt KEINE Wortzahl-Schwelle als Qualitätssignal (Mueller/Sullivan 2025) — die Regel ist ein manueller Review-Hinweis, kein gemessener Defekt. Mehrere der betroffenen Seiten (Öffnungszeiten, Danksagung) sind funktional legitim kurz und brauchen keinen Ausbau. Ein reales Thin-Content-Risiko besteht nur, wenn eine wichtige Seite ihren Zweck inhaltlich nicht erfüllt; eine pauschale Wortzahl-Quote wäre Overclaiming.",
+          "empfehlung": "Jede der vier Seiten einzeln redaktionell prüfen: wichtige, aber dünne Seiten zu eigenständig nützlichem Inhalt ausbauen oder mit thematisch passenden Seiten konsolidieren; funktional korrekte Kurzseiten unverändert lassen. Keine Wortzahl als Zielgröße verwenden.",
+          "ice": { "i": 1, "c": 1, "e": 2, "score": 2 },
+          "kbSources": [],
+          "ruleIds": ["onpage:thin"]
+        }
+      ]
+    },
+    {
+      "id": "sec-links",
+      "num": 4,
+      "title": "Interne Verlinkung & Crawlbarkeit",
+      "findings": [
+        {
+          "id": "f-links-1",
+          "title": "Archivseiten zu tief im Klick-Pfad (jenseits der maximalen Klicktiefe)",
+          "category": "links",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Drei Archivseiten liegen jenseits der konfigurierten maximalen Klicktiefe von der Startseite.",
+          "beleg": "analysis.json ruleId=links:deep; affectedUrls + clusters",
+          "evidence": "count=3 (pctOfPages=25 der gecrawlten Teilmenge; Cluster /artikel/* = 3). Betroffen: /artikel/archiv/2019/notizen, /artikel/archiv/2018/rueckblick, /artikel/archiv/2017/anfaenge — tiefe Archiv-Pfade.",
+          "auswirkung": "Tief vergrabene Seiten erhalten weniger Crawl-Aufmerksamkeit und interne Link-Equity (KB: wichtige Seiten binnen ~3 Klicks erreichbar halten). Bei alten Archivseiten ist der Effekt begrenzt und teils gewollt; als Template-Muster (ganze Archiv-Jahrgänge) könnte er die Auffindbarkeit älterer Inhalte spürbar dämpfen. Ranking-relevant nur mittelbar über Crawl-/Discovery-Priorität.",
+          "empfehlung": "Wichtige Archivinhalte über kürzere Pfade erreichbar machen — z. B. thematische Hub-/Übersichtsseiten oder ein paginiertes Archiv, das die Klicktiefe wichtiger Seiten auf ~3 Klicks reduziert. Rein historische, bewusst nachrangige Seiten dürfen tief bleiben.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable", "heading": "Link Depth", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable", "heading": "Internal Linking Best Practices", "date": "2025-12-10" }
+          ],
+          "ruleIds": ["links:deep"]
+        },
+        {
+          "id": "f-links-2",
+          "title": "Verwaiste Seiten ohne interne Eingangslinks",
+          "category": "links",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Zwei inhaltstragende Seiten haben keine internen Eingangslinks (verwaist).",
+          "beleg": "analysis.json ruleId=crawl:orphan-page; affectedUrls",
+          "evidence": "count=2 (pctOfPages=16,7 der gecrawlten Teilmenge). Betroffen: /artikel/verwaist, /artikel/alte-aktion — keine internen Eingangslinks. Hinweis: /artikel/alte-aktion (alte Aktion) könnte eine bewusst ausgelaufene Kampagnenseite sein.",
+          "auswirkung": "Verwaiste Seiten erhalten keine interne Link-Equity und werden — selbst bei Sitemap-Listung — seltener gecrawlt (KB: Orphan Pages / Why Internal Links Matter). Bei zwei Einzelseiten ist der Effekt überschaubar; als Muster (ausgelaufene Aktions-/Kampagnenseiten) deutet er auf fehlende Link-Pflege hin. Mittelbar Discovery-/Crawl-relevant, kein direkter Ranking-Score.",
+          "empfehlung": "Noch relevante verwaiste Seiten aus thematisch passenden Hub-/Artikelseiten kontextuell (Body-Links, nicht nur Navigation/Footer) verlinken, damit sie Eingangs-Equity erhalten und zuverlässig gecrawlt werden. Tatsächlich ausgelaufene Seiten (z. B. /artikel/alte-aktion) stattdessen bewusst weiterleiten, entfernen oder auf noindex setzen.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable", "heading": "Orphan Pages", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable", "heading": "Why Internal Links Matter", "date": "2025-12-10" }
+          ],
+          "ruleIds": ["crawl:orphan-page"]
+        }
+      ]
+    }
+  ],
+  "positives": [
+    "Jede Seite trägt einen <title> — kein fehlender Seitentitel (onpage:title-missing sauber).",
+    "Alle JSON-LD-Blöcke parsen fehlerfrei — kein Syntaxfehler im strukturierten Markup (schema:invalid sauber).",
+    "Durchgängig HTTPS ohne Mixed-Content (tech:https sauber).",
+    "Jede Seite hat eine H1-Überschrift (onpage:h1-missing sauber).",
+    "Kein KI-Suchbot per robots.txt gesperrt — die Site bleibt für ChatGPT Search & Co. crawlbar und zitierbar (geo:ai-bot-blocked sauber).",
+    "Organization-Schema ist site-weit vorhanden — die Marken-Entität wird ausgezeichnet (schema:no-organization sauber)."
+  ],
+  "strategy": {
+    "levers": [
+      "GEO/E-E-A-T im redaktionellen Bereich stärken: author, dateModified und externe Quellenangaben systematisch im /artikel/*-Template und im Redaktions-Workflow verankern.",
+      "Zitierbarkeit in KI-Suchen erhöhen: substanzielle Artikel mit einschlägigen, autoritativen Primärquellen belegen.",
+      "Interne-Verlinkungs-Hygiene: verwaiste Seiten anbinden oder bereinigen und wichtige Archivinhalte aus der Klicktiefe holen.",
+      "Bestehende technische Basis (HTTPS, Titel, H1, valides Schema, Organization-Entität, KI-Bot-Freigabe) bei allen Änderungen bewahren."
+    ],
+    "todos": [
+      "Kurzfristig: Article-Schema-Template um author und dateModified ergänzen; verwaiste /artikel/-Seiten kontextuell verlinken oder ausgelaufene Aktionsseiten weiterleiten/entfernen.",
+      "Mittelfristig: Redaktions-Guideline für externe Quellenangaben in faktischen Artikeln etablieren; Archiv-Zugänglichkeit über Hub-/Übersichtsseiten auf ~3 Klicks verbessern.",
+      "Content-Review der vier kurzen Seiten einzeln durchführen — kein pauschaler, wortzahl-getriebener Ausbau."
+    ]
+  },
+  "confidence": {
+    "sampleSize": 12,
+    "minNMet": true,
+    "caveats": [
+      "Teilabdeckung: 12 von 13 bekannten/entdeckten URLs gecrawlt (coveragePct=92, fetched=12, sitemapTotal=13, discovered=13). Häufigkeits-Angaben (pctOfPages) sind Schätzungen der gecrawlten Teilmenge, keine site-weite Vollerhebung; bei BFS-Crawl ohne vollständige Sitemap ist coveragePct zudem eine Obergrenze.",
+      "analysis.meta.crawledAt ist null — es wurde bewusst kein Crawl-Zeitstempel übernommen; meta.crawledAt bleibt daher null (kein Datum erfunden).",
+      "onpage:thin ist ein manueller Review-Hinweis, kein gemessener Defekt: Google nutzt keine Wortzahl-Schwelle als Qualitätssignal, und mehrere betroffene Seiten sind funktional legitim kurz — daher c=1 und keine kbSources.",
+      "Das KB-Retrieval nutzt den deterministischen lokalen Fallback-Embedder (lexikalisch, nicht semantisch); die score-Werte sind keine semantische Relevanz. Für den Thin-Content-Befund liegt kein einschlägiger KB-Treffer vor, die übrigen Empfehlungen sind mit den zitierten Quellen konsistent gehalten.",
+      "Die optionalen Laufzeit-Checks (Core Web Vitals/CrUX, TLS-Zertifikat, Safe-Browsing) wurden nicht ausgeführt; ihre Abwesenheit ist by design und weder Defekt noch Positivbefund."
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "fixture": "broken",
+  "run": 1,
+  "judgeModel": "claude-sonnet-5",
+  "promptVersion": "judge-v1",
+  "verdicts": [
+    {
+      "findingId": "f-idx-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis ruleId=tech:noindex-conflict exactly (count=3, pctOfPages=30, cluster /leistungen/* count=3, all three affectedUrls quoted verbatim); the intent caveat in auswirkung is framed conditionally, not asserted as fact."
+    },
+    {
+      "findingId": "f-idx-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis ruleId=tech:sitemap-quality exactly (count=3, pctOfPages=30, cluster /fehler/* count=3, all three affectedUrls quoted verbatim); no numbers beyond the analysis."
+    },
+    {
+      "findingId": "f-idx-3",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis ruleId=tech:robots-sitemap-conflict exactly (count=2, pctOfPages=20, cluster /gesperrt/* count=2, both affectedUrls quoted verbatim) and correctly cites signals.robots.disallow=[\"/gesperrt/\"] as confirmation."
+    },
+    {
+      "findingId": "f-can-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis ruleId=tech:canonical-nonself exactly (count=4, pctOfPages=40, cluster /produkte/* count=4, all four affectedUrls quoted verbatim); the possible-intent caveat is hedged with \"könnten\", not stated as fact."
+    },
+    {
+      "findingId": "f-can-2",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis ruleId=tech:redirect-chain exactly (count=2, pctOfPages=20, cluster /alt/* count=2, both affectedUrls quoted verbatim); honestly notes the exact hop chain isn't in analysis.json rather than inventing one."
+    },
+    {
+      "findingId": "f-link-1",
+      "supported": true,
+      "provenanceCorrect": true,
+      "fabricatedNumbers": false,
+      "verdict": "pass",
+      "rationale": "Matches analysis ruleId=crawl:orphan-page exactly (count=1, affectedUrls=[/verwaist/altseite]); the derived \"1 von 10\" (=10%) equals the analysis's own pctOfPages=10, not an invented figure."
+    }
+  ]
+}

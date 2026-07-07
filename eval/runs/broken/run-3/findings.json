@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "url": "https://example-corp.test",
+    "crawledAt": null,
+    "modelId": "claude-opus-4-8",
+    "rulesetVersion": "1.7.0",
+    "sampleSize": 10,
+    "coveragePct": 83,
+    "siteType": "server-rendered"
+  },
+  "execSummary": {
+    "metrics": [
+      "10 von 12 bekannten/entdeckten URLs gecrawlt (Abdeckung 83 %; 2 URLs blieben ungecrawlt) — server-gerenderte Site, Regelwerk 1.7.0.",
+      "6 Roh-Regel-Treffer, sämtlich im Bereich Indexierung/Crawling; 5 weitere Regel-Checks sauber bestanden.",
+      "Höchste Priorität: Die sitemap.xml bündelt noindex-, nicht-2xx- und per robots.txt gesperrte URLs — ein widersprüchliches Indexierungssignal."
+    ],
+    "patterns": [
+      "Sitemap-Hygiene ist der systemische Kern: noindex-Seiten (/leistungen/*), fehlerhafte URLs ohne 2xx (/fehler/*) und eine robots-gesperrte URL (/gesperrt/*) liegen gemeinsam in der Sitemap — 'indexiere mich'- gegen 'nicht indexierbar'-Signale.",
+      "Das Produkt-Template (/produkte/*) trägt durchgängig ein Canonical, das nicht auf die Seite selbst zeigt — potenzielle Signal-Umleitung, sofern es keine bewusste Varianten-Konsolidierung ist; die Ziel-URLs sind zu verifizieren.",
+      "Migrations-Spuren: /alt/*-Redirect-Ketten und eine verwaiste /verwaist/*-Seite deuten auf einen unvollständigen URL-Umzug hin, bei dem alte Pfade und interne Verlinkung nicht nachgezogen wurden."
+    ],
+    "quickWins": [
+      "Sitemap so generieren, dass nur kanonische URLs mit HTTP 200 verbleiben: noindex-, nicht-2xx- und robots.txt-gesperrte Einträge entfernen (eine Sitemap-Generierungs-Änderung deckt alle drei Fälle ab).",
+      "Canonical-Ziele auf /produkte/* prüfen und — falls unbeabsichtigt — self-referenziell setzen (eine Template-Änderung)."
+    ]
+  },
+  "sections": [
+    {
+      "id": "sec-index",
+      "num": 1,
+      "title": "Indexierungs-Signale: Sitemap-Hygiene & Canonical",
+      "findings": [
+        {
+          "id": "f-idx-1",
+          "title": "Sitemap listet noindex-, nicht-2xx- und robots-gesperrte URLs (Indexierungs-Konflikte)",
+          "category": "tech-index",
+          "severity": "hoch",
+          "prov": "gemessen",
+          "befund": "Die sitemap.xml enthält URLs, die dort nicht hingehören: drei auf noindex gesetzte Seiten, drei URLs, die nicht mit 2xx antworten, sowie zwei per robots.txt gesperrte URLs. Sitemap-Zugehörigkeit (\"indexiere mich\") widerspricht damit dem tatsächlichen Nicht-Indexierbar-/Nicht-Erreichbar-Status dieser Seiten.",
+          "beleg": "analysis.json ruleId=tech:noindex-conflict (count=3) + ruleId=tech:sitemap-quality (count=3) + ruleId=tech:robots-sitemap-conflict (count=2); affectedUrls + signals.robots.disallow=[\"/gesperrt/\"]",
+          "evidence": "noindex-Seiten in der Sitemap (count=3, ruleId=tech:noindex-conflict, Cluster /leistungen/* = 3): https://example-corp.test/leistungen/altbestand, https://example-corp.test/leistungen/entwurf, https://example-corp.test/leistungen/intern. Sitemap-URLs ohne 2xx (count=3, ruleId=tech:sitemap-quality, Cluster /fehler/* = 3): https://example-corp.test/fehler/404-eintrag, https://example-corp.test/fehler/500-eintrag, https://example-corp.test/fehler/leerer-eintrag. Per robots.txt (Disallow: /gesperrt/) gesperrt und dennoch gelistet (count=2, ruleId=tech:robots-sitemap-conflict, Cluster /gesperrt/* = 2): https://example-corp.test/gesperrt/report, https://example-corp.test/gesperrt/export. Zusammen 8 fehlerhafte Sitemap-Einträge bei 10 gecrawlten Seiten.",
+          "auswirkung": "Widersprüchliche Signale: Die Sitemap sagt 'indexiere diese URLs', während noindex, robots-Disallow bzw. ein Nicht-2xx-Status sie als nicht-indexierbar oder nicht-erreichbar ausweisen. Das verschwendet Crawl-Budget auf tote und gesperrte Ziele und untergräbt das Vertrauen in die Sitemap als Discovery-Signal. Google erwartet, dass jede Sitemap-URL kanonisch ist und HTTP 200 liefert. Betrifft Indexierungs-Signale und Crawl-Effizienz.",
+          "empfehlung": "Die Sitemap so generieren, dass sie ausschließlich kanonische, indexierbare URLs mit HTTP-200-Antwort enthält: die noindex-Seiten (/leistungen/*) entweder aus der Sitemap entfernen ODER — falls sie indexiert werden sollen — das noindex aufheben (nie beides gleichzeitig); die nicht-2xx-URLs (/fehler/*) streichen; die per robots.txt gesperrten URLs (/gesperrt/*) aus der Sitemap nehmen. Zu beachten: robots.txt-Disallow verhindert nur das Crawlen, nicht die Indexierung — soll eine Seite zuverlässig aus dem Index bleiben, ist noindex nötig, das aber nur greift, wenn die Seite crawlbar (nicht per Disallow gesperrt) ist.",
+          "ice": { "i": 3, "c": 3, "e": 3, "score": 27 },
+          "ruleIds": ["tech:noindex-conflict", "tech:sitemap-quality", "tech:robots-sitemap-conflict"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "sitemap.xml essentials", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/robots/intro", "heading": "noindex vs. Disallow", "date": "2025-12-10" }
+          ]
+        },
+        {
+          "id": "f-idx-2",
+          "title": "Canonical zeigt nicht auf sich selbst (gesamtes /produkte/*-Template)",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Vier Produktseiten tragen ein rel=canonical, das auf eine andere URL als die Seite selbst verweist. Das Canonical-Ziel selbst ist in analysis.json nicht erfasst, sodass offen ist, ob es sich um einen Defekt oder eine bewusste Duplikat-/Varianten-Konsolidierung handelt.",
+          "beleg": "analysis.json ruleId=tech:canonical-nonself (count=4); affectedUrls (Cluster /produkte/* = 4)",
+          "evidence": "count=4 (pctOfPages=40): https://example-corp.test/produkte/a, https://example-corp.test/produkte/b, https://example-corp.test/produkte/c, https://example-corp.test/produkte/d — rel=canonical zeigt jeweils auf eine andere URL als die Seite selbst; das Muster betrifft das komplette /produkte/*-Template (Cluster /produkte/* = 4).",
+          "auswirkung": "Ein rel=canonical, das nicht auf die Seite selbst zeigt, teilt Google mit, eine andere URL sei die 'Master'-Version; Ranking-/Indexierungssignale würden dann auf das Ziel konsolidiert und die Produktseiten selbst nicht als eigene kanonische Version indexiert. Ist der Verweis unbeabsichtigt, ist das ein echtes Ranking-/Indexierungs-Risiko für das gesamte Produkt-Template; ist er bewusst (Konsolidierung echter Duplikate), ist er korrekt. Canonical ist ein Hinweis, kein Befehl — Google kann ihn bei widersprüchlichen Signalen überstimmen. Konfidenz daher c=2, bis die Ziel-URLs verifiziert sind.",
+          "empfehlung": "Für jede /produkte/*-Seite prüfen, wohin das rel=canonical zeigt. Ist das Ziel unbeabsichtigt (kein echtes Duplikat), das Canonical self-referenziell auf die absolute URL der ausgelieferten Seite setzen. Ist es eine bewusste Konsolidierung echter Duplikate, das Ziel belassen — für dauerhaft zusammenzuführende URLs nach einem Umzug ist ein 301-Redirect stärker als ein Canonical, weil er Equity eindeutig konsolidiert und die URL definitiv auflöst. Widerspruchsfreie Begleitsignale (interne Links, Sitemap) stützen den Canonical-Hinweis.",
+          "ice": { "i": 3, "c": 2, "e": 3, "score": 18 },
+          "ruleIds": ["tech:canonical-nonself"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/canonicalization", "heading": "The Canonical Tag", "date": "2025-12-10" },
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/canonicalization", "heading": "301 Redirects vs. Canonical", "date": "2025-12-10" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sec-crawl",
+      "num": 2,
+      "title": "Crawling & interne Erreichbarkeit",
+      "findings": [
+        {
+          "id": "f-crawl-1",
+          "title": "Redirect-Ketten mit mindestens zwei Hops auf wichtigen Seiten",
+          "category": "tech-index",
+          "severity": "mittel",
+          "prov": "gemessen",
+          "befund": "Zwei interne Ziele sind nur über eine mehrstufige Redirect-Kette (≥2 Hops) erreichbar. Beide sind zentrale Navigations-/Rechtsseiten (Kontakt, Impressum); das /alt/*-Muster deutet auf einen URL-Umzug hin.",
+          "beleg": "analysis.json ruleId=tech:redirect-chain (count=2); affectedUrls (Cluster /alt/* = 2)",
+          "evidence": "count=2 (pctOfPages=20): https://example-corp.test/alt/kontakt, https://example-corp.test/alt/impressum — interne Ziele über eine Redirect-Kette mit ≥2 Hops erreichbar (Cluster /alt/* = 2). Die konkreten Ketten-Zwischenstationen liegen in crawl.csv (redirectChain/finalUrl), nicht in analysis.json.",
+          "auswirkung": "Jeder zusätzliche Redirect-Hop kostet Crawl-Budget und verwässert die weitergegebenen Link-Signale geringfügig; da die Zielseiten (Kontakt, Impressum) erreichbar bleiben, ist der Effekt bei zwei URLs überschaubar. Das /alt/*-Muster deutet auf einen URL-Umzug, bei dem interne Links und Sitemap noch auf die alten Ketten-Startpunkte zeigen — als Template-Muster wäre der Effekt größer. Kein Indexierungs-Blocker.",
+          "empfehlung": "Interne Links und Sitemap-Einträge direkt auf die finale Ziel-URL setzen, sodass höchstens ein einziger Redirect-Hop verbleibt, und die Zwischen-Hops der /alt/*-Ketten auflösen. Hinweis: Zu Redirect-Ketten liefert die Wissensbasis keinen einschlägigen Treffer (Retrieval-Score unter der Relevanzschwelle) — daher bewusst keine kbSources und eine reduzierte Konfidenz (c=2); die Empfehlung folgt der allgemeinen Richtlinie, Ketten kurz zu halten.",
+          "ice": { "i": 2, "c": 2, "e": 2, "score": 8 },
+          "ruleIds": ["tech:redirect-chain"],
+          "kbSources": []
+        },
+        {
+          "id": "f-crawl-2",
+          "title": "Verwaiste Seite ohne interne Eingangslinks",
+          "category": "links",
+          "severity": "niedrig",
+          "prov": "gemessen",
+          "befund": "Eine inhaltstragende URL hat keine internen Eingangslinks und ist damit nur über die Sitemap oder externe Verweise auffindbar.",
+          "beleg": "analysis.json ruleId=crawl:orphan-page (count=1); affectedUrls (Cluster /verwaist/* = 1)",
+          "evidence": "count=1 (pctOfPages=10): https://example-corp.test/verwaist/altseite — keine internen Eingangslinks (Cluster /verwaist/* = 1). Der /verwaist/*-Pfad legt nahe, dass es sich um Migrations-Altbestand handeln könnte.",
+          "auswirkung": "Eine verwaiste Seite erhält keine interne Link-Equity (PageRank) und wird von Crawlern schlechter entdeckt und seltener gecrawlt. Interne Links verteilen Link-Equity und helfen Suchmaschinen, Hierarchie und thematische Autorität zu erfassen. Bei einer einzelnen Content-Seite ist der Effekt begrenzt; als Muster (etwa ein ganzes verwaistes Segment) wäre er größer.",
+          "empfehlung": "https://example-corp.test/verwaist/altseite aus thematisch passenden Hub-/Übersichtsseiten kontextuell intern verlinken (Hub-and-Spoke), damit die Seite Eingangs-Link-Equity erhält und zuverlässig entdeckt und gecrawlt wird. Ist die Seite obsolet (Migrations-Altbestand), stattdessen per 301 auf das aktuelle Pendant weiterleiten oder entfernen.",
+          "ice": { "i": 1, "c": 2, "e": 2, "score": 4 },
+          "ruleIds": ["crawl:orphan-page"],
+          "kbSources": [
+            { "source": "https://developers.google.com/search/docs/crawling-indexing/links-crawlable", "heading": "Why Internal Links Matter", "date": "2025-12-10" }
+          ]
+        }
+      ]
+    }
+  ],
+  "positives": [
+    "Durchgängig HTTPS ohne Mixed-Content (tech:https sauber).",
+    "Jede gecrawlte Seite trägt einen Seitentitel (onpage:title-missing sauber).",
+    "Vorhandenes JSON-LD parst fehlerfrei — kein ungültiges strukturiertes Markup (schema:invalid sauber).",
+    "Jede Seite hat eine H1-Überschrift (onpage:h1-missing sauber).",
+    "Keine internen Links auf tote URLs (4xx/5xx) (links:internal-broken sauber)."
+  ],
+  "strategy": {
+    "levers": [
+      "Index-Hygiene: Sitemap, Canonical und Indexierungs-Direktiven zu einem widerspruchsfreien Signal konsolidieren — nur kanonische, indexierbare 200-URLs in der Sitemap, self- oder ziel-eindeutige Canonicals.",
+      "Crawl-Pfad straffen: Redirect-Ketten auf höchstens einen Hop reduzieren und verwaiste Seiten wieder intern anbinden — beides deutet auf einen unvollständig nachgezogenen URL-Umzug hin."
+    ],
+    "todos": [
+      "Sofort (e=3, hoher Impact): Sitemap auf kanonische, indexierbare 200-URLs reduzieren — noindex- (/leistungen/*), nicht-2xx- (/fehler/*) und robots-gesperrte (/gesperrt/*) Einträge entfernen.",
+      "Kurzfristig: Canonical-Ziele auf /produkte/* verifizieren und, falls unbeabsichtigt, self-referenziell setzen.",
+      "Mittelfristig: /alt/*-Redirect-Ketten auf einen Hop kürzen (interne Links/Sitemap auf finale Ziele) und /verwaist/altseite aus thematischen Hubs verlinken oder per 301 auflösen."
+    ]
+  },
+  "confidence": {
+    "sampleSize": 10,
+    "minNMet": true,
+    "caveats": [
+      "Teilabdeckung: 10 von 12 bekannten/entdeckten URLs gecrawlt (coveragePct=83, fetched=10, sitemapTotal=12, discovered=12) — 2 URLs blieben ungecrawlt. Häufigkeits-Angaben (pctOfPages) sind daher Schätzungen der gecrawlten Teilmenge, keine site-weite Vollerhebung; bei BFS-Crawl ohne vollständige Sitemap-Abdeckung ist coveragePct eine Obergrenze.",
+      "Kleine Site (pageCount=10): Der Mindest-Stichprobenumfang ist erreicht (minNMet=true, sampleSize≥5), Muster sind gleichwohl mit Vorsicht zu verallgemeinern.",
+      "Für tech:redirect-chain liefert die Wissensbasis keinen einschlägigen Treffer (Retrieval-Score unter der Relevanzschwelle); die zugehörige Empfehlung trägt bewusst keine kbSources und eine reduzierte Konfidenz (c=2) und folgt der allgemeinen Google-Richtlinie.",
+      "Non-self Canonicals auf /produkte/* können auch bewusste Varianten-/Duplikat-Konsolidierung sein; das Canonical-Ziel ist in analysis.json nicht erfasst und vor jeder Korrektur zu verifizieren (Konfidenz entsprechend c=2)."
+    ]
+  }
+}

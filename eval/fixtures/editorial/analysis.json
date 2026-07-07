@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "origin": "https://example-journal.test",
+    "host": "example-journal.test",
+    "crawledAt": null,
+    "pageCount": 12,
+    "sampleSize": 12,
+    "siteType": "server-rendered",
+    "coveragePct": 92,
+    "capped": false,
+    "fetched": 12,
+    "discovered": 13,
+    "sitemapTotal": 13,
+    "minNMet": true
+  },
+  "rulesetVersion": "1.7.0",
+  "findings": [
+    {
+      "ruleId": "schema:article-no-author",
+      "kategorie": "structured-data",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Artikel-Schema ohne author (E-E-A-T-Signal — empfohlen)",
+      "count": 7,
+      "pctOfPages": 58.3,
+      "affectedUrls": [
+        "https://example-journal.test/artikel/roestprofile",
+        "https://example-journal.test/artikel/herkunftslaender",
+        "https://example-journal.test/artikel/bruehmethoden",
+        "https://example-journal.test/artikel/mahlgrad",
+        "https://example-journal.test/artikel/lagerung",
+        "https://example-journal.test/artikel/entkoffeinierung",
+        "https://example-journal.test/artikel/wasserqualitaet"
+      ],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 7
+        }
+      ],
+      "detail": "Artikel-Schema ohne author (E-E-A-T-Signal fehlt).",
+      "quelle": "Google Search Central – Article (structured data): author = empfohlen (E-E-A-T)",
+      "datum": "2025-12"
+    },
+    {
+      "ruleId": "geo:missing-citations",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "mittel",
+      "title": "Keine externen Quellenangaben (GEO: Cite Sources)",
+      "count": 6,
+      "pctOfPages": 50,
+      "affectedUrls": [
+        "https://example-journal.test/artikel/roestprofile",
+        "https://example-journal.test/artikel/herkunftslaender",
+        "https://example-journal.test/artikel/bruehmethoden",
+        "https://example-journal.test/artikel/mahlgrad",
+        "https://example-journal.test/artikel/wasserqualitaet",
+        "https://example-journal.test/artikel/koffein-mythen"
+      ],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 6
+        }
+      ],
+      "detail": "Substanzielle Artikel ohne jegliche externe Quellenangabe (kein Outlink zu einer anderen Domain).",
+      "quelle": "arXiv 2311.09735 – GEO: Generative Engine Optimization",
+      "datum": "2023-11"
+    },
+    {
+      "ruleId": "geo:content-stale",
+      "kategorie": "geo",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Artikel ohne dateModified (Recency-Signal fehlt)",
+      "count": 5,
+      "pctOfPages": 41.7,
+      "affectedUrls": [
+        "https://example-journal.test/artikel/roestprofile",
+        "https://example-journal.test/artikel/herkunftslaender",
+        "https://example-journal.test/artikel/lagerung",
+        "https://example-journal.test/artikel/entkoffeinierung",
+        "https://example-journal.test/artikel/koffein-mythen"
+      ],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 5
+        }
+      ],
+      "detail": "Artikel ohne dateModified — Recency-Signal fehlt.",
+      "quelle": "Google Search Central – Article (dateModified empfohlen) + Ranking Systems Guide (QDF ist query-abhängig)",
+      "datum": "2025-12"
+    },
+    {
+      "ruleId": "onpage:thin",
+      "kategorie": "on-page",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Wenig Textinhalt (manueller Review-Hinweis — keine Google-Wortzahl-Schwelle)",
+      "count": 4,
+      "pctOfPages": 33.3,
+      "affectedUrls": [
+        "https://example-journal.test/artikel/kurznotiz",
+        "https://example-journal.test/artikel/pressemitteilung",
+        "https://example-journal.test/artikel/oeffnungszeiten",
+        "https://example-journal.test/artikel/danksagung"
+      ],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 4
+        }
+      ],
+      "detail": "Sehr kurze Inhaltsseiten — manueller Review-Hinweis.",
+      "quelle": "Heuristik — Google: Wortzahl ist KEIN Qualitätssignal (Mueller/Sullivan 2025); manuell prüfen",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "links:deep",
+      "kategorie": "links",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Seiten zu tief im Klick-Pfad (>maxDepth Klicks von der Startseite)",
+      "count": 3,
+      "pctOfPages": 25,
+      "affectedUrls": [
+        "https://example-journal.test/artikel/archiv/2019/notizen",
+        "https://example-journal.test/artikel/archiv/2018/rueckblick",
+        "https://example-journal.test/artikel/archiv/2017/anfaenge"
+      ],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 3
+        }
+      ],
+      "detail": "Archivseiten jenseits der maximalen Klicktiefe von der Startseite.",
+      "quelle": "Google Search Central – Site Structure & Internal Linking",
+      "datum": "2024-01"
+    },
+    {
+      "ruleId": "crawl:orphan-page",
+      "kategorie": "links",
+      "scope": "agnostic",
+      "severity": "niedrig",
+      "title": "Verwaiste Seiten (keine internen Eingangslinks)",
+      "count": 2,
+      "pctOfPages": 16.7,
+      "affectedUrls": [
+        "https://example-journal.test/artikel/verwaist",
+        "https://example-journal.test/artikel/alte-aktion"
+      ],
+      "clusters": [
+        {
+          "pattern": "/artikel/*",
+          "count": 2
+        }
+      ],
+      "detail": "Seiten ohne interne Eingangslinks.",
+      "quelle": "Google Search Central – Internal Linking",
+      "datum": "2024-01"
+    }
+  ],
+  "positives": [
+    {
+      "ruleId": "onpage:title-missing",
+      "title": "Fehlender Seitentitel"
+    },
+    {
+      "ruleId": "schema:invalid",
+      "title": "Ungültiges JSON-LD (Parse-Fehler)"
+    },
+    {
+      "ruleId": "tech:https",
+      "title": "Seiten ohne HTTPS oder mit Mixed-Content"
+    },
+    {
+      "ruleId": "onpage:h1-missing",
+      "title": "Fehlende oder leere H1-Überschrift"
+    },
+    {
+      "ruleId": "geo:ai-bot-blocked",
+      "title": "KI-Suchbot blockiert (GEO-Sichtbarkeit gefährdet)"
+    },
+    {
+      "ruleId": "schema:no-organization",
+      "title": "Kein Organization-Schema auf der gesamten Site"
+    }
+  ],
+  "signals": {
+    "robots": {
+      "exists": true
+    },
+    "llms": {
+      "exists": false
+    },
+    "aiBots": []
+  }
+}
