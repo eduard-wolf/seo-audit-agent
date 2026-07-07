@@ -1,0 +1,18 @@
+{
+  "generatedWith": {
+    "interpretModel": "claude-opus-4-8",
+    "judgeModel": "claude-sonnet-5",
+    "promptVersion": "judge-v1",
+    "k": 3,
+    "fixtures": 6,
+    "note": "Generated via isolated Claude-Code subagents (no API key). interpret=opus, judge=sonnet (cross-model). Refresh: regenerate runs+verdicts then recompute (see eval/README.md)."
+  },
+  "aggregate": {
+    "recall": 1,
+    "citationValidity": 1,
+    "fabrications": 0,
+    "faithfulness": 0.9805825242718447,
+    "stabilityPassK": 1,
+    "schemaValid": true
+  }
+}
