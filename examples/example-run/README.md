@@ -36,6 +36,8 @@ node bin/crawl-and-analyze.mjs http://127.0.0.1:<port>
 
 # 3. Rendern:
 node report/build-report.mjs findings.json   # → index.html
+#    (inzwischen erzeugt derselbe Befehl zusätzlich report.pdf via installiertem
+#     Chrome headless; dieser historische Lauf wurde vor dem PDF-Schritt erzeugt)
 ```
 
 `data/` ist git-ignored und transient; die drei deterministischen Artefakte sind

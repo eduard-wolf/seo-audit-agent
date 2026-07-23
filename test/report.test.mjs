@@ -302,9 +302,11 @@ describe('CLI — node report/build-report.mjs <findings.json>', () => {
 
   it('writes report/<host>/index.html for the example', () => {
     fs.rmSync(outDir, { recursive: true, force: true });
+    // --no-pdf keeps this test hermetic (no Chrome dependency); the PDF step
+    // has its own suite in test/report-pdf.test.mjs.
     const stdout = execFileSync(
       'node',
-      [path.join(ROOT, 'report', 'build-report.mjs'), path.join(ROOT, 'examples/findings.example.json')],
+      [path.join(ROOT, 'report', 'build-report.mjs'), path.join(ROOT, 'examples/findings.example.json'), '--no-pdf'],
       { encoding: 'utf8' },
     );
     assert.ok(fs.existsSync(outFile), `should write ${outFile}`);

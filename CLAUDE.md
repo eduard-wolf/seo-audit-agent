@@ -36,8 +36,8 @@ Every step reads the previous artifact and writes the next. All live under
 `data/<host>/` (git-ignored, transient):
 
 ```
-data/<host>/crawl.csv  →  signals.json  →  analysis.json  →  findings.json  →  strategy.md  →  report/<host>/index.html
-        crawl (det.)        crawl (det.)     analyze (det.)    interpret (LLM)   strategy (LLM)     render (det.)
+data/<host>/crawl.csv  →  signals.json  →  analysis.json  →  findings.json  →  strategy.md  →  report/<host>/index.html (+ report.pdf)
+        crawl (det.)        crawl (det.)     analyze (det.)    interpret (LLM)   strategy (LLM)     render (det.) + Chrome-headless-PDF
    └ affected-urls.csv (det. sidecar of analysis.json)   +   runtime-signals.json (optional, non-det. overlay via bin/enrich.mjs)
 ```
 
@@ -56,8 +56,13 @@ data/<host>/crawl.csv  →  signals.json  →  analysis.json  →  findings.json
 - `findings.json` — produced by the agent via `skills/interpret.md`; its shape is
   enforced by `validateFindings` in `lib/findings-schema.mjs`.
 - `strategy.md` — produced by the agent via `skills/strategy.md`.
-- `report/<host>/index.html` — rendered by `report/build-report.mjs`
-  (the final pipeline step).
+- `report/<host>/index.html` + `report/<host>/report.pdf` — rendered by
+  `report/build-report.mjs` (the final pipeline step). The PDF is printed from
+  the HTML by **installed** Chrome/Chromium headless (no npm dependency;
+  auto-detected, `--chrome`/`$CHROME_PATH` override). No Chrome → HTML ships
+  normally, PDF skipped with a loud warning (exit 0); `--no-pdf` skips
+  deliberately. Content-deterministic print of the byte-deterministic HTML
+  (PDF bytes carry Chrome timestamps).
 
 ---
 
@@ -97,7 +102,11 @@ data/<host>/crawl.csv  →  signals.json  →  analysis.json  →  findings.json
    ```bash
    node report/build-report.mjs data/<host>/findings.json
    ```
-   Renders `findings.json` → `report/<host>/index.html`.
+   Renders `findings.json` → `report/<host>/index.html`, then — integrated
+   final step — prints `report/<host>/report.pdf` via installed Chrome
+   headless. Flags: `--no-pdf` (skip deliberately), `--chrome <path>` (or
+   `$CHROME_PATH`) to pin the binary. Missing Chrome degrades gracefully:
+   HTML ships, PDF skipped with a loud warning.
 
 ---
 

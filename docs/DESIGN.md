@@ -41,6 +41,18 @@ keine Skripte, jeder untrusted String HTML-escaped, `<meta robots=noindex>`.
 Kein Client-JS heißt keine Runtime-Überraschungen und eine gegatet
 auslieferbare Datei — der Report ist ein Artefakt, kein Programm.
 
+Als integrierter Abschluss-Schritt druckt der CLI dasselbe HTML zu
+`report/<host>/report.pdf` — dem primären Liefer-Artefakt an Kunden. Bewusst
+**kein** Puppeteer/Playwright (der Kern bleibt 0-npm-dependency), sondern
+installiertes Chrome/Chromium headless (`--headless --print-to-pdf`): echtes
+Vektor-PDF mit selektierbarem Text, DIN-A4-Print-Stylesheet (`@page`,
+druckechte Severity-Farben, `break-inside`-Schutz für Befund-Karten).
+Chrome wird pro Plattform auto-detektiert (`--chrome`/`$CHROME_PATH`
+überschreibbar); ohne Chrome degradiert der Build laut, aber sauber —
+HTML liegt vor, Exit 0, `--no-pdf` schaltet bewusst ab. Das PDF ist ein
+inhaltstreuer Druck des byte-deterministischen HTML; seine Bytes variieren
+(Chrome bettet Zeitstempel ein) — Byte-Determinismus lebt im HTML-Artefakt.
+
 ## Anti-Overclaim- & Provenienz-Disziplin
 
 - **Evidence before assertion** — kein Befund ohne konkreten Wert/URL aus den
