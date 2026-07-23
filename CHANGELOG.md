@@ -29,6 +29,23 @@ this project uses static, manually-set dates (no wall-clock at build time).
   Evidenz bleibt unverändert vollständig sichtbar.
 - **Example-Run** — Interpretationsschicht unter der neuen Rubrik neu erzeugt
   (deterministische Artefakte unverändert; Kontroll-Crawl messungs-identisch).
+- **PDF-Export** — `report/build-report.mjs` erzeugt nach `index.html`
+  automatisch `report/<host>/report.pdf` über **installiertes** Chrome/Chromium
+  headless (`--headless --print-to-pdf`) — bewusst kein Puppeteer/Playwright,
+  der Kern bleibt 0-npm-dependency. Print-Stylesheet: DIN-A4-`@page` mit
+  Seitenzähler-Randboxen (Chrome ≥ 131, ältere Engines ignorieren sie still),
+  `print-color-adjust: exact` (Severity-Farben drucken), `break-inside: avoid`
+  für Befund-Karten, statisches Inhaltsverzeichnis, heller Titel-Header.
+  Chrome-Pfad auto-detektiert (macOS/Linux/Windows), überschreibbar per
+  `--chrome <pfad>`/`$CHROME_PATH` (ein gesetzter Pfad ist ein Pin — bei
+  Nichtexistenz kein stiller Fallback); ohne Chrome degradiert der Build laut,
+  aber sauber (HTML liegt vor, Exit 0), `--no-pdf` schaltet bewusst ab.
+  Stale-Guard: ein altes `report.pdf` wird vor jedem Lauf entfernt, damit nie
+  ein veraltetes PDF neben frischem HTML liegt. Salvage-Pfad: beendet sich
+  Chrome nicht sauber, obwohl das PDF nachweislich vollständig ist
+  (`%PDF-`-Magic + `%%EOF`-Trailer), wird das Artefakt mit Warnung verwendet
+  (beobachtetes macOS-Verhalten). Byte-Determinismus bleibt im HTML; das PDF
+  ist ein inhaltstreuer Druck derselben `findings.json`.
 
 ## Ruleset progression (`config/rules-version.json`)
 

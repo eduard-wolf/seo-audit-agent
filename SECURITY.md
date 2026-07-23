@@ -36,6 +36,9 @@ UWG, DSGVO data minimisation). When in doubt about authorisation, stop.
 `report/build-report.mjs` HTML-escapes **every** crawled/foreign string and ships
 a strict `Content-Security-Policy` (`default-src 'none'`) with `<meta robots=noindex>`.
 The report is a static, self-contained document intended to be hosted behind a gate.
+The optional `report.pdf` is printed by installed headless Chrome from that same
+escaped, script-free, local HTML file — no new content enters the pipeline, and
+nothing untrusted is ever interpolated into the print stylesheet.
 
 ## Reporting a vulnerability
 

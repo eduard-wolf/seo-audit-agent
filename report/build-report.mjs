@@ -16,25 +16,39 @@
  *
  * API:
  *   render(findings) → htmlString     // validates first; throws on invalid input
+ *   findChrome(opts) → path | null    // locate an installed Chrome/Chromium
+ *   printToPdf(chrome, html, pdf)     // headless-Chrome print; throws on failure
  *
  * CLI:
- *   node report/build-report.mjs <path/to/findings.json>
- *     → writes report/<host>/index.html and prints its absolute path
+ *   node report/build-report.mjs <path/to/findings.json> [--no-pdf] [--chrome <pfad>]
+ *     → writes report/<host>/index.html, then — as the integrated final step —
+ *       prints it to report/<host>/report.pdf via an INSTALLED Chrome/Chromium
+ *       in headless mode (--headless --print-to-pdf); LAST, it prints the
+ *       HTML path as the single machine-readable stdout line (after the PDF
+ *       step, so consumers reading stdout wait for the complete build).
+ *       Deliberately NOT Puppeteer/Playwright:
+ *       the core stays 0-npm-dependency. Chrome is auto-detected per platform
+ *       (macOS/Linux/Windows), overridable via --chrome <pfad> or $CHROME_PATH.
+ *       Graceful degradation: no Chrome found → the HTML report ships normally,
+ *       the PDF is skipped with a loud warning, exit stays 0. --no-pdf skips
+ *       deliberately.
  *
  * Determinism: render() derives the whole document from `findings` alone — no
  * clock, no randomness — so the same findings.json always yields byte-identical
  * HTML. (The underlying LLM synthesis is non-deterministic; the report is the
  * frozen, representative snapshot of one run, as stamped in the footer.)
+ * The PDF is a faithful print of that byte-deterministic HTML — same
+ * findings.json, same content — but its *bytes* vary across runs (Chrome embeds
+ * creation timestamps); byte-level determinism lives in the HTML artifact.
  *
- * Roadmap (NOT in MVP): PDF export. HTML→PDF would be a separate runtime step
- * (e.g. headless Chrome `page.pdf()` over this self-contained HTML); it adds a
- * heavy binary dependency and is intentionally out of scope here.
- *
- * No npm dependencies — pure Node.js.
+ * No npm dependencies — pure Node.js plus, for the PDF step only, whatever
+ * Chrome/Chromium the machine already has.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { validateFindings } from '../lib/findings-schema.mjs';
 
 // ── escaping ──────────────────────────────────────────────────────────────────
@@ -491,15 +505,32 @@ const STYLES = `
   .sev-chart { display: block; width: 100%; height: 28px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
   .sev-dist-legend { margin: 6px 0 0; font-size: .8rem; color: var(--muted); }
 
+  /* ── Print / PDF (DIN A4) ───────────────────────────────────────────────────
+     Layout contract of the integrated Chrome-headless PDF step (CLI below):
+     Chrome runs with --no-pdf-header-footer, so @page owns size, margins and
+     the running page counter. The margin boxes (@bottom-*) are CSS Paged
+     Media — Chrome ≥ 131 renders them, older engines ignore them silently.
+     Static strings only: nothing untrusted is ever interpolated into CSS. */
+  @page {
+    size: A4;
+    margin: 16mm 15mm 18mm;
+    @bottom-left { content: "SEO-Audit-Report"; font-size: 8pt; color: #5a6573; }
+    @bottom-right { content: counter(page) " / " counter(pages); font-size: 8pt; color: #5a6573; }
+  }
   @media print {
-    body { background: #fff; }
+    /* Severity colours are an information channel — they must survive print. */
+    html { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    body { background: #fff; font-size: 10.5pt; }
+    .wrap { max-width: none; padding: 0; }
     .skip-link { display: none; }
-    .hero { background: #fff; color: var(--ink); border: 1px solid var(--line); }
-    .hero h1 { color: var(--ink); }
-    .eyebrow, .hero-meta dt { color: var(--muted); }
-    .hero-meta div { background: transparent; border-color: var(--line); }
+    /* Static document: anchors render as plain text, not as interactive links. */
+    a { color: var(--ink); text-decoration: none; }
+    p, li, dd { orphans: 3; widows: 3; }
     .cols, .toc-list { grid-template-columns: 1fr; columns: 1; }
-    .finding, .tile { break-inside: avoid; }
+    section, .toc { padding: 18px 20px; margin: 12px 0; }
+    /* No section title orphaned at a page bottom, no card torn across pages. */
+    h2.section-title, h3 { break-after: avoid; }
+    .finding, .tile, .hero-meta div, .legend-list div, .kb, .sev-dist, .warn, .toc { break-inside: avoid; }
   }
 `;
 
@@ -580,12 +611,178 @@ export function hostOf(url) {
   return h;
 }
 
+// ── PDF export (integrated final build step) ──────────────────────────────────
+//
+// Deliberately NOT Puppeteer/Playwright — the core stays 0-npm-dependency. An
+// INSTALLED Chrome/Chromium prints the self-contained, JS-free HTML to a real
+// vector PDF (selectable text) via its own CLI: --headless --print-to-pdf.
+// The HTML report is the gate artifact; the PDF is the delivery copy — every
+// failure path below therefore degrades instead of failing the build.
+
+/** Well-known absolute install locations per platform, checked in order. */
+function chromeCandidatePaths(platform, env) {
+  if (platform === 'darwin') {
+    const home = env.HOME || '';
+    return [
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      ...(home ? [path.join(home, 'Applications/Google Chrome.app/Contents/MacOS/Google Chrome')] : []),
+      '/Applications/Chromium.app/Contents/MacOS/Chromium',
+      // Edge is Chromium-based and prints identical PDFs — a common fallback.
+      '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+    ];
+  }
+  if (platform === 'win32') {
+    const roots = [env.PROGRAMFILES, env['PROGRAMFILES(X86)'], env.LOCALAPPDATA].filter(Boolean);
+    return roots.flatMap((root) => [
+      path.join(root, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      path.join(root, 'Chromium', 'Application', 'chrome.exe'),
+      path.join(root, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+    ]);
+  }
+  // Linux & friends resolve via $PATH below.
+  return [];
+}
+
+/** Binary names looked up on $PATH (Linux distros, Homebrew, custom installs). */
+const CHROME_PATH_NAMES = ['google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser', 'chrome'];
+
+/** Minimal which(1): scan $PATH (with $PATHEXT on Windows) for `name`. */
+function whichSync(name, env, platform) {
+  const dirs = (env.PATH || '').split(path.delimiter).filter(Boolean);
+  const exts = platform === 'win32' ? (env.PATHEXT || '.COM;.EXE;.BAT;.CMD').split(';') : [''];
+  for (const dir of dirs) {
+    for (const ext of exts) {
+      const candidate = path.join(dir, name + ext);
+      if (fs.existsSync(candidate)) return candidate;
+    }
+  }
+  return null;
+}
+
+/**
+ * Locate an installed Chrome/Chromium binary.
+ *
+ * An `explicit` path (--chrome flag or $CHROME_PATH) is a pin, not a hint: if
+ * it does not exist the result is null — we never silently substitute a
+ * different browser for one the user named.
+ *
+ * @param {{explicit?: string|null, platform?: string, env?: object}} [opts]
+ * @returns {string|null} absolute path to the binary, or null if none found
+ */
+export function findChrome({ explicit = null, platform = process.platform, env = process.env } = {}) {
+  if (explicit) return fs.existsSync(explicit) ? explicit : null;
+  for (const candidate of chromeCandidatePaths(platform, env)) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  for (const name of CHROME_PATH_NAMES) {
+    const hit = whichSync(name, env, platform);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+/**
+ * Cheap completeness probe for a written PDF: `%PDF-` magic at byte 0 and a
+ * `%%EOF` trailer near the end. Not a full parse — just enough to tell a
+ * fully flushed file from a torso after a killed Chrome.
+ */
+export function pdfLooksComplete(pdfPath) {
+  let fd;
+  try {
+    fd = fs.openSync(pdfPath, 'r');
+    const size = fs.fstatSync(fd).size;
+    const head = Buffer.alloc(Math.min(5, size));
+    fs.readSync(fd, head, 0, head.length, 0);
+    const tail = Buffer.alloc(Math.min(64, size));
+    fs.readSync(fd, tail, 0, tail.length, size - tail.length);
+    return head.toString('latin1') === '%PDF-' && tail.toString('latin1').includes('%%EOF');
+  } catch {
+    return false;
+  } finally {
+    if (fd !== undefined) fs.closeSync(fd);
+  }
+}
+
+/**
+ * Print a self-contained HTML file to PDF with installed headless Chrome.
+ * Vector output (selectable text), DIN A4 via the @page rule in STYLES;
+ * Chrome's own header/footer is disabled so the print stylesheet owns the
+ * page. No --user-data-dir: headless mode uses an ephemeral profile of its
+ * own (no clash with a running desktop Chrome), and pinning a fresh profile
+ * dir makes Chrome on macOS hang at exit AFTER successfully writing the PDF
+ * (observed with 141/150).
+ *
+ * That failure mode also motivates the salvage path: if Chrome errors or
+ * hangs past the timeout but the PDF on disk is demonstrably complete
+ * (pdfLooksComplete), the artifact is kept and a warning string is returned.
+ *
+ * @param {string} chromePath — binary from findChrome()
+ * @param {string} htmlPath   — the freshly written report HTML
+ * @param {string} pdfPath    — destination; caller removes stale copies first
+ * @returns {string|null} null on a clean run; a warning note when the PDF was
+ *   salvaged from an unclean Chrome exit
+ * @throws {Error} when Chrome fails AND no complete PDF was written
+ */
+export function printToPdf(chromePath, htmlPath, pdfPath, { timeoutMs = 120_000 } = {}) {
+  try {
+    execFileSync(chromePath, [
+      '--headless',
+      '--disable-gpu',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--no-pdf-header-footer',
+      '--generate-pdf-document-outline',
+      `--print-to-pdf=${path.resolve(pdfPath)}`,
+      pathToFileURL(path.resolve(htmlPath)).href,
+    ], { stdio: ['ignore', 'ignore', 'pipe'], timeout: timeoutMs });
+  } catch (err) {
+    if (pdfLooksComplete(pdfPath)) {
+      return `Chrome beendete sich nicht sauber (${err?.code || err?.status || 'Fehler'}), das PDF wurde aber vollständig geschrieben und wird verwendet.`;
+    }
+    // Drop a partial/torso PDF (Chrome killed mid-write) — an incomplete
+    // artifact must never sit next to fresh HTML. Best-effort: a failing
+    // removal must not mask the original Chrome error.
+    try { fs.rmSync(pdfPath, { force: true }); } catch { /* keep original error */ }
+    const stderr = err?.stderr ? String(err.stderr).trim() : '';
+    throw new Error(`Chrome headless fehlgeschlagen (${chromePath}): ${err?.message || err}${stderr ? `\n${stderr}` : ''}`);
+  }
+  if (!fs.existsSync(pdfPath)) {
+    throw new Error(`Chrome meldete Erfolg, aber ${pdfPath} wurde nicht geschrieben`);
+  }
+  return null;
+}
+
 // ── CLI entry point ─────────────────────────────────────────────────────────────
 // Only runs when invoked directly, not on import.
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
-  const inPath = process.argv[2];
-  if (!inPath) {
-    console.error('Usage: node report/build-report.mjs <path/to/findings.json>');
+// pathToFileURL (not `file://${argv[1]}`) so the guard also matches on Windows
+// (drive letter + backslashes) — otherwise the CLI would be a silent no-op there.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const args = process.argv.slice(2);
+  let inPath = null;
+  let noPdf = false;
+  let chromeFlag = null;
+  let argError = null;
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (arg === '--no-pdf') noPdf = true;
+    else if (arg === '--chrome') {
+      // A following flag is NOT a path — refuse instead of eating the flag
+      // (`--chrome --no-pdf` must error, not pin Chrome to "--no-pdf").
+      const next = args[i + 1];
+      if (next === undefined || next.startsWith('--')) argError = '--chrome braucht einen Pfad';
+      else { chromeFlag = next; i += 1; }
+    } else if (arg.startsWith('--chrome=')) {
+      chromeFlag = arg.slice('--chrome='.length);
+      // An empty value must error like the bare form — never silently fall
+      // through to $CHROME_PATH/auto-detect (the pin contract of findChrome).
+      if (chromeFlag === '') argError = '--chrome braucht einen Pfad';
+    } else if (arg.startsWith('--')) argError = `Unbekanntes Flag: ${arg}`;
+    else if (inPath === null) inPath = arg;
+    else argError = `Unerwartetes Argument: ${arg}`;
+  }
+  if (!inPath || argError) {
+    if (argError) console.error(argError);
+    console.error('Usage: node report/build-report.mjs <path/to/findings.json> [--no-pdf] [--chrome <pfad>]');
     process.exit(1);
   }
 
@@ -612,5 +809,38 @@ if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
   fs.writeFileSync(outFile, html, 'utf8');
 
   console.error(`report written: host=${host} bytes=${Buffer.byteLength(html, 'utf8')}`);
+
+  // Integrated final step: print the just-written HTML to report/<host>/report.pdf.
+  // First drop any stale PDF — an outdated report.pdf next to fresher HTML is a
+  // delivery hazard on every path below (skip, degrade, failure). The removal
+  // itself must also degrade: a locked/undeletable stale PDF (EBUSY on Windows
+  // while open in a viewer, EACCES on a read-only dir) may never abort the
+  // build after gate-ready HTML was written.
+  const pdfFile = path.join(outDir, 'report.pdf');
+  try {
+    fs.rmSync(pdfFile, { force: true });
+  } catch (err) {
+    console.error(`WARNUNG: altes report.pdf konnte nicht entfernt werden (${err?.code || err}) — es kann veraltet sein und passt evtl. nicht zum frischen HTML.`);
+  }
+  if (noPdf) {
+    console.error('pdf: übersprungen (--no-pdf)');
+  } else {
+    const explicit = chromeFlag || process.env.CHROME_PATH || null;
+    const chrome = findChrome({ explicit });
+    if (!chrome) {
+      console.error(explicit
+        ? `WARNUNG: PDF übersprungen — angegebener Chrome-Pfad existiert nicht: ${explicit} (--chrome/$CHROME_PATH prüfen). HTML-Report liegt vor.`
+        : 'WARNUNG: PDF übersprungen — kein installiertes Chrome/Chromium gefunden. HTML-Report liegt vor; für das PDF Chrome installieren oder den Pfad per --chrome/$CHROME_PATH setzen.');
+    } else {
+      try {
+        const note = printToPdf(chrome, outFile, pdfFile);
+        if (note) console.error(`WARNUNG: ${note}`);
+        console.error(`pdf written: ${pdfFile} bytes=${fs.statSync(pdfFile).size}`);
+      } catch (err) {
+        console.error(`WARNUNG: PDF-Erzeugung fehlgeschlagen — HTML-Report liegt trotzdem vor.\n${err?.message || err}`);
+      }
+    }
+  }
+
   console.log(outFile); // stdout = the one machine-readable line: the written path
 }

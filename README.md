@@ -10,8 +10,10 @@ in **einem** RAG-geerdeten LLM-Schritt interpretieren, statisch rendern.
 
 > **English (TL;DR).** An agentic SEO/GEO audit workspace: collect & check
 > **deterministically**, interpret in **one** RAG-grounded LLM step, render a
-> single self-contained HTML report **statically**. Runs inside a coding agent
-> (Claude Code); the Node core (crawler, rule engine, renderer) is dependency-free.
+> self-contained HTML report **statically** — plus a client-ready `report.pdf`
+> printed by installed headless Chrome (no npm package). Runs inside a coding
+> agent (Claude Code); the Node core (crawler, rule engine, renderer) is
+> dependency-free.
 > The detailed docs below are in German. Security policy: [`SECURITY.md`](SECURITY.md).
 
 ---
@@ -35,8 +37,10 @@ Interpretationsstufe mit Provenienz-Pflicht und zitiertem Wissen.
 **Wirkung.** Statt eines Daten-Dumps liefert es das, was ein Senior-Auditor
 abgeben würde: nach **ICE** (`score = i×c×e`) priorisierte Befunde mit Beleg,
 Evidenz, Auswirkung und einer **wissensbasiert begründeten** Empfehlung — plus
-einen sequenzierten Maßnahmen- und Strategieplan. Ergebnis ist ein einzelnes,
-self-contained HTML-Dokument, das gegatet ausgeliefert werden kann.
+einen sequenzierten Maßnahmen- und Strategieplan. Ergebnis ist ein
+self-contained HTML-Dokument, das gegatet ausgeliefert werden kann — plus ein
+kundenfertiges `report.pdf`, das der Build automatisch über installiertes
+Chrome headless mitdruckt (ohne Chrome: HTML wie gehabt, Warnung statt Abbruch).
 
 ---
 
@@ -126,10 +130,11 @@ und `tech:canonical-nonself` (85,7 %) ehrlich als **Crawl-Umgebungs-Artefakte**
 des localhost-HTTP-Laufs ein, statt sie als kritische Funde aufzublasen. Details:
 [`examples/example-run/README.md`](examples/example-run/README.md).
 
-> **Keine PNG-Screenshots eingecheckt — bewusst.** Die 0-Dependency-Kette bringt
-> keinen Headless-Browser mit, deshalb ist das Erzeugen von Bildern ein
-> *bewusst manueller* Schritt außerhalb der reproduzierbaren Kette. Maßgeblicher,
-> versionierter Beleg ist die oben verlinkte `index.html` selbst.
+> **Keine PNG-Screenshots eingecheckt — bewusst.** Die 0-Dependency-Kette
+> *bündelt* keinen Headless-Browser (der PDF-Schritt nutzt ein bereits
+> installiertes Chrome und degradiert ohne es sauber); Screenshot-Bilder bleiben
+> ein *bewusst manueller* Schritt außerhalb der reproduzierbaren Kette.
+> Maßgeblicher, versionierter Beleg ist die oben verlinkte `index.html` selbst.
 
 ---
 
@@ -187,6 +192,10 @@ existiert dieses Tool *daneben*, ehrlich gesagt?
   Gedächtnis zitieren.
 - **Node ≥ 20.** Crawler, Regel-Engine und Renderer sind **dependency-frei**
   (reines Node, keine npm-Abhängigkeiten).
+- **Optional: installiertes Chrome/Chromium** — nur für das automatische
+  `report.pdf` am Ende des Renderns (headless `--print-to-pdf`, kein npm-Paket).
+  Fehlt es, liefert der Build das HTML unverändert und überspringt das PDF mit
+  klarer Warnung.
 - **Python-Produktions-Adapter.** Der deterministische Kern ist bewusst
   dependency-freies Node; die Python-Seite liefert die Produktions-Adapter —
   GSC-Enrichment (`crawl/gsc.py`) und einen pgvector-RAG-Store
@@ -219,9 +228,13 @@ node bin/enrich.mjs data/<host>
 
 # 3. (optional) Strategie — skills/strategy.md anwenden.
 
-# 4. Rendern (kein Modell):
+# 4. Rendern (kein Modell): HTML + PDF in einem Schritt
 node report/build-report.mjs data/<host>/findings.json
-#    → report/<host>/index.html
+#    → report/<host>/index.html + report/<host>/report.pdf
+#      (PDF via installiertem Chrome/Chromium headless — kein npm-Paket;
+#       Pfad auto-detektiert, überschreibbar per --chrome/$CHROME_PATH.
+#       Ohne Chrome: HTML wie gehabt, PDF wird mit Warnung übersprungen;
+#       --no-pdf schaltet bewusst ab.)
 ```
 
 **Flags für Schritt 1** (`bin/crawl-and-analyze.mjs`):
