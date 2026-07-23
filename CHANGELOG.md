@@ -9,6 +9,27 @@ this project uses static, manually-set dates (no wall-clock at build time).
 > several review rounds) was kept in private working branches. The ruleset
 > progression below is the authoritative record of *what* changed and *when*.
 
+## [Unreleased] — 2026-07 — Verständlichkeits-Rubrik (Klartext für Nicht-Techniker)
+
+- **Skills** — `skills/interpret.md` §1b: verbindliche Vier-Ebenen-Rubrik für den
+  deutschen Kunden-Output (Problem in Alltagssprache / Business-Wirkung /
+  Was tun + Wer / Aufwand & Priorität), 30-Sekunden-Regeln für die Executive
+  Summary, Jargon-Radar und Regeln aus systematischen Laien-Lesetests
+  (4 Personas). `skills/strategy.md`: Ticket-Muster
+  `[Priorität … · Aufwand … · Wer]` für `strategy.todos` (weiterhin reine Strings).
+- **Schema** — optionales Feld `wer` pro Befund (nicht-leerer String, z. B.
+  `Entwicklung`/`Redaktion`/`Agentur`); schema-optional, damit committete
+  Eval-Läufe valide bleiben, im Neu-Output Pflicht per Rubrik.
+- **Renderer** — deterministische Klartext-Ableitungen ohne neue Zahlen:
+  Aufwand aus `ice.e` (gering/mittel/groß), Priorität aus `ice.score`
+  (≥ 18 hoch / ≥ 8 mittel / sonst niedrig); Wer-Badge; sichtbare
+  Befund-Nummern (`2.1`) für auflösbare Querverweise; Lese-Anleitung-Sektion;
+  Provenienz-Klartext-Hinweise; Kategorie-Labels; ICE-Skala „(max. 27)";
+  deutsche Datumsanzeige im Hero (Footer behält den Roh-Zeitstempel).
+  Evidenz bleibt unverändert vollständig sichtbar.
+- **Example-Run** — Interpretationsschicht unter der neuen Rubrik neu erzeugt
+  (deterministische Artefakte unverändert; Kontroll-Crawl messungs-identisch).
+
 ## Ruleset progression (`config/rules-version.json`)
 
 The rule catalogue is versioned independently of the package release. From the

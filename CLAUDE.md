@@ -122,6 +122,10 @@ resuming in a fresh session is lossless.
 ## Quality anchors (apply throughout)
 - **Evidence before assertion** — never write a finding without a value/URL in
   the artifacts.
+- **Klartext für Nicht-Techniker** — jeder Befund und jedes To-do trägt die vier
+  Ebenen (Problem in Alltagssprache / Business-Wirkung / Was tun + Wer /
+  Aufwand & Priorität) nach `skills/interpret.md` §1b und der Rubrik in
+  `skills/strategy.md`. Klarheit ergänzt die Evidenz, ersetzt sie nie.
 - **ICE with anchors** — score `i`/`c`/`e` ∈ {1,2,3} against the rubric;
   `score = i × c × e`. No invented numbers.
 - **Provenance** — every claim is `gemessen` / `beobachtet` / `geschätzt`.

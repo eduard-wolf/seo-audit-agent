@@ -50,10 +50,16 @@ hier nach `examples/example-run/` kopiert, damit der Beleg im Repo liegt.
   werden zu einem priorisierten Senior-Audit von 27 Befunden in 6 Abschnitten
   verdichtet: ICE-Scoring (`score = i×c×e`), Provenienz pro Befund,
   Evidence-before-Assertion, RAG-zitierte Empfehlungen.
-- **Anti-Overclaim sichtbar gemacht.** Abschnitt 6 des Reports ordnet
-  `tech:https` (100 %) und `tech:canonical-nonself` (85,7 %) ehrlich als
-  **Crawl-Umgebungs-Artefakte** des localhost-HTTP-Laufs ein — gemessen korrekt,
-  aber kein realer Site-Defekt — statt sie als kritische Funde aufzublasen.
+- **Anti-Overclaim sichtbar gemacht.** Abschnitt 6 des Reports („Fehlalarme der
+  Testumgebung") ordnet `tech:https` (100 %) und `tech:canonical-nonself`
+  (85,7 %) ehrlich als Artefakte des localhost-HTTP-Laufs ein — gemessen
+  korrekt, aber kein realer Site-Defekt — statt sie als kritische Funde
+  aufzublasen.
+- **Klartext für Nicht-Techniker.** Die Interpretation folgt der
+  Verständlichkeits-Rubrik (`skills/interpret.md` §1b): jeder Befund trägt
+  Problem in Alltagssprache, Business-Wirkung, konkrete Handlung + `wer`
+  (Entwicklung/Redaktion/Agentur); Priorität und Aufwand leitet der Renderer
+  deterministisch aus den ICE-Ankern ab.
 
 ## Eingefrorener Stand
 
@@ -61,6 +67,12 @@ Die LLM-Synthese (Schritt 3) ist **nicht-deterministisch**. Dieser Lauf ist eine
 eingefrorene, repräsentative Momentaufnahme. Der Crawl-Zeitpunkt im Report ist
 statisch gestempelt (`2026-06-29`, ISO), weil der Renderer bewusst ohne
 Wall-Clock arbeitet (byte-identische Ausgabe je `findings.json`).
+
+Die Interpretationsschicht (`findings.json` + `index.html`) wurde am 2026-07-23
+unter der neuen Verständlichkeits-Rubrik **neu erzeugt** — über denselben,
+unveränderten deterministischen Artefakten (`crawl.csv`, `signals.json`,
+`analysis.json`); ein frischer Kontroll-Crawl der Fixture lieferte
+messungs-identische 40 Regel-Treffer und identische Positives.
 
 > Öffne `index.html` per `file://` im Browser. Screenshots (PNG) werden ergänzt —
 > ihre Erzeugung ist ein manueller Schritt außerhalb der dependency-freien Kette.
