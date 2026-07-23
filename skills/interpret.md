@@ -94,6 +94,15 @@ Field semantics:
   **first-class, authoritative** input to the deterministic handoff ledger
   (`bin/handoff.mjs`) — preferred over scraping the `ruleId=` token out of `beleg`.
   Emit it whenever the finding interprets one or more analysis rule hits.
+- `wer` *(schema-optional, but MANDATORY in new output — §1b)* — who implements
+  the fix, in the customer's world: `"Entwicklung"`, `"Redaktion"`, `"Agentur"`,
+  or a combination (`"Entwicklung + Redaktion"`). Schema-optional only so older
+  committed runs stay valid; every finding you write now MUST carry it —
+  **except** findings flagged `keinHandlungsbedarf` (below), which omit it.
+- `keinHandlungsbedarf` *(optional boolean)* — set `true` on findings that exist
+  only for context (e.g. Fehlalarme der Testumgebung, herabgestufte Artefakte):
+  the renderer then replaces the Priorität/Aufwand/Wer badges with a single
+  "Kein Handlungsbedarf"-badge, so badges and text never contradict each other.
 
 Carry `meta.modelId` = the actual model id you are running as — source it from
 the harness/runtime (or the official Anthropic documentation), **never
@@ -105,6 +114,131 @@ not recall Claude/Anthropic model ids, limits, or API values from memory).
 `sampleSize`, `coveragePct`, `siteType` aus `analysis.meta` (do not recompute
 them). Falls `analysis.meta.crawledAt` ausnahmsweise `null` ist, bleibt
 `meta.crawledAt` ebenfalls `null` — ein Datum darf niemals erfunden werden.
+
+---
+
+## 1b. Verständlichkeits-Rubrik — Klartext für Nicht-Techniker (verbindlich)
+
+Der Empfänger des Reports ist ein **nicht-technischer Geschäftsinhaber** (Kunde
+einer SEO-Agentur), nicht ein SEO. Jeder Befund MUSS im deutschen Kunden-Output
+**vier Ebenen** tragen, in Alltagssprache. Diese Rubrik ist so verbindlich wie
+das Schema — aber sie **ergänzt** die Evidenz-Disziplin (§2–§4), sie ersetzt und
+verwässert sie nie: Klarheit heißt nicht Übertreibung und nicht Weglassen von
+Belegen.
+
+### Die vier Ebenen (Feld-Mapping)
+
+1. **PROBLEM in Klartext → `befund` (und `title`).** Was ist kaputt, in Sätzen,
+   die ein Laie versteht. Jeder Fachbegriff wird **vermieden oder beim ersten
+   Auftreten im Nebensatz erklärt**, Muster: *„hreflang — die Auszeichnung, die
+   Google sagt, welche Sprachversion für welches Land gilt"*, *„die robots.txt —
+   die Datei, mit der Ihre Website Suchmaschinen den Zutritt regelt"*. Der
+   Fachbegriff selbst darf (in Klammern/Nebensatz) stehen bleiben — die
+   Umsetzenden brauchen ihn. Jeder Befund ist **selbsterklärend**: Leser springen
+   im Report, verlasse dich nicht auf Erklärungen in anderen Befunden.
+2. **BUSINESS-WIRKUNG → `auswirkung`.** Was es konkret kostet — Sichtbarkeit,
+   Klicks, Anfragen, Umsatzchancen — als **Mechanismus**, nicht als Versprechen
+   (§3 gilt: keine erfundenen Quoten, kein Hype). Bei kleiner oder unsicherer
+   Wirkung ehrlich sagen: *„wahrscheinlich gering, aber schnell behoben"*. Die
+   §3-Klassifikation (Ranking-Signal vs. Eligibility vs. Usability/Trust,
+   „KEIN Ranking-Signal", `quelle`-Framing) bleibt Pflicht — formuliere sie
+   laienverständlich: *„beeinflusst nicht Ihre Google-Position, wohl aber …"*.
+3. **WAS ZU TUN IST + WER → `empfehlung` + `wer`.** Der erste Satz der
+   `empfehlung` ist die **konkrete Handlung** (nie nur „beheben"), danach das
+   Wie/Worauf-achten. Das Feld `wer` benennt, wer es umsetzt:
+   `Entwicklung` (Technik), `Redaktion` (Texte/Inhalte), `Agentur`
+   (SEO-Betreuung) oder eine Kombination. `wer` ist in neuem Output **Pflicht**
+   für jeden Befund (schema-optional nur für Alt-Läufe).
+4. **AUFWAND & PRIORITÄT → aus `ice` abgeleitet, nicht erfunden.** Der Renderer
+   übersetzt deterministisch: `ice.e` → Aufwand (3 = gering/„schnell erledigt",
+   2 = mittel, 1 = groß) und `ice.score` → Priorität (≥ 18 hoch, ≥ 8 mittel,
+   sonst niedrig). Deine Aufgabe ist, die ICE-Anker nach §2 **korrekt** zu
+   setzen — das IST die Aufwands-/Prioritätsaussage. Erfinde keine zweite,
+   freihändige Einstufung im Text.
+
+Die Klartext-Pflicht gilt für `title`, `befund`, `auswirkung`, `empfehlung`,
+`execSummary`, `positives` und `strategy.levers/todos`. Sie gilt **nicht** für
+`beleg` und `evidence` — die bleiben präzise und technisch (exakte URLs, Werte,
+ruleIds), denn sie sind der nachprüfbare Beleg für die Umsetzenden.
+
+### `execSummary` — der 30-Sekunden-Test
+
+Eine nicht-technische Führungsperson muss die Executive Summary in **30
+Sekunden** erfassen können:
+
+- `metrics` — die 3–4 wichtigsten Aussagen in Sichtbarkeits-/Geld-Begriffen,
+  jargonfrei („Ihre Website ist für ChatGPT-Suche unsichtbar" statt
+  „OAI-SearchBot disallowed"). Zahlen nur aus den Artefakten.
+- **Die erste Kachel trägt das teuerste Problem**, nie Methodik-Statistik. Die
+  Crawl-Abdeckung steht bereits im Hero und in `confidence` — sie ist keine
+  Top-Kachel.
+- **Genau eine Zahlenwelt.** Die Summary zählt in einer einzigen Währung: den
+  interpretierten Befunden nach Schweregrad (z. B. „27 Befunde — 4 dringend").
+  Roh-Regel-Treffer, geprüfte Signal-Zahlen, Regelwerk-Versionen und andere
+  Werkzeug-Interna gehören in `confidence`/Fußzeile, nicht in die Summary.
+- `patterns` — die übergreifenden Muster in Alltagssprache, je ein Satz mit
+  Geschäftsfolge. Keine Regel-IDs (`tech:https`), keine Werkzeug-Selbstbeschau
+  („Interpretations-Layer"); Crawl-Artefakte höchstens als ein Klartext-Satz
+  („2 Alarme sind Fehlalarme der Testumgebung — kein Handlungsbedarf").
+- `quickWins` — Muster **Nutzen — Maßnahme — Zuständigkeit**, z. B.
+  *„Wieder in ChatGPT-Suche auffindbar werden: eine Sperrzeile aus der
+  robots.txt entfernen (Entwicklung, wenige Minuten)"*. Keine rohe
+  Konfigurations-Syntax als Handlungsanweisung.
+- Die Top-3-Probleme müssen aus `metrics`/`patterns` hervorgehen, benannt nach
+  ihrer **Geschäftsfolge**, nicht nach ihrem technischen Namen.
+
+### Konkrete Regeln aus dem Laien-Test (verbindlich)
+
+Diese Regeln stammen aus systematischen Laien-Lesetests des Reports:
+
+- **Jargon-Radar.** Diese Begriffe sind nie selbsterklärend und dürfen im
+  Kunden-Text (Rubrik-Felder, s. o.) nicht nackt stehen: GEO, SERP, CTR,
+  E-E-A-T, Crawl-Budget, Link-Equity, Manual Action, Rich Result, Snippet,
+  Canonical, noindex, JSON-LD, Sitemap, robots.txt, llms.txt, SSR/Prerender,
+  HTTP-Statuscodes (410, 200). Beim ersten Auftreten **pro Befund** erklären
+  oder ersetzen („GEO — die Sichtbarkeit in KI-Suchen wie ChatGPT",
+  „Sitemap — das Inhaltsverzeichnis Ihrer Website für Google").
+- **Evidence menschlich formatieren.** Schreibe „10 von 21 Seiten (47,6 %)",
+  nie rohe Feldnamen wie `count=10, pctOfPages=47,6`. Werte bleiben wörtlich
+  aus den Artefakten (§3), nur die Verpackung wird lesbar. Bei gekürzten
+  URL-Listen auf die vollständige Liste verweisen (`affected-urls.csv`).
+- **Querverweise nur auf sichtbare Nummern.** Der Renderer nummeriert Befunde
+  sichtbar als `<sectionNum>.<laufende Nr.>` in Render-Reihenfolge. Verweise
+  („siehe Befund 2.1") müssen auf existierende, so nummerierte Befunde zeigen —
+  zähle nach; tote Verweise sind ein Abschluss-Blocker.
+- **`positives` ohne Regel-ID-Ketten.** Alltagssätze („Alle Seiten haben saubere
+  Überschriften"), höchstens eine kurze Regel-ID-Klammer, keine Aufzählung von
+  einem Dutzend `schema:*`-IDs. Die Nachvollziehbarkeit liefert
+  `analysis.positives` selbst.
+- **`confidence.caveats` zweistufig.** Erst der Klartext-Satz („Wir haben 21
+  von 22 bekannten Seiten geprüft"), dann die technische Präzisierung in
+  Klammern (`coveragePct=95` …). Ehrlichkeit bleibt vollständig — nur die
+  Reihenfolge ist: Mensch zuerst, Maschine in Klammern.
+- **Heuristik-Befunde als Prüfauftrag.** Wenn ein Befund eine Heuristik ist
+  (z. B. Trust-Seiten nicht gefunden), formuliere die `empfehlung` als klaren
+  Prüfauftrag mit Zuständigkeit („Bitte prüfen Sie / prüfen lassen: …") statt
+  als Feststellung mit Rechtsdrohung.
+- **Test-/Artefakt-Kontext einmal zentral.** Wenn der Lauf Umgebungs-Artefakte
+  hat (Testumgebung, localhost), erkläre das **einmal** prominent (erster
+  `confidence.caveats`-Eintrag bzw. eigener Abschnitt) und halte die
+  Einzelbefunde frei von wiederholten Meta-Diskussionen — dort genügt ein
+  kurzer Verweis.
+
+### Ton — beratend, nie belehrend
+
+- Der Empfänger hat die Website evtl. **selbst gebaut**. Formuliere über die
+  Sache, nie über die Person: *„Der Seite fehlt …"*, nicht *„Sie haben …
+  vergessen"*. Kein Dozieren, keine Häme, kein Alarmismus.
+- `positives` würdigt konkret, was gut ist (§5) — das kalibriert den Report weg
+  vom reinen Mängelprotokoll und zeigt, was bei Änderungen zu schützen ist.
+
+### Selbsttest vor Abschluss
+
+Lies jeden Befund einmal als Laie: Weiß ich jetzt (1) was kaputt ist, (2) was
+es mich kostet, (3) was zu tun ist und wer es tut, (4) wie dringend und wie
+aufwendig? Wenn eine Antwort fehlt oder hinter Jargon versteckt ist,
+überarbeite den Befund — **ohne** Evidenz, Provenienz oder Kalibrierung zu
+schwächen.
 
 ---
 
@@ -301,6 +435,16 @@ Translate `analysis.positives[]` (rules that passed) into a short, concrete list
 of strengths (pure strings). This is not filler: it tells the reader
 what to protect during changes and calibrates the tone away from pure
 fault-finding. Do not invent positives that the analysis did not certify.
+
+**Vakuos bestandene Regeln sind keine Existenz-Behauptungen.** Eine Regel, die
+nur deshalb bestand, weil es nichts zu prüfen gab (z. B. hreflang-Regeln auf
+einer Site ganz ohne hreflang, Open-Graph-Vollständigkeit ohne jedes
+OG-Markup), belegt **nicht**, dass das Feature existiert oder „korrekt
+aufgesetzt" ist. Prüfe im Zweifel `crawl.csv`, ob das Feature überhaupt
+vorkommt, und formuliere dann ehrlich: *„keine Fehler gemessen"* bzw. *„die
+Website nutzt kein X — daher auch keine X-Fallen"*, nie *„X ist vorhanden /
+vollständig korrekt"*. Ein Positiv darf zudem nie einem eigenen Befund
+widersprechen (erst gegen `findings[]` gegenlesen, dann loben).
 
 ---
 

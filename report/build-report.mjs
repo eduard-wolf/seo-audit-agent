@@ -72,17 +72,96 @@ const PROV_CLASS = { gemessen: 'gemessen', beobachtet: 'beobachtet', 'geschätzt
 /** Severity → German short rationale shown next to the label (text, not colour-only). */
 const SEV_HINT = { hoch: 'kritisch', mittel: 'relevant', niedrig: 'gering' };
 
+/** Provenance → lay explanation shown next to the tag (Verständlichkeits-Rubrik). */
+const PROV_HINT = {
+  gemessen: 'direkt gemessen',
+  beobachtet: 'aus den Daten abgelesen',
+  'geschätzt': 'fachliche Einschätzung',
+};
+
+/** Category slug → lay label (fixed vocabulary; unknown slugs render escaped as-is). */
+const CAT_LABEL = {
+  geo: 'KI-Sichtbarkeit (GEO)',
+  'tech-index': 'Technik & Indexierung',
+  'structured-data': 'Strukturierte Daten',
+  'on-page': 'Inhalte & Seitentexte',
+  performance: 'Ladezeit & Technik',
+  crawl: 'Erreichbarkeit & Verlinkung',
+  trust: 'Vertrauen & Recht',
+  hygiene: 'Technische Hygiene',
+  i18n: 'Sprachversionen',
+  links: 'Interne Verlinkung',
+  a11y: 'Barrierefreiheit',
+};
+
+/** siteType → lay hint shown in the hero (fixed vocabulary; unknown types get no hint). */
+const SITE_TYPE_HINT = {
+  'server-rendered': 'Seiten kommen fertig vom Server — gut für Suchmaschinen',
+  'client-rendered': 'Inhalte entstehen erst im Browser — riskant für Suchmaschinen',
+};
+
+/**
+ * Format an ISO-ish date string as a German date (DD.MM.YYYY) for the hero.
+ * Pure string transform — no Date object, no clock, stays deterministic.
+ * Non-matching strings render unchanged; the footer keeps the raw value.
+ */
+function formatDateDE(value) {
+  const m = typeof value === 'string' ? value.match(/^(\d{4})-(\d{2})-(\d{2})/) : null;
+  return m ? `${m[3]}.${m[2]}.${m[1]}` : value;
+}
+
+/**
+ * Deterministic lay-language derivations from the ICE anchors — no new numbers,
+ * only a relabelling of values the interpret step already scored (§2 of
+ * skills/interpret.md). Fixed buckets, documented in the report legend:
+ *   Aufwand   ← ice.e     (3 = gering, 2 = mittel, 1 = groß)
+ *   Priorität ← ice.score (≥18 hoch, ≥8 mittel, sonst niedrig)
+ */
+const AUFWAND_LABEL = {
+  3: ['gering', 'schnell erledigt'],
+  2: ['mittel', 'überschaubares Projekt'],
+  1: ['groß', 'größeres Vorhaben'],
+};
+function prioritaetOf(score) {
+  if (score >= 18) return ['hoch', 'zuerst angehen'];
+  if (score >= 8) return ['mittel', 'bald einplanen'];
+  return ['niedrig', 'bei Gelegenheit'];
+}
+
 // ── section renderers ──────────────────────────────────────────────────────────
 
-function renderBadges(f) {
+/**
+ * Lay-facing action badges: Priorität + Aufwand (derived), Wer (optional field).
+ * A finding flagged `keinHandlungsbedarf` renders a single no-action badge
+ * instead — Priorität/Aufwand/Wer would contradict its own "nichts zu tun" text.
+ */
+function renderActionBadges(f) {
+  if (f.keinHandlungsbedarf === true) {
+    return `<p class="badges badges--action">
+        <span class="badge badge--noaction">Kein Handlungsbedarf — dient nur der Einordnung</span>
+      </p>`;
+  }
+  const [prio, prioHint] = prioritaetOf(f.ice.score);
+  const [aufwand, aufwandHint] = AUFWAND_LABEL[f.ice.e] || AUFWAND_LABEL[2];
+  const wer = (typeof f.wer === 'string' && f.wer.trim() !== '')
+    ? `\n        <span class="badge badge--wer">Wer: ${esc(f.wer)}</span>`
+    : '';
+  return `<p class="badges badges--action">
+        <span class="badge badge--prio-${prio}">Priorität: ${prio} — ${prioHint}</span>
+        <span class="badge badge--aufwand">Aufwand: ${aufwand} — ${aufwandHint}</span>${wer}
+      </p>`;
+}
+
+/** Audit-metadata badges: Schweregrad, Provenienz (mit Klartext-Hinweis), ICE, Kategorie. */
+function renderAuditBadges(f) {
   const sev = SEV_CLASS[f.severity] || 'mittel';
   const prov = PROV_CLASS[f.prov] || 'geschaetzt';
   const { i, c, e, score } = f.ice;
-  return `<p class="badges">
+  return `<p class="badges badges--audit">
         <span class="badge badge--sev-${sev}">Schweregrad: ${esc(f.severity)} (${esc(SEV_HINT[f.severity] || '')})</span>
-        <span class="badge badge--prov-${prov}">Provenienz: ${esc(f.prov)}</span>
-        <span class="badge badge--ice"><abbr title="Impact × Confidence × Ease">ICE</abbr> ${esc(i)} × ${esc(c)} × ${esc(e)} = ${esc(score)}</span>
-        <span class="badge badge--cat">Kategorie: ${esc(f.category)}</span>
+        <span class="badge badge--prov-${prov}">Provenienz: ${esc(f.prov)} — ${esc(PROV_HINT[f.prov] || '')}</span>
+        <span class="badge badge--ice"><abbr title="Impact × Confidence × Ease">ICE</abbr> ${esc(i)} × ${esc(c)} × ${esc(e)} = ${esc(score)} (max. 27)</span>
+        <span class="badge badge--cat">Kategorie: ${esc(Object.hasOwn(CAT_LABEL, f.category) ? CAT_LABEL[f.category] : f.category)}</span>
       </p>`;
 }
 
@@ -95,22 +174,27 @@ function renderKbSources(kbSources) {
     return `<li>${parts.join(' · ')}</li>`;
   });
   return `<div class="kb">
-          <p class="kb-label">Wissensbasis-Beleg</p>
+          <p class="kb-label">Quellen dieser Empfehlung</p>
           <ul class="kb-list">${items.join('')}</ul>
         </div>`;
 }
 
-function renderFinding(f) {
+function renderFinding(f, sectionNum, index) {
+  // Lay reading order: Problem → Bedeutung → To-do; the evidence stays fully
+  // visible below (non-negotiable), the artifact pointer (beleg) renders muted.
+  // The visible "num.index" makes cross-references between findings resolvable.
+  const nr = (sectionNum !== undefined && index !== undefined) ? `${esc(sectionNum)}.${esc(index + 1)} ` : '';
   return `<article class="finding finding--sev-${SEV_CLASS[f.severity] || 'mittel'}" id="${esc(f.id)}" aria-labelledby="h-${esc(f.id)}">
-      <h3 id="h-${esc(f.id)}" class="finding-title">${esc(f.title)}</h3>
-      ${renderBadges(f)}
+      <h3 id="h-${esc(f.id)}" class="finding-title">${nr}${esc(f.title)}</h3>
+      ${renderActionBadges(f)}
       <dl class="finding-body">
-        <dt>Befund</dt><dd>${esc(f.befund)}</dd>
-        <dt>Beleg</dt><dd>${esc(f.beleg)}</dd>
-        <dt>Evidenz</dt><dd>${esc(f.evidence)}</dd>
-        <dt>Auswirkung</dt><dd>${esc(f.auswirkung)}</dd>
-        <dt>Empfehlung</dt><dd>${esc(f.empfehlung)}</dd>
+        <dt>Das Problem</dt><dd>${esc(f.befund)}</dd>
+        <dt>Was das für Sie bedeutet</dt><dd>${esc(f.auswirkung)}</dd>
+        <dt>Was zu tun ist</dt><dd>${esc(f.empfehlung)}</dd>
+        <dt>Zahlen &amp; betroffene Seiten</dt><dd>${esc(f.evidence)}</dd>
+        <dt>Datenquelle</dt><dd class="beleg">${esc(f.beleg)}</dd>
       </dl>
+      ${renderAuditBadges(f)}
       ${renderKbSources(f.kbSources)}
     </article>`;
 }
@@ -119,7 +203,7 @@ function renderSection(section) {
   const findings = Array.isArray(section.findings) ? section.findings : [];
   return `<section class="section" id="${esc(section.id)}" aria-labelledby="h-${esc(section.id)}">
       <h2 id="h-${esc(section.id)}" class="section-title">${esc(section.num)}. ${esc(section.title)}</h2>
-      ${findings.map(renderFinding).join('\n      ')}
+      ${findings.map((f, i) => renderFinding(f, section.num, i)).join('\n      ')}
     </section>`;
 }
 
@@ -128,6 +212,7 @@ function renderToc(sections, { hasStrategy } = {}) {
   // section); Strategie only when it has content. Link only what is rendered.
   const items = [
     `<li><a href="#h-exec">Zusammenfassung</a></li>`,
+    `<li><a href="#h-legend">So lesen Sie diesen Report</a></li>`,
     ...sections.map((s) => `<li><a href="#${esc(s.id)}">${esc(s.num)}. ${esc(s.title)}</a></li>`),
     `<li><a href="#h-conf">Konfidenz</a></li>`,
     `<li><a href="#h-pos">Positives</a></li>`,
@@ -193,7 +278,7 @@ function renderExecSummary(es, sevCounts) {
     .map((m) => `<div class="tile">${esc(m)}</div>`)
     .join('');
   return `<section class="exec" aria-labelledby="h-exec">
-      <h2 id="h-exec" class="section-title">Executive Summary</h2>
+      <h2 id="h-exec" class="section-title">Das Wichtigste in Kürze (Executive Summary)</h2>
       <div class="tiles">${tiles}</div>
       ${renderSeverityChart(sevCounts)}
       <div class="cols">
@@ -206,6 +291,33 @@ function renderExecSummary(es, sevCounts) {
           ${ul(es.quickWins, 'wins')}
         </div>
       </div>
+    </section>`;
+}
+
+/**
+ * Static reading guide (Verständlichkeits-Rubrik): explains every badge and
+ * field label of the finding cards in lay language. Pure static markup —
+ * deterministic by construction.
+ */
+function renderLegend() {
+  return `<section class="legend" aria-labelledby="h-legend">
+      <h2 id="h-legend" class="section-title">So lesen Sie diesen Report</h2>
+      <p>Jeder Befund beantwortet vier Fragen: <strong>Was ist das Problem?</strong> ·
+      <strong>Was bedeutet es für Ihr Geschäft?</strong> ·
+      <strong>Was ist zu tun — und wer macht es?</strong> ·
+      <strong>Wie dringend und wie aufwendig ist es?</strong>
+      Unter „Zahlen &amp; betroffene Seiten“ steht der gemessene Beleg zu jedem Befund —
+      keine Empfehlung ohne Beleg. Wo eine Adress-Liste gekürzt ist, liegt die vollständige
+      Liste in der Begleitdatei <code>affected-urls.csv</code> (bekommen Sie zusammen mit
+      diesem Report bzw. von Ihrer Agentur).</p>
+      <dl class="legend-list">
+        <div><dt>Priorität</dt><dd>Empfohlene Reihenfolge, abgeleitet aus der ICE-Bewertung: <strong>hoch</strong> = zuerst angehen, <strong>mittel</strong> = bald einplanen, <strong>niedrig</strong> = bei Gelegenheit.</dd></div>
+        <div><dt>Aufwand</dt><dd>Grobe Größenordnung der Umsetzung: <strong>gering</strong> = schnell erledigt (oft eine einzelne Einstellung), <strong>mittel</strong> = überschaubares Projekt, <strong>groß</strong> = größeres Vorhaben.</dd></div>
+        <div><dt>Wer</dt><dd>Wer die Umsetzung typischerweise übernimmt: <strong>Entwicklung</strong> (Technik/Programmierung), <strong>Redaktion</strong> (Texte/Inhalte) oder <strong>Agentur</strong> (SEO-Betreuung).</dd></div>
+        <div><dt>Schweregrad</dt><dd>Wie ernst das Problem fachlich ist — unabhängig davon, wie leicht es sich beheben lässt.</dd></div>
+        <div><dt>Provenienz</dt><dd>Woher wir es wissen: <em>gemessen</em> = direkt gemessen beim Abruf Ihrer Seiten, <em>beobachtet</em> = aus den Daten abgelesen, <em>geschätzt</em> = fachliche Einschätzung ohne direkte Messung.</dd></div>
+        <div><dt>ICE</dt><dd>Interne Bewertungsformel: Impact × Confidence × Ease (Wirkung × Sicherheit der Aussage × Leichtigkeit der Umsetzung, je 1–3 Punkte). Aus ihr werden Priorität und Aufwand abgeleitet — keine zusätzlich erfundenen Zahlen.</dd></div>
+      </dl>
     </section>`;
 }
 
@@ -238,25 +350,25 @@ function renderConfidence(conf) {
     ? `<p class="warn"><strong>Achtung:</strong> Mindest-Stichprobe nicht erreicht — die Befunde sind indikativ, nicht repräsentativ.</p>`
     : '';
   return `<section class="confidence${warn ? ' confidence--warn' : ''}" aria-labelledby="h-conf">
-      <h2 id="h-conf" class="section-title">Konfidenz &amp; Einschränkungen</h2>
+      <h2 id="h-conf" class="section-title">Konfidenz &amp; Einschränkungen — wie belastbar sind diese Ergebnisse?</h2>
       ${banner}
-      <p class="conf-meta">Stichprobe: ${esc(conf.sampleSize)} Seiten · Mindest-N erfüllt: ${warn ? 'nein' : 'ja'}</p>
+      <p class="conf-meta">Geprüfte Seiten: ${esc(conf.sampleSize)} · genug für belastbare Aussagen: ${warn ? 'nein' : 'ja'}</p>
       ${ul(conf.caveats) || '<p>Keine zusätzlichen Einschränkungen.</p>'}
     </section>`;
 }
 
 function renderHero(meta, host) {
   const coverageStr = (meta.coveragePct == null) ? 'n. v.' : `${esc(meta.coveragePct)} %`;
-  const crawledAtStr = (meta.crawledAt == null || meta.crawledAt === '') ? 'unbekannt' : esc(meta.crawledAt);
+  const crawledAtStr = (meta.crawledAt == null || meta.crawledAt === '') ? 'unbekannt' : esc(formatDateDE(meta.crawledAt));
   return `<header class="hero">
       <p class="eyebrow">SEO-Audit-Report</p>
       <h1>SEO-Audit: ${esc(host)}</h1>
       <dl class="hero-meta">
         <div><dt>Adresse</dt><dd>${esc(meta.url)}</dd></div>
-        <div><dt>Site-Typ</dt><dd>${esc(meta.siteType)}</dd></div>
-        <div><dt>Stichprobe</dt><dd>${esc(meta.sampleSize)} Seiten</dd></div>
-        <div><dt>Abdeckung</dt><dd>${coverageStr}</dd></div>
-        <div><dt>Crawl-Zeitpunkt</dt><dd>${crawledAtStr}</dd></div>
+        <div><dt>Site-Typ</dt><dd>${esc(meta.siteType)}${Object.hasOwn(SITE_TYPE_HINT, meta.siteType) ? ` (${SITE_TYPE_HINT[meta.siteType]})` : ''}</dd></div>
+        <div><dt>Geprüfte Seiten</dt><dd>${esc(meta.sampleSize)}</dd></div>
+        <div><dt>Abdeckung</dt><dd>${coverageStr} der bekannten Seiten</dd></div>
+        <div><dt>Geprüft am (Crawl-Zeitpunkt)</dt><dd>${crawledAtStr}</dd></div>
       </dl>
     </header>`;
 }
@@ -265,9 +377,9 @@ function renderFooter(meta) {
   const crawledAtFooter = (meta.crawledAt == null || meta.crawledAt === '') ? 'unbekannt' : esc(meta.crawledAt);
   return `<footer class="stamp">
       <p class="stamp-line">Erzeugt aus <code>findings.json</code> · Modell <strong>${esc(meta.modelId)}</strong> · Regelwerk <strong>${esc(meta.rulesetVersion)}</strong> · Crawl <strong>${crawledAtFooter}</strong></p>
-      <p class="note">Eingefrorener, repräsentativer Lauf — die LLM-Synthese ist <strong>nicht-deterministisch</strong>. Dieser Report ist eine eingefrorene Momentaufnahme genau dieses Laufs.</p>
+      <p class="note">Eingefrorener, repräsentativer Lauf — die LLM-Synthese ist <strong>nicht-deterministisch</strong>. Dieser Report ist eine eingefrorene Momentaufnahme genau dieses Laufs. Für Leser ohne Technik-Hintergrund: Alle Messwerte stammen aus der automatischen, wiederholbaren Prüfung; nur die Formulierung der Bewertung kann zwischen Läufen variieren.</p>
       <p class="note">Bewusst <code>noindex</code>: der Report kann gegatet gehostet werden und soll nicht in Suchmaschinen erscheinen.</p>
-      <p class="note legend-ice"><abbr title="Impact × Confidence × Ease">ICE</abbr> = Impact × Confidence × Ease — Bewertung je Befund (Wirkung × Konfidenz × Aufwand).</p>
+      <p class="note legend-ice"><abbr title="Impact × Confidence × Ease">ICE</abbr> = Impact × Confidence × Ease — Bewertung je Befund (Wirkung × Sicherheit der Aussage × Leichtigkeit der Umsetzung, je 1–3).</p>
     </footer>`;
 }
 
@@ -326,6 +438,14 @@ const STYLES = `
 
   .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
   .badge { display: inline-block; font-size: .76rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: #f1f3f6; color: var(--ink); }
+  .badges--audit { margin: 14px 0 0; }
+  .badges--audit .badge { font-weight: 600; opacity: .85; }
+  .badge--prio-hoch { background: var(--sev-hoch-bg); border-color: var(--sev-hoch-bd); color: var(--sev-hoch-fg); }
+  .badge--prio-mittel { background: var(--sev-mittel-bg); border-color: var(--sev-mittel-bd); color: var(--sev-mittel-fg); }
+  .badge--prio-niedrig { background: var(--sev-niedrig-bg); border-color: var(--sev-niedrig-bd); color: var(--sev-niedrig-fg); }
+  .badge--aufwand { background: var(--accent-soft); border-color: #d3ddf7; color: var(--accent); }
+  .badge--wer { background: #ecfdf3; border-color: #6cd699; color: #066034; }
+  .badge--noaction { background: #f1f3f6; border-color: var(--line); color: var(--muted); border-style: dashed; }
   .badge--sev-hoch { background: var(--sev-hoch-bg); border-color: var(--sev-hoch-bd); color: var(--sev-hoch-fg); }
   .badge--sev-mittel { background: var(--sev-mittel-bg); border-color: var(--sev-mittel-bd); color: var(--sev-mittel-fg); }
   .badge--sev-niedrig { background: var(--sev-niedrig-bg); border-color: var(--sev-niedrig-bd); color: var(--sev-niedrig-fg); }
@@ -339,6 +459,14 @@ const STYLES = `
   .finding-body dt { font-weight: 700; color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; padding-top: 2px; }
   .finding-body dd { margin: 0; }
   @media (max-width: 560px) { .finding-body { grid-template-columns: 1fr; } .finding-body dt { margin-top: 8px; } }
+
+  .finding-body dd.beleg { color: var(--muted); font-size: .84rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; word-break: break-word; }
+
+  .legend-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; margin: 14px 0 0; }
+  .legend-list div { background: #f7f8fa; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .legend-list dt { font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 4px; }
+  .legend-list dd { margin: 0; font-size: .92rem; }
+  @media (max-width: 640px) { .legend-list { grid-template-columns: 1fr; } }
 
   .kb { margin-top: 14px; padding: 10px 14px; background: #f7f8fa; border: 1px dashed var(--line); border-radius: 8px; }
   .kb-label { margin: 0 0 4px; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
@@ -401,6 +529,7 @@ export function render(findings) {
   // surrounding div, keeping the rendered layout identical.
   const mainContent = `${renderExecSummary(execSummary, sevCounts)}
       ${renderToc(sections, { hasStrategy })}
+      ${renderLegend()}
       ${renderConfidence(confidence)}
       ${sections.map(renderSection).join('\n      ')}
       ${renderPositives(positives)}

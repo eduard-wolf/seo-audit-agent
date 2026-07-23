@@ -104,6 +104,29 @@ A senior memo, roughly:
 Keep these consistent with the memo, then re-run `validateFindings` from
 `lib/findings-schema.mjs` and fix any errors before finishing.
 
+### Verständlichkeits-Rubrik für `levers`/`todos` (verbindlich — Kunden-Output)
+
+`strategy.levers` und `strategy.todos` erscheinen wörtlich im Kunden-Report.
+Es gelten dieselben Regeln wie in `skills/interpret.md` §1b — jedes To-do trägt
+die **vier Ebenen** in einem reinen String (keine Objekte, das Schema erzwingt
+Strings):
+
+- **Muster:** `[Priorität hoch · Aufwand gering · Entwicklung] <konkrete
+  Handlung in Alltagssprache> — <Geschäftsnutzen in einem Halbsatz>.`
+  Beispiel: *„[Priorität hoch · Aufwand gering · Entwicklung] Die Sperre für
+  ChatGPT-Suchcrawler aus der robots.txt entfernen — sonst kann ChatGPT Ihre
+  Website nicht als Quelle nennen."*
+- Priorität/Aufwand im Präfix müssen mit den ICE-Werten der zugehörigen Befunde
+  **konsistent** sein (gleiche Buckets wie der Renderer: `e` 3/2/1 →
+  gering/mittel/groß; `score` ≥ 18/≥ 8/sonst → hoch/mittel/niedrig) — keine
+  freihändige Zweitbewertung.
+- Zuständigkeit aus dem `wer`-Vokabular: `Entwicklung`, `Redaktion`, `Agentur`
+  oder Kombination.
+- Fachbegriffe vermeiden oder im Nebensatz erklären; Ton beratend, nie
+  belehrend; keine versprochenen Kennzahlen (Anti-Overclaim gilt unverändert).
+- `levers` — je Hebel ein jargonfreier Satz, benannt nach dem Geschäftsnutzen,
+  nicht nach der Technik.
+
 ---
 
 ## Definition of done
