@@ -739,6 +739,10 @@ export function printToPdf(chromePath, htmlPath, pdfPath, { timeoutMs = 120_000 
     if (pdfLooksComplete(pdfPath)) {
       return `Chrome beendete sich nicht sauber (${err?.code || err?.status || 'Fehler'}), das PDF wurde aber vollständig geschrieben und wird verwendet.`;
     }
+    // Drop a partial/torso PDF (Chrome killed mid-write) — an incomplete
+    // artifact must never sit next to fresh HTML. Best-effort: a failing
+    // removal must not mask the original Chrome error.
+    try { fs.rmSync(pdfPath, { force: true }); } catch { /* keep original error */ }
     const stderr = err?.stderr ? String(err.stderr).trim() : '';
     throw new Error(`Chrome headless fehlgeschlagen (${chromePath}): ${err?.message || err}${stderr ? `\n${stderr}` : ''}`);
   }

@@ -316,6 +316,24 @@ describe('CLI — Chrome found but failing (stub binary, POSIX)', () => {
     assert.ok(/pdf written:/.test(stderr), 'the salvaged PDF is still reported as written');
   });
 
+  it('a torso PDF (Chrome killed mid-write) is removed — never ships next to fresh HTML', (t) => {
+    if (IS_WINDOWS) return t.skip('Shell-Stub — POSIX only');
+    const fake = writeFakeChrome('chrome-torso', [
+      '#!/bin/sh',
+      'for a in "$@"; do case "$a" in --print-to-pdf=*) out="${a#--print-to-pdf=}";; esac; done',
+      'printf \'%%PDF-1.4\\nabgebrochen-mitten-im-schreiben\' > "$out"',
+      'exit 1',
+      '',
+    ].join('\n'));
+    fs.rmSync(OUT_DIR, { recursive: true, force: true });
+    const { status, stderr } = runCli([FIXTURE, '--chrome', fake]);
+    assert.equal(status, 0, 'degradation, not failure');
+    assert.ok(fs.existsSync(path.join(OUT_DIR, 'index.html')), 'HTML ships');
+    assert.ok(!fs.existsSync(path.join(OUT_DIR, 'report.pdf')),
+      'the incomplete PDF is deleted, not left beside fresh HTML');
+    assert.ok(/WARNUNG: PDF-Erzeugung fehlgeschlagen/.test(stderr), 'failure is loud');
+  });
+
   it('"success" without a written file is a loud degradation, not a silent pass', (t) => {
     if (IS_WINDOWS) return t.skip('Shell-Stub — POSIX only');
     const fake = writeFakeChrome('chrome-liar', '#!/bin/sh\nexit 0\n');
